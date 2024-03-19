@@ -1,0 +1,186 @@
+# import { Composer, Context, InlineKeyboard } from "grammy";
+# import { insertDoc, insertVideo, searchDocFileid, searchVideoFileid } from "../functions/dbFunc.js";
+# import { Menu, MenuRange } from "@grammyjs/menu";
+
+
+# export const botComposer = new Composer<Context>
+
+# botComposer.command("start", (ctx) => {
+#     ctx.reply("Bot made by @N_0_D_E")
+# })
+
+# botComposer.on("msg:document", (ctx) => {
+#     console.log(ctx);
+
+#     const data = {
+#         userid: ctx.msg.from?.id,
+#         first_name: ctx.msg.from?.first_name,
+#         file_id: ctx.msg.document.file_id,
+#         file_name: ctx.msg.document?.file_name,
+#         file_caption: ctx.msg.caption,
+#         file_unique_id: ctx.msg.document.file_unique_id,
+#         file_size: ctx.msg.document.file_size,
+#         mime_type: ctx.msg.document.mime_type
+#     }
+#     insertDoc(data)
+
+# })
+
+# botComposer.on("msg:video", (ctx) => {
+#     console.log(ctx);
+
+#     const data = {
+#         userid: ctx.msg.from?.id,
+#         first_name: ctx.msg.from?.first_name,
+#         file_id: ctx.msg.video.file_id,
+#         file_name: ctx.msg.video?.file_name,
+#         file_caption: ctx.msg.caption,
+#         file_unique_id: ctx.msg.video.file_unique_id,
+#         file_size: ctx.msg.video.file_size,
+#         mime_type: ctx.msg.video.mime_type
+#     }
+#     insertVideo(data)
+
+# })
+
+# botComposer.command('doc', async (ctx) => {
+#     try {
+#         await ctx.reply(`Movies are here.`, { reply_markup: menufordoc, parse_mode: 'HTML' });
+#     } catch (error) {
+#         console.error("Error processing file command:", error);
+#         await ctx.reply("An error occurred while processing your request.");
+#     }
+# });
+
+
+
+# botComposer.command('vid', async (ctx) => {
+#     try {
+#         const data = ctx.from?.id;
+#         const docs = await searchVideoFileid(data);
+
+#         if (docs.length === 0) {
+#             await ctx.reply("No documents found.");
+#             return;
+#         }
+
+#         await Promise.all(docs.map(async (doc) => {
+#             await ctx.replyWithVideo(doc.file_id, {
+#                 caption: doc.file_caption
+#             });
+#         }));
+
+#     } catch (error) {
+#         console.error("Error processing file command:", error);
+#         await ctx.reply("An error occurred while processing your request.");
+#     }
+# });
+
+# ///////////////////////////////////////////////////button/////////////////////////////////////////////
+
+
+# export const menufordoc = new Menu("dynamicDocMenu", { autoAnswer: false});
+# menufordoc
+#     .url("About", "t.me/xn0de").row()
+#     .dynamic(async (ctx, range) => {
+#         // Generate a part of the menu dynamically!
+#         const data = 5502786021;
+#         function bytesToMegabytes(bytes: number) {
+#             return bytes / (1024 * 1024);
+#         }
+#         let page = Number(ctx.match)
+
+#         if (page != 0) {
+#             const docs = await searchDocFileid(data, page);
+#             // Display paginated data
+#             if (docs.length === 0) {
+#                 await ctx.reply("No documents found.");
+#                 return;
+#             }
+#             (docs.map(async (doc) => {
+#                 const file_size = bytesToMegabytes(doc.file_size)
+#                 range
+#                     .text(doc.file_name, async (ctx) => {
+#                         try {
+#                             await ctx.answerCallbackQuery({
+#                                 text: doc.file_name,
+#                                 show_alert: true,
+#                             });
+#                         } catch (error) {
+#                             console.log(error);
+
+#                         }
+#                     })
+#                     .text(file_size.toFixed(1) + 'MB 📩', async (ctx) => {
+#                         try {
+#                             await ctx.replyWithDocument(doc.file_id, {
+#                                 caption: doc.file_caption
+#                             });
+#                         } catch (error) {
+#                             console.log(error);
+
+#                         }
+#                     })
+#                     .row()
+#             }));
+#         } else {
+#             const docs = await searchDocFileid(data, 1);
+#             // Display paginated data
+
+#             if (docs.length === 0) {
+#                 await ctx.reply("No documents found.");
+#                 return;
+#             }
+#             (docs.map(async (doc) => {
+#                 const file_size = bytesToMegabytes(doc.file_size)
+#                 range
+#                     .text(doc.file_name, async (ctx) => {
+#                         try {
+#                             await ctx.answerCallbackQuery({
+#                                 text: doc.file_name,
+#                                 show_alert: true,
+#                             });
+#                         } catch (error) {
+#                             console.log(error);
+
+#                         }
+#                     })
+#                     .text(file_size.toFixed(1) + 'MB 📩', async (ctx) => {
+#                         try {
+#                             await ctx.replyWithDocument(doc.file_id, {
+#                                 caption: doc.file_caption
+#                             });
+#                         } catch (error) {
+#                             console.log(error);
+
+#                         }
+#                     })
+#                     .row()
+#             }));
+#         }
+#     })
+#     .row()
+#     .dynamic((ctx, range) => {
+#         try {
+#             function generatePayloadPrev() {
+#                 let page = Number(ctx.match) - 1
+#                 return page.toString()
+#             }
+#             function generatePayloadNext() {
+#                 let page = 1
+#                 page = Number(ctx.match) + 1
+#                 return page.toString()
+#             }
+#             range.text({ text: "Prev", payload: generatePayloadPrev }, (ctx) => {
+#                 ctx.menu.update({immediate:true})
+#             })
+#                 .text({ text: "Next", payload: generatePayloadNext }, (ctx) => {
+#                     ctx.menu.update({immediate:true})
+#                 })
+#         } catch (error) {
+#             console.log(error);
+#         }
+#     }).row()
+#     .text("Cancel", (ctx) => ctx.deleteMessage());
+
+

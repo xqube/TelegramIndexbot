@@ -1,0 +1,23 @@
+{
+  "name": "movie_tgbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/bot.js",
+  "type": "module",
+  "scripts": {
+    "dev": "DEBUG=* nodemon bot.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grammyjs/menu": "^1.2.1",
+    "dotenv": "^16.4.5",
+    "grammy": "^1.21.1",
+    "mongodb": "^6.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.28",
+    "nodemon": "^3.1.0",
+    "typescript": "^5.4.2"
+  }
+}
