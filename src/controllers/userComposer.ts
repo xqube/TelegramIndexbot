@@ -19,7 +19,7 @@ botComposer.on("callback_query:data", async (ctx: any) => {
         const thread_id_nav = Number(data[2])
 
         /////below code is for the file name button click
-        const file_thread_id = Number(data[3])  //need this line for getting the file in the same thread id or checking the the req from if its from a specific thread id
+        const file_thread_id = Number(data[2])  //need this line for getting the file in the same thread id or checking the the req from if its from a specific thread id
         const file_unique_id = data[1]
 
         if (calladatafile) {
