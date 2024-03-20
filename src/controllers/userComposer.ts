@@ -60,8 +60,6 @@ botComposer.on("callback_query:data", async (ctx: any) => {
             }
         }
 
-
-
         if (ctx.update.callback_query.message.entities[0].user.id == ctx.from.id) { //checks if the same user is clicking the button
             //get next page
             if (calladatanext) {
@@ -120,7 +118,7 @@ botComposer.chatType("private").command("start", async (ctx) => {
                     await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_name })
                 }
             }
-        } else ctx.reply("Bot made by @xn0de")
+        } else ctx.reply("Hi, send me Documents, videos and audios")
     } catch (error) {
 
     }

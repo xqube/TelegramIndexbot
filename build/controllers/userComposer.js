@@ -118,7 +118,7 @@ botComposer.chatType("private").command("start", async (ctx) => {
             }
         }
         else
-            ctx.reply("Bot made by @xn0de");
+            ctx.reply("Hi, send me Documents, videos and audios");
     }
     catch (error) {
     }
