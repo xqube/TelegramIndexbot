@@ -5,7 +5,8 @@
   "main": "build/bot.js",
   "type": "module",
   "scripts": {
-    "dev": "DEBUG=* nodemon bot.js"
+    "dev": "DEBUG=* nodemon bot.js",
+    "start":"node bot.js"
   },
   "author": "",
   "license": "ISC",
