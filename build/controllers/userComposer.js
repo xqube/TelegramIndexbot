@@ -16,10 +16,15 @@ botComposer.on("callback_query:data", async (ctx) => {
         const file_unique_id = data[0];
         if (file_thread_id.toString() == process.env.DOC_THREAD_ID) {
             const { filteredDocs } = await search_document_file_id(file_unique_id);
-            await ctx.answerCallbackQuery({
-                text: `${filteredDocs.file_name}`,
-                show_alert: true,
-            });
+            try {
+                await ctx.answerCallbackQuery({
+                    text: `${filteredDocs.file_name}`,
+                    show_alert: true,
+                });
+            }
+            catch (error) {
+                console.log("error at answercallbacjquery");
+            }
             // if (filteredDocs.file_caption) {
             //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
             // } else {
