@@ -23,7 +23,7 @@ botComposer.on("callback_query:data", async (ctx) => {
                 });
             }
             catch (error) {
-                console.log("error at answercallbacjquery");
+                console.log("error at answerCallbackQuery in callback_query:data at userComposer", error.message);
             }
             // if (filteredDocs.file_caption) {
             //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
@@ -33,10 +33,15 @@ botComposer.on("callback_query:data", async (ctx) => {
         }
         else if (file_thread_id.toString() == process.env.VIDEO_THREAD_ID) {
             const { filteredDocs } = await search_video_file_id(file_unique_id);
-            await ctx.answerCallbackQuery({
-                text: `${filteredDocs.file_name}`,
-                show_alert: true,
-            });
+            try {
+                await ctx.answerCallbackQuery({
+                    text: `${filteredDocs.file_name}`,
+                    show_alert: true,
+                });
+            }
+            catch (error) {
+                console.log("error at answerCallbackQuery in callback_query:data at userComposer", error.message);
+            }
             // if (filteredDocs.file_caption) {
             //     await ctx.replyWithVideo(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
             // } else {
@@ -45,10 +50,15 @@ botComposer.on("callback_query:data", async (ctx) => {
         }
         else if (file_thread_id.toString() == process.env.AUDIO_THREAD_ID) {
             const { filteredDocs } = await search_audio_file_id(file_unique_id);
-            await ctx.answerCallbackQuery({
-                text: `${filteredDocs.file_name}`,
-                show_alert: true,
-            });
+            try {
+                await ctx.answerCallbackQuery({
+                    text: `${filteredDocs.file_name}`,
+                    show_alert: true,
+                });
+            }
+            catch (error) {
+                console.log("error at answerCallbackQuery in callback_query:data at userComposer", error.message);
+            }
             // if (filteredDocs.file_caption) {
             //     await ctx.replyWithVideo(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
             // } else {
