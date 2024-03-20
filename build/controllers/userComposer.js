@@ -13,7 +13,8 @@ botComposer.on("callback_query:data", async (ctx) => {
         const searchTerm = extractSearchTerm(messageText);
         const data = calldata.split('__');
         ///below code is for nav button click
-        const thread_id_nav = Number(data[2]);
+        // const thread_id_nav = Number(data[2])
+        const thread_id_nav = 0;
         /////below code is for the file name button click
         const file_thread_id = Number(data[3]);
         const file_unique_id = data[1];
