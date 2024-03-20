@@ -11,8 +11,14 @@ export async function mongoconnect() {
     console.log('Connected successfully to server');
     const db = mongoclient.db("tgindex");
     const DocumentCollection = db.collection('documents');
-    const VideoCollection = db.collection('Video');
+    const VideoCollection = db.collection('videos');
+    const AudioCollection = db.collection('audios');
+    const UserCollection = db.collection('users');
 
+    await DocumentCollection.createIndex({ file_unique_id: 1 }, { unique: true });
+    await VideoCollection.createIndex({ file_unique_id: 1 }, { unique: true });
+    await AudioCollection.createIndex({ file_unique_id: 1 }, { unique: true });
+    await UserCollection.createIndex({ id: 1 }, { unique: true });
 
-    return {DocumentCollection, VideoCollection}
+    return { DocumentCollection, VideoCollection, AudioCollection, UserCollection }
 }

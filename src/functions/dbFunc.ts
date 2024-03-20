@@ -1,38 +1,90 @@
 import { mongoconnect } from "../db/dbConfig.js";
 
-interface filteredDocs {
-    video_id: string
-}
 
-const { DocumentCollection, VideoCollection } = await mongoconnect()
+const { DocumentCollection, VideoCollection, AudioCollection, UserCollection } = await mongoconnect()
 
 
-
-export async function insertDoc(data: object) {
-    const insertResult = await DocumentCollection.insertOne(data);
-    if (insertResult) {
-        return insertResult
+export async function insert_document(data: object) {
+    try {
+        const insertResult = await DocumentCollection.insertOne(data);
+        if (insertResult) {
+            return insertResult
+        }
+    } catch (error: any) {
+        if (error.code === 11000 && error.keyPattern.file_unique_id) {
+            console.log("Duplicate file_unique_id detected. Skipping insertion.");
+        } else {
+            // Handle other types of errors
+            console.error("Error inserting document:", error);
+        }
     }
 }
 
-export async function insertVideo(data: object) {
-    const insertResult = await VideoCollection.insertOne(data);
-    if (insertResult) {
-        return insertResult
+export async function insert_video(data: object) {
+    try {
+        const insertResult = await VideoCollection.insertOne(data);
+        if (insertResult) {
+            return insertResult
+        }
+    } catch (error: any) {
+        if (error.code === 11000 && error.keyPattern.file_unique_id) {
+            console.log("Duplicate file_unique_id detected. Skipping insertion.");
+        } else {
+            // Handle other types of errors
+            console.error("Error inserting document:", error);
+        }
+    }
+}
+
+export async function insert_audio(data: object) {
+    try {
+        const insertResult = await AudioCollection.insertOne(data);
+        if (insertResult) {
+            return insertResult
+        }
+    } catch (error: any) {
+        if (error.code === 11000 && error.keyPattern.file_unique_id) {
+            console.log("Duplicate file_unique_id detected. Skipping insertion.");
+        } else {
+            // Handle other types of errors
+            console.error("Error inserting document:", error);
+        }
     }
 }
 
 
-export async function searchDoc(searchTerm:string, page: number): Promise<{ filteredDocs: any[], totalsize: number }> {
+export async function insert_user(data: object) {
+    try {
+        const insertResult = await UserCollection.insertOne(data);
+        if (insertResult) {
+            return insertResult
+        }
+    } catch (error: any) {
+        if (error.code === 11000 && error.keyPattern.id) {
+            console.log("Duplicate file_unique_id detected. Skipping insertion.");
+        } else {
+            // Handle other types of errors
+            console.error("Error inserting document:", error);
+        }
+    }
+}
+
+
+
+
+export async function search_document(searchTerms: string, page: number): Promise<{ filteredDocs: any[], totalsize: number }> {
     try {
         const skip = (page - 1) * 10;
+        // Split the search terms into individual words
+        const searchWords = searchTerms.trim().split(/\s+/);
+        // Construct an array of regex patterns, one for each search word
+        const regexPatterns = searchWords.map(word => new RegExp(`\\b${word}\\b`, "i"));
+        // Combine the regex patterns using the OR operator
+        const combinedRegex = { $and: regexPatterns.map(pattern => ({ file_name: pattern })) };
         // Count filtered documents
-        const totalsize = await DocumentCollection.countDocuments({ file_name: { $regex: new RegExp(`\\b${searchTerm}\\b`, "i") } });
-
+        const totalsize = await DocumentCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
-        const filteredDocs = await DocumentCollection.find({ file_name: { $regex: new RegExp(`\\b${searchTerm}\\b`, "i") } }).skip(skip).limit(10).toArray();
-        
-        
+        const filteredDocs = await DocumentCollection.find(combinedRegex).skip(skip).limit(10).toArray();
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
     } catch (error) {
@@ -43,15 +95,19 @@ export async function searchDoc(searchTerm:string, page: number): Promise<{ filt
 
 
 
-export async function searchVid(searchTerm:string, page: number): Promise<{ filteredDocs: any[], totalsize: number }> {
+export async function search_video(searchTerms: string, page: number): Promise<{ filteredDocs: any[], totalsize: number }> {
     try {
         const skip = (page - 1) * 10;
+        // Split the search terms into individual words
+        const searchWords = searchTerms.trim().split(/\s+/);
+        // Construct an array of regex patterns, one for each search word
+        const regexPatterns = searchWords.map(word => new RegExp(`\\b${word}\\b`, "i"));
+        // Combine the regex patterns using the OR operator
+        const combinedRegex = { $and: regexPatterns.map(pattern => ({ file_name: pattern })) };
         // Count filtered documents
-        const totalsize = await VideoCollection.countDocuments({ file_name: { $regex: new RegExp(`\\b${searchTerm}\\b`, "i") } });
-
+        const totalsize = await VideoCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
-        const filteredDocs = await VideoCollection.find({ file_name: { $regex: new RegExp(`\\b${searchTerm}\\b`, "i") } }).skip(skip).limit(10).toArray();
-        
+        const filteredDocs = await VideoCollection.find(combinedRegex).skip(skip).limit(10).toArray();
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
     } catch (error) {
@@ -61,25 +117,54 @@ export async function searchVid(searchTerm:string, page: number): Promise<{ filt
 }
 
 
-
-export async function searchDocFileid(data: any): Promise<any | null> {
-
+export async function search_audio(searchTerms: string, page: number): Promise<{ filteredDocs: any[], totalsize: number }> {
     try {
-        const filteredDocs = await DocumentCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, _id: 0 } });
-        return {filteredDocs};
+        const skip = (page - 1) * 10;
+        // Split the search terms into individual words
+        const searchWords = searchTerms.trim().split(/\s+/);
+        // Construct an array of regex patterns, one for each search word
+        const regexPatterns = searchWords.map(word => new RegExp(`\\b${word}\\b`, "i"));
+        // Combine the regex patterns using the OR operator
+        const combinedRegex = { $and: regexPatterns.map(pattern => ({ file_name: pattern })) };
+        // Count filtered documents
+        const totalsize = await AudioCollection.countDocuments(combinedRegex);
+
+        // Fetch filtered documents for the specified page
+        const filteredDocs = await AudioCollection.find(combinedRegex).skip(skip).limit(10).toArray();
+
+        // Return an object containing both filtered documents and total size
+        return { filteredDocs, totalsize };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+
+export async function search_document_file_id(data: any): Promise<any | null> {
+    try {
+        const filteredDocs = await DocumentCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
+        return { filteredDocs };
     } catch (error) {
         console.log(error);
     }
-
 }
 
-export async function searchVidFileid(data: any): Promise<any | null> {
-
+export async function search_video_file_id(data: any): Promise<any | null> {
     try {
-        const filteredDocs = await VideoCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, _id: 0 } });
-        return {filteredDocs};
+        const filteredDocs = await VideoCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
+        return { filteredDocs };
     } catch (error) {
         console.log(error);
     }
-
 }
+
+export async function search_audio_file_id(data: any): Promise<any | null> {
+    try {
+        const filteredDocs = await AudioCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
+        return { filteredDocs };
+    } catch (error) {
+        console.log(error);
+    }
+}
+
