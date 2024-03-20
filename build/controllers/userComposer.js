@@ -65,7 +65,7 @@ botComposer.on("callback_query:data", async (ctx) => {
         }
     }
     catch (error) {
-        console.log(error.message);
+        console.log("Error in callback_query:data at UserComposer", error.message);
     }
 });
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -69,7 +69,7 @@ botComposer.on("callback_query:data", async (ctx: any) => {
             await ctx.editMessageText(`Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: thread_id_nav });
         }
     } catch (error: any) {
-        console.log(error.message);
+        console.log("Error in callback_query:data at UserComposer",error.message);
     }
 
 })

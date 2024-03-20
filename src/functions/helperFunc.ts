@@ -3,6 +3,7 @@ import { search_audio, search_document, search_video } from "./dbFunc.js";
 
 
 export async function keyboardlist(ctx: any, page: number, searchTerm: string, threadid: number | undefined) {
+   try {
     const inlineKeyboard = new InlineKeyboard()
     if (threadid == process.env.DOC_THREAD_ID) {
         const { filteredDocs, totalsize } = await search_document(searchTerm, page);
@@ -82,6 +83,10 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
         }
     }
     return inlineKeyboard
+   } catch (error:any) {
+    console.log("Error at keyboardlist in helperFunc.ts",error.message);
+    
+   }
 }
 
 

@@ -85,8 +85,8 @@ export async function search_document(searchTerms, page) {
         return { filteredDocs, totalsize };
     }
     catch (error) {
-        console.error(error);
-        throw error;
+        console.error("Error in search_document at dbFunc.ts", error.message);
+        throw (error);
     }
 }
 export async function search_video(searchTerms, page) {
@@ -106,8 +106,8 @@ export async function search_video(searchTerms, page) {
         return { filteredDocs, totalsize };
     }
     catch (error) {
-        console.error(error);
-        throw error;
+        console.error("Error in search_video at dbFunc.ts", error.message);
+        throw (error);
     }
 }
 export async function search_audio(searchTerms, page) {
@@ -127,8 +127,8 @@ export async function search_audio(searchTerms, page) {
         return { filteredDocs, totalsize };
     }
     catch (error) {
-        console.error(error);
-        throw error;
+        console.error("Error in search_audio at dbFunc.ts", error.message);
+        throw (error);
     }
 }
 export async function search_document_file_id(data) {

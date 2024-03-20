@@ -87,9 +87,9 @@ export async function search_document(searchTerms: string, page: number): Promis
         const filteredDocs = await DocumentCollection.find(combinedRegex).skip(skip).limit(10).toArray();
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
-    } catch (error) {
-        console.error(error);
-        throw error;
+    } catch (error: any) {
+        console.error("Error in search_document at dbFunc.ts", error.message);
+        throw (error)
     }
 }
 
@@ -110,9 +110,9 @@ export async function search_video(searchTerms: string, page: number): Promise<{
         const filteredDocs = await VideoCollection.find(combinedRegex).skip(skip).limit(10).toArray();
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
-    } catch (error) {
-        console.error(error);
-        throw error;
+    } catch (error: any) {
+        console.error("Error in search_video at dbFunc.ts", error.message);
+        throw (error)
     }
 }
 
@@ -134,9 +134,9 @@ export async function search_audio(searchTerms: string, page: number): Promise<{
 
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
-    } catch (error) {
-        console.error(error);
-        throw error;
+    } catch (error: any) {
+        console.error("Error in search_audio at dbFunc.ts", error.message);
+        throw (error)
     }
 }
 
