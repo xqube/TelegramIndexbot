@@ -21,6 +21,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
                     .row()
             }));
         }
+        
         if (page == 1 && page < totalPages) {
             inlineKeyboard
                 .text("Next>>", `^next__${page}__${threadid}`).row()
@@ -94,12 +95,7 @@ export function bytesToMegabytes(bytes: number) {
     return bytes / (1024 * 1024);
 }
 
-export function hasAlphanumericAndSpaces(text: any): boolean {
-    // Define a regular expression pattern to match all characters that are alphanumeric, '-', '_', '[', ']', '.', or a space
-    const pattern = /^[a-zA-Z0-9\s\-_\[\].]*$/;
-    // Test if the string matches the pattern
-    return pattern.test(text);
-}
+
 
 export function cleanFileName(fileName: any): string {
     // Define a regular expression pattern to match characters to be removed

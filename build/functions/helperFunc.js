@@ -99,12 +99,6 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
 export function bytesToMegabytes(bytes) {
     return bytes / (1024 * 1024);
 }
-export function hasAlphanumericAndSpaces(text) {
-    // Define a regular expression pattern to match all characters that are alphanumeric, '-', '_', '[', ']', '.', or a space
-    const pattern = /^[a-zA-Z0-9\s\-_\[\].]*$/;
-    // Test if the string matches the pattern
-    return pattern.test(text);
-}
 export function cleanFileName(fileName) {
     // Define a regular expression pattern to match characters to be removed
     const pattern = /[^a-zA-Z0-9\s]+/g;

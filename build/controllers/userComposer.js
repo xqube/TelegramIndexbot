@@ -15,7 +15,7 @@ botComposer.on("callback_query:data", async (ctx) => {
         ///below code is for nav button click
         const thread_id_nav = Number(data[2]);
         /////below code is for the file name button click
-        const file_thread_id = Number(data[2]); //need this line for getting the file in the same thread id or checking the the req from if its from a specific thread id
+        const file_thread_id = Number(data[2]); //checking the the req from if its from a specific thread id
         const file_unique_id = data[1];
         if (calladatafile) {
             if (file_thread_id.toString() == process.env.DOC_THREAD_ID) {
@@ -55,18 +55,27 @@ botComposer.on("callback_query:data", async (ctx) => {
                 // }
             }
         }
-        //get next page
-        if (calladatanext) {
-            const page = Number(data[1]);
-            const nextpage = page + 1;
-            const inlineKeyboard = await keyboardlist(ctx, nextpage, searchTerm, thread_id_nav);
-            await ctx.editMessageText(`Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: thread_id_nav });
+        if (ctx.update.callback_query.message.entities[0].user.id == ctx.from.id) { //checks if the same user is clicking the button
+            //get next page
+            if (calladatanext) {
+                const page = Number(data[1]);
+                const nextpage = page + 1;
+                const inlineKeyboard = await keyboardlist(ctx, nextpage, searchTerm, thread_id_nav);
+                await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: thread_id_nav });
+            }
+            //get prev page
+            if (calladataprev) {
+                const page = Number(data[1]);
+                const prevpage = page - 1;
+                const inlineKeyboard = await keyboardlist(ctx, prevpage, searchTerm, thread_id_nav);
+                await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: thread_id_nav });
+            }
         }
-        if (calladataprev) {
-            const page = Number(data[1]);
-            const prevpage = page - 1;
-            const inlineKeyboard = await keyboardlist(ctx, prevpage, searchTerm, thread_id_nav);
-            await ctx.editMessageText(`Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: thread_id_nav });
+        else {
+            await ctx.answerCallbackQuery({
+                text: "Request for yourself 😊",
+                show_alert: true,
+            });
         }
     }
     catch (error) {
@@ -166,18 +175,19 @@ botComposer.chatType("private").on(":file", async (ctx) => {
     }
 });
 botComposer.on(":text", async (ctx) => {
+    var _a, _b, _c, _d, _e, _f;
     try {
         const searchparam = ctx.msg.text;
         const inlineKeyboard = await keyboardlist(ctx, 1, searchparam, ctx.msg.message_thread_id);
         if (inlineKeyboard) {
             if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-                await ctx.reply(`Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.DOC_THREAD_ID });
+                await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.DOC_THREAD_ID });
             }
             else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-                await ctx.reply(`Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.VIDEO_THREAD_ID });
+                await ctx.reply(`Hey <a href="tg://user?id=${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id}">${(_d = ctx.from) === null || _d === void 0 ? void 0 : _d.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.VIDEO_THREAD_ID });
             }
             else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-                await ctx.reply(`Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.AUDIO_THREAD_ID });
+                await ctx.reply(`Hey <a href="tg://user?id=${(_e = ctx.from) === null || _e === void 0 ? void 0 : _e.id}">${(_f = ctx.from) === null || _f === void 0 ? void 0 : _f.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.AUDIO_THREAD_ID });
             }
         }
         if (ctx.from) {

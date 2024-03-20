@@ -16,8 +16,14 @@ export async function mongoconnect() {
     const UserCollection = db.collection('users');
 
     await DocumentCollection.createIndex({ file_unique_id: 1 }, { unique: true });
+    await DocumentCollection.createIndex({ file_name: 1});
+
     await VideoCollection.createIndex({ file_unique_id: 1 }, { unique: true });
+    await VideoCollection.createIndex({ file_name: 1});
+
     await AudioCollection.createIndex({ file_unique_id: 1 }, { unique: true });
+    await AudioCollection.createIndex({ file_name: 1});
+
     await UserCollection.createIndex({ id: 1 }, { unique: true });
 
     return { DocumentCollection, VideoCollection, AudioCollection, UserCollection }
