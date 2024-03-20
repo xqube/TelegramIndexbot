@@ -15,7 +15,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                 (filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text("hello", `${doc.file_unique_id}__${threadid}`) //changed it to __ coz fileid can have an underscore
+                        .text(doc.file_name, `${doc.file_unique_id}__${threadid}`) //changed it to __ coz fileid can have an underscore
                         .url(file_size.toFixed(1) + 'MB 📩', `https://t.me/${process.env.BOT_USERNAME}?start=doc__${doc.file_unique_id}`)
                         .row();
                 }));
@@ -29,7 +29,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                     .text("Next>>", `^next__${page}__${threadid}`).row();
             }
             else if (page == totalPages && page != 1) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`);
+                inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`).row();
             }
         }
         else if (threadid == process.env.VIDEO_THREAD_ID) {
