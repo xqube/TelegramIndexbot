@@ -12,7 +12,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
             await ctx.reply("No documents found.", { message_thread_id: threadid });
             return;
         } else {
-            (filteredDocs.map((doc: any) => {
+            (filteredDocs.map(async (doc: any) => {
                 const file_size = bytesToMegabytes(doc.file_size)
                 inlineKeyboard
                     .text(doc?.file_name, `${doc.file_unique_id}__${threadid}`) //changed it to __ coz fileid can have an underscore
@@ -38,7 +38,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
             await ctx.reply("No documents found.", { message_thread_id: threadid });
             return;
         } else {
-            (filteredDocs.map((doc: any) => {
+            (filteredDocs.map(async (doc: any) => {
                 const file_size = bytesToMegabytes(doc.file_size)
                 inlineKeyboard
                     .text(doc.file_name, `${doc.file_unique_id}__${threadid}`)
@@ -63,7 +63,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
             await ctx.reply("No documents found.", { message_thread_id: threadid });
             return;
         } else {
-            (filteredDocs.map((doc: any) => {
+            (filteredDocs.map(async (doc: any) => {
                 const file_size = bytesToMegabytes(doc.file_size)
                 inlineKeyboard
                     .text(doc.file_name, `${doc.file_unique_id}__${threadid}`)
