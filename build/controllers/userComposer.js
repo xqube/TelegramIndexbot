@@ -8,13 +8,16 @@ botComposer.on("callback_query:data", async (ctx) => {
         const calldata = ctx.update.callback_query.data;
         const calladatanext = calldata.match(/\^next/);
         const calladataprev = calldata.match(/\^prev/);
+        const calladatafile = calldata.match(/file/);
         const messageText = (_a = ctx.update.callback_query.message) === null || _a === void 0 ? void 0 : _a.text;
         const searchTerm = extractSearchTerm(messageText);
         const data = calldata.split('__');
+        ///below code is for nav button click
         const thread_id_nav = Number(data[2]);
-        const file_thread_id = Number(data[1]);
-        const file_unique_id = data[0];
-        if (file_unique_id) {
+        /////below code is for the file name button click
+        const file_thread_id = Number(data[3]);
+        const file_unique_id = data[1];
+        if (calladatafile) {
             if (file_thread_id.toString() == process.env.DOC_THREAD_ID) {
                 const { filteredDocs } = await search_document_file_id(file_unique_id);
                 await ctx.answerCallbackQuery({

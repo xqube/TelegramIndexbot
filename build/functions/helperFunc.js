@@ -15,7 +15,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                 (filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text(doc.file_name, `${doc.file_unique_id}__${threadid}`) //changed it to __ coz fileid can have an underscore
+                        .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`) //changed it to __ coz fileid can have an underscore
                         .url(file_size.toFixed(1) + 'MB 📩', `https://t.me/${process.env.BOT_USERNAME}?start=doc__${doc.file_unique_id}`)
                         .row();
                 }));
@@ -44,7 +44,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                 (filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text(doc.file_name, `${doc.file_unique_id}__${threadid}`)
+                        .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`)
                         .url(file_size.toFixed(1) + 'MB 📩', `https://t.me/${process.env.BOT_USERNAME}?start=vid__${doc.file_unique_id}`)
                         .row();
                 }));
@@ -73,7 +73,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                 (filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text(doc.file_name, `${doc.file_unique_id}__${threadid}`)
+                        .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`)
                         .url(file_size.toFixed(1) + 'MB 📩', `https://t.me/${process.env.BOT_USERNAME}?start=aud__${doc.file_unique_id}`)
                         .row();
                 }));
