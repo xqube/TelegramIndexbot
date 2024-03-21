@@ -5,11 +5,15 @@ import { mongoclient, mongoconnect } from "./db/dbConfig.js";
 import { ownerComposer } from "./controllers/ownerComposer.js";
 import { autoRetry } from "@grammyjs/auto-retry";
 const bot = new Bot(process.env.TOKEN);
-mongoconnect()
-    .then(() => {
-    console.log("Connected mongodb");
-})
-    .catch(console.error);
+try {
+    mongoconnect()
+        .then(() => {
+        console.log("Connected mongodb");
+    });
+}
+catch (error) {
+    console.log("hey rror", error.message);
+}
 bot.api.config.use(autoRetry());
 bot.use(ownerComposer);
 bot.use(botComposer);

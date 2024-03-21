@@ -12,15 +12,20 @@ type MyContext = Context
 
 const bot = new Bot<MyContext>(process.env.TOKEN!);
 
-mongoconnect()
+try {
+    mongoconnect()
     .then(() => {
         console.log("Connected mongodb");
 
     })
-    .catch(console.error)
+} catch (error:any) {
+    console.log("hey rror",error.message);
+    
+}
+
+
 
 bot.api.config.use(autoRetry());
-
 bot.use(ownerComposer)
 bot.use(botComposer)
 

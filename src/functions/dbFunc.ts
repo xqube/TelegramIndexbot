@@ -1,12 +1,13 @@
 import { mongoconnect } from "../db/dbConfig.js";
 
 
-const { DocumentCollection, VideoCollection, AudioCollection, UserCollection } = await mongoconnect()
+// const { DocumentCollection, VideoCollection, AudioCollection, UserCollection } = await mongoconnect()
+const db = await mongoconnect()
 
 
 export async function insert_document(data: object) {
     try {
-        const insertResult = await DocumentCollection.insertOne(data);
+        const insertResult = await db.DocumentCollection.insertOne(data);
         if (insertResult) {
             return insertResult
         }
@@ -22,7 +23,7 @@ export async function insert_document(data: object) {
 
 export async function insert_video(data: object) {
     try {
-        const insertResult = await VideoCollection.insertOne(data);
+        const insertResult = await db.VideoCollection.insertOne(data);
         if (insertResult) {
             return insertResult
         }
@@ -38,7 +39,7 @@ export async function insert_video(data: object) {
 
 export async function insert_audio(data: object) {
     try {
-        const insertResult = await AudioCollection.insertOne(data);
+        const insertResult = await db.AudioCollection.insertOne(data);
         if (insertResult) {
             return insertResult
         }
@@ -55,7 +56,7 @@ export async function insert_audio(data: object) {
 
 export async function insert_user(data: object) {
     try {
-        const insertResult = await UserCollection.insertOne(data);
+        const insertResult = await db.UserCollection.insertOne(data);
         if (insertResult) {
             return insertResult
         }
@@ -82,9 +83,9 @@ export async function search_document(searchTerms: string, page: number): Promis
         // Combine the regex patterns using the OR operator
         const combinedRegex = { $and: regexPatterns.map(pattern => ({ file_name: pattern })) };
         // Count filtered documents
-        const totalsize = await DocumentCollection.countDocuments(combinedRegex);
+        const totalsize = await db.DocumentCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
-        const filteredDocs = await DocumentCollection.find(combinedRegex).skip(skip).limit(10).toArray();
+        const filteredDocs = await db.DocumentCollection.find(combinedRegex).skip(skip).limit(10).toArray();
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
     } catch (error: any) {
@@ -105,9 +106,9 @@ export async function search_video(searchTerms: string, page: number): Promise<{
         // Combine the regex patterns using the OR operator
         const combinedRegex = { $and: regexPatterns.map(pattern => ({ file_name: pattern })) };
         // Count filtered documents
-        const totalsize = await VideoCollection.countDocuments(combinedRegex);
+        const totalsize = await db.VideoCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
-        const filteredDocs = await VideoCollection.find(combinedRegex).skip(skip).limit(10).toArray();
+        const filteredDocs = await db.VideoCollection.find(combinedRegex).skip(skip).limit(10).toArray();
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
     } catch (error: any) {
@@ -127,10 +128,10 @@ export async function search_audio(searchTerms: string, page: number): Promise<{
         // Combine the regex patterns using the OR operator
         const combinedRegex = { $and: regexPatterns.map(pattern => ({ file_name: pattern })) };
         // Count filtered documents
-        const totalsize = await AudioCollection.countDocuments(combinedRegex);
+        const totalsize = await db.AudioCollection.countDocuments(combinedRegex);
 
         // Fetch filtered documents for the specified page
-        const filteredDocs = await AudioCollection.find(combinedRegex).skip(skip).limit(10).toArray();
+        const filteredDocs = await db.AudioCollection.find(combinedRegex).skip(skip).limit(10).toArray();
 
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
@@ -143,7 +144,7 @@ export async function search_audio(searchTerms: string, page: number): Promise<{
 
 export async function search_document_file_id(data: any): Promise<any | null> {
     try {
-        const filteredDocs = await DocumentCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
+        const filteredDocs = await db.DocumentCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
         return { filteredDocs };
     } catch (error) {
         console.log(error);
@@ -152,7 +153,7 @@ export async function search_document_file_id(data: any): Promise<any | null> {
 
 export async function search_video_file_id(data: any): Promise<any | null> {
     try {
-        const filteredDocs = await VideoCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
+        const filteredDocs = await db.VideoCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
         return { filteredDocs };
     } catch (error) {
         console.log(error);
@@ -161,7 +162,7 @@ export async function search_video_file_id(data: any): Promise<any | null> {
 
 export async function search_audio_file_id(data: any): Promise<any | null> {
     try {
-        const filteredDocs = await AudioCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
+        const filteredDocs = await db.AudioCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
         return { filteredDocs };
     } catch (error) {
         console.log(error);
