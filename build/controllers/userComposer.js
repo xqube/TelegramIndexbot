@@ -1,8 +1,8 @@
 import { Composer } from "grammy";
 import { insert_audio, insert_document, insert_user, insert_video, search_audio_file_id, search_document_file_id, search_video_file_id } from "../functions/dbFunc.js";
 import { cleanFileName, extractSearchTerm, keyboardlist } from "../functions/helperFunc.js";
-export const botComposer = new Composer;
-botComposer.on("callback_query:data", async (ctx) => {
+export const userComposer = new Composer;
+userComposer.on("callback_query:data", async (ctx) => {
     var _a;
     try {
         const calldata = ctx.update.callback_query.data;
@@ -83,7 +83,7 @@ botComposer.on("callback_query:data", async (ctx) => {
     }
 });
 //////////////////////////////////////////////////////////////////////////////////////////
-botComposer.chatType("private").command("start", async (ctx) => {
+userComposer.chatType("private").command("start", async (ctx) => {
     try {
         if (ctx.match) {
             const parts = ctx.match.split("__");
@@ -131,20 +131,38 @@ botComposer.chatType("private").command("start", async (ctx) => {
     catch (error) {
     }
 });
-botComposer.chatType("private").on(":file", async (ctx) => {
+userComposer.chatType("private").command("id", async (ctx) => {
+    try {
+        if (ctx.msg.reply_to_message.document) {
+            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.document.file_unique_id}</code>`, { parse_mode: "HTML" });
+        }
+        else if (ctx.msg.reply_to_message.video) {
+            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.video.file_unique_id}</code>`, { parse_mode: "HTML" });
+        }
+        else if (ctx.msg.reply_to_message.audio) {
+            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.audio.file_unique_id}</code>`, { parse_mode: "HTML" });
+        }
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+});
+userComposer.chatType("private").on(":file", async (ctx, next) => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
     try {
         if (ctx.msg.document) {
             const file_name = cleanFileName(ctx.msg.document.file_name);
             const file_caption = cleanFileName((_a = ctx.msg.caption) !== null && _a !== void 0 ? _a : '');
             const data = {
-                userid: (_b = ctx.msg.from) === null || _b === void 0 ? void 0 : _b.id,
+                user_id: (_b = ctx.msg.from) === null || _b === void 0 ? void 0 : _b.id,
                 first_name: (_c = ctx.msg.from) === null || _c === void 0 ? void 0 : _c.first_name,
                 file_id: ctx.msg.document.file_id,
                 file_name: file_name,
                 file_caption: file_caption,
                 file_unique_id: ctx.msg.document.file_unique_id,
                 file_size: ctx.msg.document.file_size,
+                is_banned: false,
+                is_copyrighted: false
             };
             await insert_document(data);
         }
@@ -152,13 +170,15 @@ botComposer.chatType("private").on(":file", async (ctx) => {
             const file_name = cleanFileName(ctx.msg.video.file_name);
             const file_caption = cleanFileName((_d = ctx.msg.caption) !== null && _d !== void 0 ? _d : '');
             const data = {
-                userid: (_e = ctx.msg.from) === null || _e === void 0 ? void 0 : _e.id,
+                user_id: (_e = ctx.msg.from) === null || _e === void 0 ? void 0 : _e.id,
                 first_name: (_f = ctx.msg.from) === null || _f === void 0 ? void 0 : _f.first_name,
                 file_id: ctx.msg.video.file_id,
                 file_name: file_name,
                 file_caption: file_caption,
                 file_unique_id: ctx.msg.video.file_unique_id,
                 file_size: ctx.msg.video.file_size,
+                is_banned: false,
+                is_copyrighted: false
             };
             await insert_video(data);
         }
@@ -166,13 +186,15 @@ botComposer.chatType("private").on(":file", async (ctx) => {
             const file_name = cleanFileName(ctx.msg.audio.file_name);
             const file_caption = cleanFileName((_g = ctx.msg.caption) !== null && _g !== void 0 ? _g : '');
             const data = {
-                userid: (_h = ctx.msg.from) === null || _h === void 0 ? void 0 : _h.id,
+                user_id: (_h = ctx.msg.from) === null || _h === void 0 ? void 0 : _h.id,
                 first_name: (_j = ctx.msg.from) === null || _j === void 0 ? void 0 : _j.first_name,
                 file_id: (_k = ctx.msg.audio) === null || _k === void 0 ? void 0 : _k.file_id,
                 file_name: file_name,
                 file_caption: file_caption,
                 file_unique_id: (_l = ctx.msg.audio) === null || _l === void 0 ? void 0 : _l.file_unique_id,
                 file_size: (_m = ctx.msg.audio) === null || _m === void 0 ? void 0 : _m.file_size,
+                is_banned: false,
+                is_copyrighted: false
                 // add performer section
             };
             await insert_audio(data);
@@ -181,8 +203,9 @@ botComposer.chatType("private").on(":file", async (ctx) => {
     catch (error) {
         console.log(error.message);
     }
+    await next();
 });
-botComposer.on(":text", async (ctx) => {
+userComposer.on(":text", async (ctx, next) => {
     var _a, _b, _c, _d, _e, _f;
     try {
         const msgDeleteTime = Number(process.env.MESSAGE_DELETE_TIME);
@@ -215,4 +238,5 @@ botComposer.on(":text", async (ctx) => {
     catch (error) {
         console.log(error.message);
     }
+    await next();
 });

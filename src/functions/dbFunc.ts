@@ -1,3 +1,5 @@
+import { bot } from "../bot.js";
+import { botComposer } from "../controllers/botComposer.js";
 import { mongoconnect } from "../db/dbConfig.js";
 
 
@@ -81,7 +83,13 @@ export async function search_document(searchTerms: string, page: number): Promis
         // Construct an array of regex patterns, one for each search word
         const regexPatterns = searchWords.map(word => new RegExp(`\\b${word}\\b`, "i"));
         // Combine the regex patterns using the OR operator
-        const combinedRegex = { $and: regexPatterns.map(pattern => ({ file_name: pattern })) };
+        const combinedRegex = {
+            $and: [
+                { $or: regexPatterns.map(pattern => ({ file_name: pattern })) },
+                { is_banned: false },
+                { is_copyrighted: false }
+            ]
+        };
         // Count filtered documents
         const totalsize = await db.DocumentCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
@@ -104,7 +112,13 @@ export async function search_video(searchTerms: string, page: number): Promise<{
         // Construct an array of regex patterns, one for each search word
         const regexPatterns = searchWords.map(word => new RegExp(`\\b${word}\\b`, "i"));
         // Combine the regex patterns using the OR operator
-        const combinedRegex = { $and: regexPatterns.map(pattern => ({ file_name: pattern })) };
+        const combinedRegex = {
+            $and: [
+                { $or: regexPatterns.map(pattern => ({ file_name: pattern })) },
+                { is_banned: false },
+                { is_copyrighted: false }
+            ]
+        };
         // Count filtered documents
         const totalsize = await db.VideoCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
@@ -126,7 +140,13 @@ export async function search_audio(searchTerms: string, page: number): Promise<{
         // Construct an array of regex patterns, one for each search word
         const regexPatterns = searchWords.map(word => new RegExp(`\\b${word}\\b`, "i"));
         // Combine the regex patterns using the OR operator
-        const combinedRegex = { $and: regexPatterns.map(pattern => ({ file_name: pattern })) };
+        const combinedRegex = {
+            $and: [
+                { $or: regexPatterns.map(pattern => ({ file_name: pattern })) },
+                { is_banned: false },
+                { is_copyrighted: false }
+            ]
+        };
         // Count filtered documents
         const totalsize = await db.AudioCollection.countDocuments(combinedRegex);
 
@@ -146,8 +166,8 @@ export async function search_document_file_id(data: any): Promise<any | null> {
     try {
         const filteredDocs = await db.DocumentCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
         return { filteredDocs };
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        console.log(error.message);
     }
 }
 
@@ -155,8 +175,8 @@ export async function search_video_file_id(data: any): Promise<any | null> {
     try {
         const filteredDocs = await db.VideoCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
         return { filteredDocs };
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        console.log(error.message);
     }
 }
 
@@ -164,8 +184,92 @@ export async function search_audio_file_id(data: any): Promise<any | null> {
     try {
         const filteredDocs = await db.AudioCollection.findOne({ file_unique_id: data }, { projection: { file_id: 1, file_name: 1, file_caption: 1, _id: 0 } });
         return { filteredDocs };
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        console.log(error.message);
+    }
+}
+
+
+export async function ban_all_user_files(data: any): Promise<any | null> {
+    try {
+        const filter = { userid: data };
+        const chat_id = data.toString()
+        const updateDoc = {
+            $set: {
+                is_banned: true,
+            }
+        };
+        const doc_result = await db.DocumentCollection.updateMany(filter, updateDoc);
+        const vid_result = await db.VideoCollection.updateMany(filter, updateDoc);
+        const aud_result = await db.AudioCollection.updateMany(filter, updateDoc);
+        if (doc_result.modifiedCount != 0 || vid_result.modifiedCount != 0 || aud_result.modifiedCount != 0) {
+            try {
+                await bot.api.sendMessage(chat_id, `<b>Sorry to inform that some of your files are reported due to copyright</b>\n\nBanned ${doc_result.modifiedCount} file in document section\nBanned ${vid_result.modifiedCount} file in video section\nBanned ${aud_result.modifiedCount} file in audio section`, { parse_mode: "HTML" })
+            } catch (error: any) {
+                console.log("Error on sending ban meessage in dbFunc", error.message);
+
+            }
+        }
+        return { doc_result, vid_result, aud_result }
+    } catch (error: any) {
+        console.log(error.message);
+    }
+}
+
+export async function ban_all_user_files_reply(data: any): Promise<any | null> {
+    try {
+        const filter = { file_unique_id: data };
+        const updateDoc = {
+            $set: {
+                is_banned: true,
+            }
+        };
+        const result = await db.DocumentCollection.findOne(filter, { projection: { userid: 1, _id: 0 } });
+        if (result) {
+            const doc_result = await db.DocumentCollection.updateMany({ userid: result.userid }, updateDoc);
+            const vid_result = await db.VideoCollection.updateMany({ userid: result.userid }, updateDoc);
+            const aud_result = await db.AudioCollection.updateMany({ userid: result.userid }, updateDoc);
+            if (doc_result.modifiedCount != 0 || vid_result.modifiedCount != 0 || aud_result.modifiedCount != 0) {
+                try {
+                    await bot.api.sendMessage(result.userid, `<b>Sorry to inform that some of your files are reported due to copyright</b>\n\nBanned ${doc_result.modifiedCount} file in document section\nBanned ${vid_result.modifiedCount} file in video section\nBanned ${aud_result.modifiedCount} file in audio section`, { parse_mode: "HTML" })
+                } catch (error: any) {
+                    console.log("Error on sending ban meessage in dbFunc", error.message);
+    
+                }
+            }
+            return { doc_result, vid_result, aud_result }
+        }
+
+    } catch (error: any) {
+        console.log(error.message);
+    }
+}
+
+
+export async function copyright_file(data: any): Promise<any | null> {
+    try {
+        const filter = { file_unique_id: data };
+        const updateDoc = {
+            $set: {
+                is_banned: true,
+            }
+        };
+        const result = await db.DocumentCollection.findOne(filter, { projection: { userid: 1, _id: 0 } });
+
+        const doc_result = await db.DocumentCollection.updateMany(filter, updateDoc);
+        const vid_result = await db.VideoCollection.updateMany(filter, updateDoc);
+        const aud_result = await db.AudioCollection.updateMany(filter, updateDoc);
+        if (doc_result.modifiedCount != 0 || vid_result.modifiedCount != 0 || aud_result.modifiedCount != 0) {
+            try {
+                await bot.api.sendMessage(result.userid, `<b>Sorry to inform that some of your files are reported due to copyright</b>\n\nBanned ${doc_result.modifiedCount} file in document section\nBanned ${vid_result.modifiedCount} file in video section\nBanned ${aud_result.modifiedCount} file in audio section`, { parse_mode: "HTML" })
+            } catch (error: any) {
+                console.log("Error on sending ban meessage in dbFunc", error.message);
+
+            }
+        }
+        return { doc_result, vid_result, aud_result }
+    } catch (error: any) {
+        console.log(error.message);
     }
 }
 

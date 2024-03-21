@@ -3,10 +3,10 @@ import { insert_audio, insert_document, insert_user, insert_video, search_audio_
 import { cleanFileName, extractSearchTerm, keyboardlist } from "../functions/helperFunc.js";
 
 
-export const botComposer = new Composer<Context>
+export const userComposer = new Composer<Context>
 
 
-botComposer.on("callback_query:data", async (ctx: any) => {
+userComposer.on("callback_query:data", async (ctx: any) => {
     try {
         const calldata = ctx.update.callback_query.data
         const calladatanext = calldata.match(/\^next/)
@@ -90,7 +90,7 @@ botComposer.on("callback_query:data", async (ctx: any) => {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-botComposer.chatType("private").command("start", async (ctx) => {
+userComposer.chatType("private").command("start", async (ctx) => {
     try {
         if (ctx.match) {
             const parts = ctx.match.split("__");
@@ -135,47 +135,68 @@ botComposer.chatType("private").command("start", async (ctx) => {
 })
 
 
+userComposer.chatType("private").command("id", async (ctx: any) => {
+    try {
+        if (ctx.msg.reply_to_message.document) {
+            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.document.file_unique_id}</code>`, {parse_mode:"HTML"})
+        } else if (ctx.msg.reply_to_message.video) {
+            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.video.file_unique_id}</code>`, {parse_mode:"HTML"})
+        } else if (ctx.msg.reply_to_message.audio) {
+            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.audio.file_unique_id}</code>`, {parse_mode:"HTML"})
+        }
+    } catch (error: any) {
+        console.log(error.message);
+
+    }
+})
 
 
-botComposer.chatType("private").on(":file", async (ctx) => {
+
+userComposer.chatType("private").on(":file", async (ctx, next) => {
     try {
         if (ctx.msg.document) {
             const file_name = cleanFileName(ctx.msg.document.file_name)
             const file_caption = cleanFileName(ctx.msg.caption ?? '')
             const data = {
-                userid: ctx.msg.from?.id,
+                user_id: ctx.msg.from?.id,
                 first_name: ctx.msg.from?.first_name,
                 file_id: ctx.msg.document.file_id,
                 file_name: file_name,
                 file_caption: file_caption,
                 file_unique_id: ctx.msg.document.file_unique_id,
                 file_size: ctx.msg.document.file_size,
+                is_banned: false,
+                is_copyrighted: false
             }
             await insert_document(data)
         } else if (ctx.msg.video) {
             const file_name = cleanFileName(ctx.msg.video.file_name)
             const file_caption = cleanFileName(ctx.msg.caption ?? '')
             const data = {
-                userid: ctx.msg.from?.id,
+                user_id: ctx.msg.from?.id,
                 first_name: ctx.msg.from?.first_name,
                 file_id: ctx.msg.video.file_id,
                 file_name: file_name,
                 file_caption: file_caption,
                 file_unique_id: ctx.msg.video.file_unique_id,
                 file_size: ctx.msg.video.file_size,
+                is_banned: false,
+                is_copyrighted: false
             }
             await insert_video(data)
         } else if (ctx.msg.audio) {
             const file_name = cleanFileName(ctx.msg.audio.file_name)
             const file_caption = cleanFileName(ctx.msg.caption ?? '')
             const data = {
-                userid: ctx.msg.from?.id,
+                user_id: ctx.msg.from?.id,
                 first_name: ctx.msg.from?.first_name,
                 file_id: ctx.msg.audio?.file_id,
                 file_name: file_name,
                 file_caption: file_caption,
                 file_unique_id: ctx.msg.audio?.file_unique_id,
                 file_size: ctx.msg.audio?.file_size,
+                is_banned: false,
+                is_copyrighted: false
                 // add performer section
             }
             await insert_audio(data)
@@ -183,10 +204,11 @@ botComposer.chatType("private").on(":file", async (ctx) => {
     } catch (error: any) {
         console.log(error.message);
     }
+    await next()
 })
 
 
-botComposer.on(":text", async (ctx) => {
+userComposer.on(":text", async (ctx, next) => {
     try {
         const msgDeleteTime: number = Number(process.env.MESSAGE_DELETE_TIME)
         const searchparam = ctx.msg.text
@@ -215,6 +237,7 @@ botComposer.on(":text", async (ctx) => {
     } catch (error: any) {
         console.log(error.message);
     }
+    await next()
 });
 
 
