@@ -98,21 +98,21 @@ botComposer.chatType("private").command("start", async (ctx) => {
             const type = parts[0]
             if (type == "doc") {
                 const { filteredDocs } = await search_document_file_id(file_unique_id)
-                if (filteredDocs.file_caption) {
+                if (filteredDocs.file_caption != "") {
                     await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_caption })
                 } else {
                     await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_name })
                 }
             } else if (type == "vid") {
                 const { filteredDocs } = await search_video_file_id(file_unique_id)
-                if (filteredDocs.file_caption) {
+                if (filteredDocs.file_caption != "") {
                     await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_caption })
                 } else {
                     await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_name })
                 }
             } else if (type == "aud") {
                 const { filteredDocs } = await search_audio_file_id(file_unique_id)
-                if (filteredDocs.file_caption) {
+                if (filteredDocs.file_caption != "") {
                     await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_caption })
                 } else {
                     await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_name })
@@ -128,6 +128,7 @@ botComposer.chatType("private").command("start", async (ctx) => {
             }
             ctx.reply("Hi, spam me with documents, videos and audios you have ;)")
         }
+
     } catch (error) {
 
     }
