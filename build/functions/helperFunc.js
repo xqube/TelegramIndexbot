@@ -26,6 +26,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
             }
             else if (page > 1 && page < totalPages) {
                 inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`)
+                    .text(`${page}/${totalPages}📄`)
                     .text("Next>>", `^next__${page}__${threadid}`).row();
             }
             else if (page == totalPages && page != 1) {
@@ -55,6 +56,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
             }
             else if (page > 1 && page < totalPages) {
                 inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`)
+                    .text(`${page}/${totalPages}📄`)
                     .text("Next>>", `^next__${page}__${threadid}`).row();
             }
             else if (page == totalPages && page != 1) {
@@ -84,6 +86,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
             }
             else if (page > 1 && page < totalPages) {
                 inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`)
+                    .text(`${page}/${totalPages}📄`)
                     .text("Next>>", `^next__${page}__${threadid}`).row();
             }
             else if (page == totalPages && page != 1) {
