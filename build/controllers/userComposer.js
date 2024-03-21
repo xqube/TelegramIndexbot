@@ -117,8 +117,16 @@ botComposer.chatType("private").command("start", async (ctx) => {
                 }
             }
         }
-        else
-            ctx.reply("Hi, send me Documents, videos and audios");
+        else {
+            if (ctx.from) {
+                const data = {
+                    id: ctx.from.id,
+                    first_name: ctx.from.first_name,
+                };
+                await insert_user(data);
+            }
+            ctx.reply("Hi, spam me with documents, videos and audios you have ;)");
+        }
     }
     catch (error) {
     }
@@ -189,13 +197,6 @@ botComposer.on(":text", async (ctx) => {
             else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
                 await ctx.reply(`Hey <a href="tg://user?id=${(_e = ctx.from) === null || _e === void 0 ? void 0 : _e.id}">${(_f = ctx.from) === null || _f === void 0 ? void 0 : _f.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.AUDIO_THREAD_ID });
             }
-        }
-        if (ctx.from) {
-            const data = {
-                id: ctx.from.id,
-                first_name: ctx.from.first_name,
-            };
-            await insert_user(data);
         }
     }
     catch (error) {
