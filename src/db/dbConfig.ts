@@ -10,7 +10,6 @@ export async function mongoconnect(): Promise<any> {
     try {
         await mongoclient.connect();
         const db = mongoclient.db("tgindex");
-        console.log('Connected successfully to DB server');
         const DocumentCollection = db.collection('documents');
         const VideoCollection = db.collection('videos');
         const AudioCollection = db.collection('audios');
