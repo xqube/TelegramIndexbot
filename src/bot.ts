@@ -18,8 +18,8 @@ if (db) {
 }
 
 bot.api.config.use(autoRetry());
-bot.use(ownerComposer)
 bot.use(userComposer)
+bot.use(ownerComposer)
 
 process.once("SIGINT", () => {
     bot.stop()

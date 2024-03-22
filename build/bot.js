@@ -10,8 +10,8 @@ if (db) {
     console.log('Connected successfully to DB server');
 }
 bot.api.config.use(autoRetry());
-bot.use(ownerComposer);
 bot.use(userComposer);
+bot.use(ownerComposer);
 process.once("SIGINT", () => {
     bot.stop();
     mongoclient.close();

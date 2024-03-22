@@ -20,7 +20,7 @@ export async function mongoconnect() {
         await AudioCollection.createIndex({ file_unique_id: 1 }, { unique: true });
         await AudioCollection.createIndex({ file_name: 1 });
         await AudioCollection.createIndex({ is_banned: 1 });
-        await UserCollection.createIndex({ id: 1 }, { unique: true });
+        await UserCollection.createIndex({ user_id: 1 }, { unique: true });
         return { DocumentCollection, VideoCollection, AudioCollection, UserCollection };
     }
     catch (error) {

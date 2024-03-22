@@ -177,6 +177,33 @@ export async function search_audio_file_id(data) {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //moderation area
 ///////////////////////////////////////////////////////////////////////////////////////////////
+export async function get_file_details(data) {
+    try {
+        const file_unique_id = { file_unique_id: data };
+        const updateDoc = {
+            $set: {
+                is_banned: true,
+            }
+        };
+        const doc_result = await db.DocumentCollection.findOne(file_unique_id, updateDoc);
+        const vid_result = await db.VideoCollection.findOne(file_unique_id, updateDoc);
+        const aud_result = await db.AudioCollection.findOne(file_unique_id, updateDoc);
+        return { doc_result, vid_result, aud_result };
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
+export async function get_user_data(data) {
+    try {
+        const user_id = parseInt(data);
+        const user_data = await db.UserCollection.findOne({ user_id: user_id });
+        return { user_data };
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
 export async function terminate_user_files(data) {
     try {
         const user_id = { user_id: data };
@@ -185,11 +212,30 @@ export async function terminate_user_files(data) {
                 is_banned: true,
             }
         };
+        const user_data = await db.UserCollection.findOne(user_id);
         const doc_mod_result = await db.DocumentCollection.updateMany(user_id, updateDoc);
         const vid_mod_result = await db.VideoCollection.updateMany(user_id, updateDoc);
         const aud_mod_result = await db.AudioCollection.updateMany(user_id, updateDoc);
         const user_mod_result = await db.UserCollection.updateOne(user_id, updateDoc);
-        const user_data = await db.UserCollection.findOne({ user_id: user_id });
+        return { doc_mod_result, vid_mod_result, aud_mod_result, user_mod_result, user_data };
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
+export async function reinstate_user_files(data) {
+    try {
+        const user_id = { user_id: data };
+        const updateDoc = {
+            $set: {
+                is_banned: false,
+            }
+        };
+        const user_data = await db.UserCollection.findOne(user_id);
+        const doc_mod_result = await db.DocumentCollection.updateMany(user_id, updateDoc);
+        const vid_mod_result = await db.VideoCollection.updateMany(user_id, updateDoc);
+        const aud_mod_result = await db.AudioCollection.updateMany(user_id, updateDoc);
+        const user_mod_result = await db.UserCollection.updateOne(user_id, updateDoc);
         return { doc_mod_result, vid_mod_result, aud_mod_result, user_mod_result, user_data };
     }
     catch (error) {
@@ -218,12 +264,51 @@ export async function terminate_user_files_reply(data) {
         console.log(error.message);
     }
 }
+export async function reinstate_user_files_reply(data) {
+    try {
+        const file_unique_id = { file_unique_id: data };
+        const updateDoc = {
+            $set: {
+                is_banned: false,
+            }
+        };
+        const file_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        if (file_result) {
+            const doc_mod_result = await db.DocumentCollection.updateMany({ user_id: file_result.user_id }, updateDoc);
+            const vid_mod_result = await db.VideoCollection.updateMany({ user_id: file_result.user_id }, updateDoc);
+            const aud_mod_result = await db.AudioCollection.updateMany({ user_id: file_result.user_id }, updateDoc);
+            const user_data = await db.UserCollection.findOne({ user_id: file_result.user_id });
+            const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
+            return { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result };
+        }
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
 export async function remove_file(data) {
     try {
         const file_unique_id = { file_unique_id: data };
         const updateDoc = {
             $set: {
                 is_banned: true,
+            }
+        };
+        const doc_mod_result = await db.DocumentCollection.updateOne(file_unique_id, updateDoc);
+        const vid_mod_result = await db.VideoCollection.updateOne(file_unique_id, updateDoc);
+        const aud_mod_result = await db.AudioCollection.updateOne(file_unique_id, updateDoc);
+        return { doc_mod_result, vid_mod_result, aud_mod_result };
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
+export async function restore_file(data) {
+    try {
+        const file_unique_id = { file_unique_id: data };
+        const updateDoc = {
+            $set: {
+                is_banned: false,
             }
         };
         const doc_mod_result = await db.DocumentCollection.updateOne(file_unique_id, updateDoc);
@@ -265,6 +350,54 @@ export async function warn_user_file(data) {
             }
             return { doc_mod_result, vid_mod_result, aud_mod_result, user_data };
         }
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
+export async function rwarn_user(data) {
+    try {
+        const user_id = parseInt(data);
+        const userDoc = {
+            $set: {
+                warn: 0
+            }
+        };
+        const user_data = await db.UserCollection.findOne({ user_id: user_id });
+        const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
+        return { user_mod_result, user_data };
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
+export async function ban_user(data) {
+    try {
+        const user_id = parseInt(data);
+        const userDoc = {
+            $set: {
+                is_banned: true
+            }
+        };
+        const user_data = await db.UserCollection.findOne({ user_id: user_id });
+        const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
+        return { user_mod_result, user_data };
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
+export async function unban_user(data) {
+    try {
+        const user_id = parseInt(data);
+        const userDoc = {
+            $set: {
+                is_banned: false
+            }
+        };
+        const user_data = await db.UserCollection.findOne({ user_id: user_id });
+        const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
+        return { user_mod_result, user_data };
     }
     catch (error) {
         console.log(error.message);

@@ -128,29 +128,36 @@ userComposer.chatType("private").command("start", async (ctx) => {
                 }
                 await insert_user(data)
             }
-            ctx.reply("Hi, spam me with documents, videos and audios you have ;)")
+            ctx.reply(`👋 Hi, I'm ${ctx.me.first_name}! Send me documents, videos, and audios, and I'll store them securely for you. You can access them later from our group: https://t.me/+Q1fGy7GpkJ81NjA1`)
         }
-
     } catch (error) {
 
     }
 })
 
 
-userComposer.chatType("private").command("id", async (ctx: any) => {
+userComposer.chatType("private").command("info", async (ctx, next) => {
     try {
-        if (ctx.msg.reply_to_message.document) {
-            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.document.file_unique_id}</code>`, { parse_mode: "HTML" })
-        } else if (ctx.msg.reply_to_message.video) {
-            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.video.file_unique_id}</code>`, { parse_mode: "HTML" })
-        } else if (ctx.msg.reply_to_message.audio) {
-            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.audio.file_unique_id}</code>`, { parse_mode: "HTML" })
+        if (ctx.msg.chat.type == 'private') {
+            const replyMessage = ctx.msg.reply_to_message;
+            if (replyMessage) {
+                if (replyMessage.document) {
+                    ctx.reply(`<pre language="json">id: ${replyMessage.document.file_unique_id}</pre>`, { parse_mode: "HTML" })
+                } else if (replyMessage.video) {
+                    ctx.reply(`<pre language="json">id: ${replyMessage.video.file_unique_id}</pre>`, { parse_mode: "HTML" })
+                } else if (replyMessage.audio) {
+                    ctx.reply(`<pre language="json">id: ${replyMessage.audio.file_unique_id}</pre>`, { parse_mode: "HTML" })
+                }
+            } else {
+                ctx.reply("Please reply to a message containing a document, video, or audio.");
+            }
         }
     } catch (error: any) {
         console.log(error.message);
-
     }
-})
+    await next();
+});
+
 
 
 
