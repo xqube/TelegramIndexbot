@@ -128,7 +128,7 @@ userComposer.chatType("private").command("start", async (ctx) => {
                 }
                 await insert_user(data)
             }
-            ctx.reply(`👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase, and all files will be deleted upon stable release.</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`)
+            ctx.reply(`👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase, and all files will be deleted upon stable release.</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`,{parse_mode:"HTML"})
         }
     } catch (error) {
 
