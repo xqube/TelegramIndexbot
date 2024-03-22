@@ -121,8 +121,10 @@ userComposer.chatType("private").command("start", async (ctx) => {
         } else {
             if (ctx.from) {
                 const data = {
-                    id: ctx.from.id,
+                    user_id: ctx.from.id,
                     first_name: ctx.from.first_name,
+                    warn: 0,
+                    is_banned: false
                 }
                 await insert_user(data)
             }
@@ -138,11 +140,11 @@ userComposer.chatType("private").command("start", async (ctx) => {
 userComposer.chatType("private").command("id", async (ctx: any) => {
     try {
         if (ctx.msg.reply_to_message.document) {
-            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.document.file_unique_id}</code>`, {parse_mode:"HTML"})
+            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.document.file_unique_id}</code>`, { parse_mode: "HTML" })
         } else if (ctx.msg.reply_to_message.video) {
-            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.video.file_unique_id}</code>`, {parse_mode:"HTML"})
+            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.video.file_unique_id}</code>`, { parse_mode: "HTML" })
         } else if (ctx.msg.reply_to_message.audio) {
-            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.audio.file_unique_id}</code>`, {parse_mode:"HTML"})
+            ctx.reply(`File id: <code>${ctx.msg.reply_to_message.audio.file_unique_id}</code>`, { parse_mode: "HTML" })
         }
     } catch (error: any) {
         console.log(error.message);
@@ -166,7 +168,6 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 file_unique_id: ctx.msg.document.file_unique_id,
                 file_size: ctx.msg.document.file_size,
                 is_banned: false,
-                is_copyrighted: false
             }
             await insert_document(data)
         } else if (ctx.msg.video) {
@@ -181,7 +182,6 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 file_unique_id: ctx.msg.video.file_unique_id,
                 file_size: ctx.msg.video.file_size,
                 is_banned: false,
-                is_copyrighted: false
             }
             await insert_video(data)
         } else if (ctx.msg.audio) {
@@ -196,7 +196,6 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 file_unique_id: ctx.msg.audio?.file_unique_id,
                 file_size: ctx.msg.audio?.file_size,
                 is_banned: false,
-                is_copyrighted: false
                 // add performer section
             }
             await insert_audio(data)
@@ -210,7 +209,7 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
 
 userComposer.on(":text", async (ctx, next) => {
     try {
-        const msgDeleteTime: number = Number(process.env.MESSAGE_DELETE_TIME)
+        const msgDeleteTime: number = parseInt(process.env.MESSAGE_DELETE_TIME || "")
         const searchparam = ctx.msg.text
         const inlineKeyboard = await keyboardlist(ctx, 1, searchparam, ctx.msg.message_thread_id)
         if (inlineKeyboard) {

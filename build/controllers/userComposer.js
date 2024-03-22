@@ -120,8 +120,10 @@ userComposer.chatType("private").command("start", async (ctx) => {
         else {
             if (ctx.from) {
                 const data = {
-                    id: ctx.from.id,
+                    user_id: ctx.from.id,
                     first_name: ctx.from.first_name,
+                    warn: 0,
+                    is_banned: false
                 };
                 await insert_user(data);
             }
@@ -162,7 +164,6 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 file_unique_id: ctx.msg.document.file_unique_id,
                 file_size: ctx.msg.document.file_size,
                 is_banned: false,
-                is_copyrighted: false
             };
             await insert_document(data);
         }
@@ -178,7 +179,6 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 file_unique_id: ctx.msg.video.file_unique_id,
                 file_size: ctx.msg.video.file_size,
                 is_banned: false,
-                is_copyrighted: false
             };
             await insert_video(data);
         }
@@ -194,7 +194,6 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 file_unique_id: (_l = ctx.msg.audio) === null || _l === void 0 ? void 0 : _l.file_unique_id,
                 file_size: (_m = ctx.msg.audio) === null || _m === void 0 ? void 0 : _m.file_size,
                 is_banned: false,
-                is_copyrighted: false
                 // add performer section
             };
             await insert_audio(data);
@@ -208,7 +207,7 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
 userComposer.on(":text", async (ctx, next) => {
     var _a, _b, _c, _d, _e, _f;
     try {
-        const msgDeleteTime = Number(process.env.MESSAGE_DELETE_TIME);
+        const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
         const searchparam = ctx.msg.text;
         const inlineKeyboard = await keyboardlist(ctx, 1, searchparam, ctx.msg.message_thread_id);
         if (inlineKeyboard) {
