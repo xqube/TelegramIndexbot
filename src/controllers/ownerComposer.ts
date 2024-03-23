@@ -19,7 +19,7 @@ ownerComposer.command("sysinfo", async (ctx: any, next) => {
 
 
 
-ownerComposer.command("db", async (ctx: any, next) => {
+ownerComposer.command("lookdb", async (ctx: any, next) => {
     try {
         const admins: any = process.env.OWNERS
         if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
@@ -29,17 +29,17 @@ ownerComposer.command("db", async (ctx: any, next) => {
                 const data = JSON.stringify(doc_result, null, 4)
                 await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" })
             } else if (ctx.msg.reply_to_message.video) {
-                const { vid_result } = await get_file_details(ctx.msg.reply_to_message.document.file_unique_id)
+                const { vid_result } = await get_file_details(ctx.msg.reply_to_message.video.file_unique_id)
                 const data = JSON.stringify(vid_result, null, 4)
                 await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" })
             } else if (ctx.msg.reply_to_message.audio) {
-                const { aud_result } = await get_file_details(ctx.msg.reply_to_message.document.file_unique_id)
+                const { aud_result } = await get_file_details(ctx.msg.reply_to_message.audio.file_unique_id)
                 const data = JSON.stringify(aud_result, null, 4)
                 await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" })
             }
         }
     } catch (error: any) {
-        console.log("Error at remove in owner Composer", error.message);
+        console.log("Error at db in owner Composer", error.message);
     }
     await next();
 })

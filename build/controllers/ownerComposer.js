@@ -15,7 +15,7 @@ ownerComposer.command("sysinfo", async (ctx, next) => {
     }
     await next();
 });
-ownerComposer.command("db", async (ctx, next) => {
+ownerComposer.command("lookdb", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
         if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
@@ -25,19 +25,19 @@ ownerComposer.command("db", async (ctx, next) => {
                 await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" });
             }
             else if (ctx.msg.reply_to_message.video) {
-                const { vid_result } = await get_file_details(ctx.msg.reply_to_message.document.file_unique_id);
+                const { vid_result } = await get_file_details(ctx.msg.reply_to_message.video.file_unique_id);
                 const data = JSON.stringify(vid_result, null, 4);
                 await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" });
             }
             else if (ctx.msg.reply_to_message.audio) {
-                const { aud_result } = await get_file_details(ctx.msg.reply_to_message.document.file_unique_id);
+                const { aud_result } = await get_file_details(ctx.msg.reply_to_message.audio.file_unique_id);
                 const data = JSON.stringify(aud_result, null, 4);
                 await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" });
             }
         }
     }
     catch (error) {
-        console.log("Error at remove in owner Composer", error.message);
+        console.log("Error at db in owner Composer", error.message);
     }
     await next();
 });
