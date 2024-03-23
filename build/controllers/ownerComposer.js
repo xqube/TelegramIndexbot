@@ -267,7 +267,7 @@ ownerComposer.command("restore", async (ctx, next) => {
             else if (ctx.msg.reply_to_message.video) {
                 const { vid_mod_result } = await restore_file(ctx.msg.reply_to_message.video.file_unique_id);
                 if (vid_mod_result.modifiedCount != 0) {
-                    await ctx.reply(`UnBanned ${vid_mod_result.modifiedCount} file in document Collection`);
+                    await ctx.reply(`UnBanned ${vid_mod_result.modifiedCount} file in video Collection`);
                 }
                 else {
                     await ctx.reply(`file already UnBanned ;)`);
@@ -276,7 +276,7 @@ ownerComposer.command("restore", async (ctx, next) => {
             else if (ctx.msg.reply_to_message.audio) {
                 const { aud_mod_result } = await restore_file(ctx.msg.reply_to_message.audio.file_unique_id);
                 if (aud_mod_result.modifiedCount != 0) {
-                    await ctx.reply(`UnBanned ${aud_mod_result.modifiedCount} file in document Collection`);
+                    await ctx.reply(`UnBanned ${aud_mod_result.modifiedCount} file in audio Collection`);
                 }
                 else {
                     await ctx.reply(`file already UnBanned ;)`);
@@ -303,10 +303,10 @@ ownerComposer.command("warn", async (ctx, next) => {
                         catch (error) {
                             console.log("Error on sending warn meessage on terminate command ownerComposer", error.message);
                         }
-                        await ctx.reply(`Banned ${doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount} file in document Collection\n\nBanned ${vid_mod_result.modifiedCount} file in video Collection\n\nBanned ${aud_mod_result.modifiedCount} file in audio Collection\n\nWarned user: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
+                        await ctx.reply(`Banned ${doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount} file in documents Collection\n\nBanned ${vid_mod_result.modifiedCount} file in video Collection\n\nBanned ${aud_mod_result.modifiedCount} file in audio Collection\n\nWarned user: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
                     }
                     else {
-                        await ctx.reply(`Banned ${doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount} file in document Collection\n\nBanned ${vid_mod_result.modifiedCount} file in video Collection\n\nBanned ${aud_mod_result.modifiedCount} file in audio Collection\n\n<b>Max Warning Reached, user need to be banned</b>\n\nUSER: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
+                        await ctx.reply(`Banned ${doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount} file in documents Collection\n\nBanned ${vid_mod_result.modifiedCount} file in video Collection\n\nBanned ${aud_mod_result.modifiedCount} file in audio Collection\n\n<b>Max Warning Reached, user need to be banned</b>\n\nUSER: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
                     }
                 }
                 else {
@@ -323,10 +323,10 @@ ownerComposer.command("warn", async (ctx, next) => {
                         catch (error) {
                             console.log("Error on sending warn meessage on terminate command ownerComposer", error.message);
                         }
-                        await ctx.reply(`Banned ${doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount} file in document Collection\n\nWarned user: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
+                        await ctx.reply(`Banned ${doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount} file in documents Collection\n\nWarned user: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
                     }
                     else {
-                        await ctx.reply(`Banned ${doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount} file in document Collection\n\n<b>Max Warning Reached, user need to be banned</b>\n\nUSER: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
+                        await ctx.reply(`Banned ${doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount} file in documents Collection\n\n<b>Max Warning Reached, user need to be banned</b>\n\nUSER: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
                     }
                 }
                 else {
@@ -343,10 +343,10 @@ ownerComposer.command("warn", async (ctx, next) => {
                         catch (error) {
                             console.log("Error on sending warn meessage on terminate command ownerComposer", error.message);
                         }
-                        await ctx.reply(`Banned ${vid_mod_result === null || vid_mod_result === void 0 ? void 0 : vid_mod_result.modifiedCount} file in document Collection\n\nWarned user: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
+                        await ctx.reply(`Banned ${vid_mod_result === null || vid_mod_result === void 0 ? void 0 : vid_mod_result.modifiedCount} file in videos Collection\n\nWarned user: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
                     }
                     else {
-                        await ctx.reply(`Banned ${vid_mod_result === null || vid_mod_result === void 0 ? void 0 : vid_mod_result.modifiedCount} file in document Collection\n\n<b>Max Warning Reached, user need to be banned</b>\n\nUSER: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
+                        await ctx.reply(`Banned ${vid_mod_result === null || vid_mod_result === void 0 ? void 0 : vid_mod_result.modifiedCount} file in videos Collection\n\n<b>Max Warning Reached, user need to be banned</b>\n\nUSER: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
                     }
                 }
                 else {
@@ -363,10 +363,10 @@ ownerComposer.command("warn", async (ctx, next) => {
                         catch (error) {
                             console.log("Error on sending warn meessage on terminate command ownerComposer", error.message);
                         }
-                        await ctx.reply(`Banned ${aud_mod_result === null || aud_mod_result === void 0 ? void 0 : aud_mod_result.modifiedCount} file in document Collection\n\nWarned user: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
+                        await ctx.reply(`Banned ${aud_mod_result === null || aud_mod_result === void 0 ? void 0 : aud_mod_result.modifiedCount} file in audios Collection\n\nWarned user: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
                     }
                     else {
-                        await ctx.reply(`Banned ${aud_mod_result === null || aud_mod_result === void 0 ? void 0 : aud_mod_result.modifiedCount} file in document Collection\n\n<b>Max Warning Reached, user need to be banned</b>\n\nUSER: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
+                        await ctx.reply(`Banned ${aud_mod_result === null || aud_mod_result === void 0 ? void 0 : aud_mod_result.modifiedCount} file in audios Collection\n\n<b>Max Warning Reached, user need to be banned</b>\n\nUSER: <a href="tg://user?id=${user_data.user_id}">${user_data.first_name}</a> [<code>${user_data.user_id}</code>]`, { parse_mode: "HTML" });
                     }
                 }
                 else {
