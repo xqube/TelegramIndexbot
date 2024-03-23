@@ -100,16 +100,26 @@ export function bytesToMegabytes(bytes: number) {
 
 
 
+// export function cleanFileName(fileName: any): string {
+//     // Define a regular expression pattern to match characters to be removed
+//     const pattern = /[^a-zA-Z0-9\s]+/g;
+//     // Remove special characters
+//     let cleanedFileName = fileName.replace(pattern, " ");
+//     // Replace consecutive spaces with a single space
+//     cleanedFileName = cleanedFileName.replace(/\s{2,}/g, " ");
+//     return cleanedFileName;
+// }
+
+
 export function cleanFileName(fileName: any): string {
     // Define a regular expression pattern to match characters to be removed
-    const pattern = /[^a-zA-Z0-9\s]+/g;
+    const pattern = /[_.,\[\]\|\\\/\?\>\<\+\=\-\!\@\#\$\%\^\&\*\(\)\~\`\{\}\s]+/g;
     // Remove special characters
     let cleanedFileName = fileName.replace(pattern, " ");
     // Replace consecutive spaces with a single space
     cleanedFileName = cleanedFileName.replace(/\s{2,}/g, " ");
     return cleanedFileName;
 }
-
 
 
 
