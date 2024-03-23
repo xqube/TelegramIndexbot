@@ -274,14 +274,26 @@ export async function terminate_user_files_reply(data) {
                 is_banned: true,
             }
         };
-        const file_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        if (file_result) {
-            const doc_mod_result = await db.DocumentCollection.updateMany({ user_id: file_result.user_id }, updateDoc);
-            const vid_mod_result = await db.VideoCollection.updateMany({ user_id: file_result.user_id }, updateDoc);
-            const aud_mod_result = await db.AudioCollection.updateMany({ user_id: file_result.user_id }, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: file_result.user_id });
+        const doc_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const vid_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const aud_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        if (doc_result) {
+            const doc_mod_result = await db.DocumentCollection.updateMany({ user_id: doc_result.user_id }, updateDoc);
+            const user_data = await db.UserCollection.findOne({ user_id: doc_result.user_id });
             const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
-            return { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result };
+            return { doc_mod_result, user_data, user_mod_result };
+        }
+        else if (vid_result) {
+            const vid_mod_result = await db.VideoCollection.updateMany({ user_id: vid_result.user_id }, updateDoc);
+            const user_data = await db.UserCollection.findOne({ user_id: vid_result.user_id });
+            const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
+            return { vid_mod_result, user_data, user_mod_result };
+        }
+        else if (aud_result) {
+            const aud_mod_result = await db.AudioCollection.updateMany({ user_id: aud_result.user_id }, updateDoc);
+            const user_data = await db.UserCollection.findOne({ user_id: aud_result.user_id });
+            const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
+            return { aud_mod_result, user_data, user_mod_result };
         }
     }
     catch (error) {
@@ -296,14 +308,26 @@ export async function reinstate_user_files_reply(data) {
                 is_banned: false,
             }
         };
-        const file_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        if (file_result) {
-            const doc_mod_result = await db.DocumentCollection.updateMany({ user_id: file_result.user_id }, updateDoc);
-            const vid_mod_result = await db.VideoCollection.updateMany({ user_id: file_result.user_id }, updateDoc);
-            const aud_mod_result = await db.AudioCollection.updateMany({ user_id: file_result.user_id }, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: file_result.user_id });
+        const doc_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const vid_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const aud_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        if (doc_result) {
+            const doc_mod_result = await db.DocumentCollection.updateMany({ user_id: doc_result.user_id }, updateDoc);
+            const user_data = await db.UserCollection.findOne({ user_id: doc_result.user_id });
             const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
-            return { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result };
+            return { doc_mod_result, user_data, user_mod_result };
+        }
+        else if (vid_result) {
+            const vid_mod_result = await db.VideoCollection.updateMany({ user_id: vid_result.user_id }, updateDoc);
+            const user_data = await db.UserCollection.findOne({ user_id: vid_result.user_id });
+            const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
+            return { vid_mod_result, user_data, user_mod_result };
+        }
+        else if (aud_result) {
+            const aud_mod_result = await db.AudioCollection.updateMany({ user_id: aud_result.user_id }, updateDoc);
+            const user_data = await db.UserCollection.findOne({ user_id: aud_result.user_id });
+            const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
+            return { aud_mod_result, user_data, user_mod_result };
         }
     }
     catch (error) {
@@ -360,19 +384,41 @@ export async function warn_user_file(data) {
                 warn: 1
             }
         };
-        const file_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        if (file_result) {
+        const doc_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const vid_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const aud_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        if (doc_result) {
             const doc_mod_result = await db.DocumentCollection.updateOne(file_unique_id, updateDoc);
-            const vid_mod_result = await db.VideoCollection.updateOne(file_unique_id, updateDoc);
-            const aud_mod_result = await db.AudioCollection.updateOne(file_unique_id, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: file_result.user_id });
-            if (doc_mod_result.modifiedCount != 0 || vid_mod_result.modifiedCount != 0 || aud_mod_result.modifiedCount != 0) {
+            const user_data = await db.UserCollection.findOne({ user_id: doc_result.user_id });
+            if (doc_mod_result.modifiedCount != 0) {
                 if (user_data && user_data.warn < warn_limit && !user_data.is_banned) {
                     const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
-                    return { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result };
+                    return { doc_mod_result, user_data, user_mod_result };
                 }
             }
-            return { doc_mod_result, vid_mod_result, aud_mod_result, user_data };
+            return { doc_mod_result, user_data };
+        }
+        else if (vid_result) {
+            const vid_mod_result = await db.VideoCollection.updateOne(file_unique_id, updateDoc);
+            const user_data = await db.UserCollection.findOne({ user_id: vid_result.user_id });
+            if (vid_mod_result.modifiedCount != 0) {
+                if (user_data && user_data.warn < warn_limit && !user_data.is_banned) {
+                    const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
+                    return { vid_mod_result, user_data, user_mod_result };
+                }
+            }
+            return { vid_mod_result, user_data };
+        }
+        else if (aud_result) {
+            const aud_mod_result = await db.AudioCollection.updateOne(file_unique_id, updateDoc);
+            const user_data = await db.UserCollection.findOne({ user_id: aud_result.user_id });
+            if (aud_mod_result.modifiedCount != 0) {
+                if (user_data && user_data.warn < warn_limit && !user_data.is_banned) {
+                    const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
+                    return { aud_mod_result, user_data, user_mod_result };
+                }
+            }
+            return { aud_mod_result, user_data };
         }
     }
     catch (error) {
