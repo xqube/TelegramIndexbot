@@ -169,8 +169,8 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 const file_name = cleanFileName(ctx.msg.document.file_name)
                 const file_caption = cleanFileName(ctx.msg.caption ?? '')
                 const data = {
-                    user_id: ctx.msg.from?.id,
-                    first_name: ctx.msg.from?.first_name,
+                    user_id: ctx.msg.from.id,
+                    first_name: ctx.msg.from.first_name,
                     file_id: ctx.msg.document.file_id,
                     file_name: file_name,
                     file_caption: file_caption,
@@ -183,8 +183,8 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 const file_name = cleanFileName(ctx.msg.video.file_name)
                 const file_caption = cleanFileName(ctx.msg.caption ?? '')
                 const data = {
-                    user_id: ctx.msg.from?.id,
-                    first_name: ctx.msg.from?.first_name,
+                    user_id: ctx.msg.from.id,
+                    first_name: ctx.msg.from.first_name,
                     file_id: ctx.msg.video.file_id,
                     file_name: file_name,
                     file_caption: file_caption,
@@ -197,12 +197,67 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 const file_name = cleanFileName(ctx.msg.audio.file_name)
                 const file_caption = cleanFileName(ctx.msg.caption ?? '')
                 const data = {
-                    user_id: ctx.msg.from?.id,
-                    first_name: ctx.msg.from?.first_name,
-                    file_id: ctx.msg.audio?.file_id,
+                    user_id: ctx.msg.from.id,
+                    first_name: ctx.msg.from.first_name,
+                    file_id: ctx.msg.audio.file_id,
                     file_name: file_name,
                     file_caption: file_caption,
-                    file_unique_id: ctx.msg.audio?.file_unique_id,
+                    file_unique_id: ctx.msg.audio.file_unique_id,
+                    file_size: ctx.msg.audio?.file_size,
+                    is_banned: false,
+                    // add performer section
+                }
+                await insert_audio(data)
+            }
+        }
+    } catch (error: any) {
+        console.log(error.message);
+    }
+    await next()
+})
+
+
+userComposer.chatType("channel").on(":file", async (ctx, next) => {
+    try {
+        if (ctx.chat.id == parseInt(process.env.OFFICIAL_CHANNEL || "")) {
+            if (ctx.msg.document) {
+                const file_name = cleanFileName(ctx.msg.document.file_name)
+                const file_caption = cleanFileName(ctx.msg.caption ?? '')
+                const data = {
+                    user_id: 12345678,
+                    first_name: "12345678",
+                    file_id: ctx.msg.document.file_id,
+                    file_name: file_name,
+                    file_caption: file_caption,
+                    file_unique_id: ctx.msg.document.file_unique_id,
+                    file_size: ctx.msg.document.file_size,
+                    is_banned: false,
+                }
+                await insert_document(data)
+            } else if (ctx.msg.video) {
+                const file_name = cleanFileName(ctx.msg.video.file_name)
+                const file_caption = cleanFileName(ctx.msg.caption ?? '')
+                const data = {
+                    user_id: 12345678,
+                    first_name: "12345678",
+                    file_id: ctx.msg.video.file_id,
+                    file_name: file_name,
+                    file_caption: file_caption,
+                    file_unique_id: ctx.msg.video.file_unique_id,
+                    file_size: ctx.msg.video.file_size,
+                    is_banned: false,
+                }
+                await insert_video(data)
+            } else if (ctx.msg.audio) {
+                const file_name = cleanFileName(ctx.msg.audio.file_name)
+                const file_caption = cleanFileName(ctx.msg.caption ?? '')
+                const data = {
+                    user_id: 12345678,
+                    first_name: "12345678",
+                    file_id: ctx.msg.audio.file_id,
+                    file_name: file_name,
+                    file_caption: file_caption,
+                    file_unique_id: ctx.msg.audio.file_unique_id,
                     file_size: ctx.msg.audio?.file_size,
                     is_banned: false,
                     // add performer section

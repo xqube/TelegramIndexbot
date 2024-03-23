@@ -159,7 +159,7 @@ userComposer.chatType("private").command("info", async (ctx, next) => {
     await next();
 });
 userComposer.chatType("private").on(":file", async (ctx, next) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    var _a, _b, _c, _d;
     try {
         const { is_banned } = await is_user_banned(ctx.from.id);
         if (!is_banned) {
@@ -167,8 +167,8 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                 const file_name = cleanFileName(ctx.msg.document.file_name);
                 const file_caption = cleanFileName((_a = ctx.msg.caption) !== null && _a !== void 0 ? _a : '');
                 const data = {
-                    user_id: (_b = ctx.msg.from) === null || _b === void 0 ? void 0 : _b.id,
-                    first_name: (_c = ctx.msg.from) === null || _c === void 0 ? void 0 : _c.first_name,
+                    user_id: ctx.msg.from.id,
+                    first_name: ctx.msg.from.first_name,
                     file_id: ctx.msg.document.file_id,
                     file_name: file_name,
                     file_caption: file_caption,
@@ -180,10 +180,10 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.video) {
                 const file_name = cleanFileName(ctx.msg.video.file_name);
-                const file_caption = cleanFileName((_d = ctx.msg.caption) !== null && _d !== void 0 ? _d : '');
+                const file_caption = cleanFileName((_b = ctx.msg.caption) !== null && _b !== void 0 ? _b : '');
                 const data = {
-                    user_id: (_e = ctx.msg.from) === null || _e === void 0 ? void 0 : _e.id,
-                    first_name: (_f = ctx.msg.from) === null || _f === void 0 ? void 0 : _f.first_name,
+                    user_id: ctx.msg.from.id,
+                    first_name: ctx.msg.from.first_name,
                     file_id: ctx.msg.video.file_id,
                     file_name: file_name,
                     file_caption: file_caption,
@@ -195,15 +195,72 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.audio) {
                 const file_name = cleanFileName(ctx.msg.audio.file_name);
-                const file_caption = cleanFileName((_g = ctx.msg.caption) !== null && _g !== void 0 ? _g : '');
+                const file_caption = cleanFileName((_c = ctx.msg.caption) !== null && _c !== void 0 ? _c : '');
                 const data = {
-                    user_id: (_h = ctx.msg.from) === null || _h === void 0 ? void 0 : _h.id,
-                    first_name: (_j = ctx.msg.from) === null || _j === void 0 ? void 0 : _j.first_name,
-                    file_id: (_k = ctx.msg.audio) === null || _k === void 0 ? void 0 : _k.file_id,
+                    user_id: ctx.msg.from.id,
+                    first_name: ctx.msg.from.first_name,
+                    file_id: ctx.msg.audio.file_id,
                     file_name: file_name,
                     file_caption: file_caption,
-                    file_unique_id: (_l = ctx.msg.audio) === null || _l === void 0 ? void 0 : _l.file_unique_id,
-                    file_size: (_m = ctx.msg.audio) === null || _m === void 0 ? void 0 : _m.file_size,
+                    file_unique_id: ctx.msg.audio.file_unique_id,
+                    file_size: (_d = ctx.msg.audio) === null || _d === void 0 ? void 0 : _d.file_size,
+                    is_banned: false,
+                    // add performer section
+                };
+                await insert_audio(data);
+            }
+        }
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+    await next();
+});
+userComposer.chatType("channel").on(":file", async (ctx, next) => {
+    var _a, _b, _c, _d;
+    try {
+        if (ctx.chat.id == parseInt(process.env.OFFICIAL_CHANNEL || "")) {
+            if (ctx.msg.document) {
+                const file_name = cleanFileName(ctx.msg.document.file_name);
+                const file_caption = cleanFileName((_a = ctx.msg.caption) !== null && _a !== void 0 ? _a : '');
+                const data = {
+                    user_id: 12345678,
+                    first_name: "12345678",
+                    file_id: ctx.msg.document.file_id,
+                    file_name: file_name,
+                    file_caption: file_caption,
+                    file_unique_id: ctx.msg.document.file_unique_id,
+                    file_size: ctx.msg.document.file_size,
+                    is_banned: false,
+                };
+                await insert_document(data);
+            }
+            else if (ctx.msg.video) {
+                const file_name = cleanFileName(ctx.msg.video.file_name);
+                const file_caption = cleanFileName((_b = ctx.msg.caption) !== null && _b !== void 0 ? _b : '');
+                const data = {
+                    user_id: 12345678,
+                    first_name: "12345678",
+                    file_id: ctx.msg.video.file_id,
+                    file_name: file_name,
+                    file_caption: file_caption,
+                    file_unique_id: ctx.msg.video.file_unique_id,
+                    file_size: ctx.msg.video.file_size,
+                    is_banned: false,
+                };
+                await insert_video(data);
+            }
+            else if (ctx.msg.audio) {
+                const file_name = cleanFileName(ctx.msg.audio.file_name);
+                const file_caption = cleanFileName((_c = ctx.msg.caption) !== null && _c !== void 0 ? _c : '');
+                const data = {
+                    user_id: 12345678,
+                    first_name: "12345678",
+                    file_id: ctx.msg.audio.file_id,
+                    file_name: file_name,
+                    file_caption: file_caption,
+                    file_unique_id: ctx.msg.audio.file_unique_id,
+                    file_size: (_d = ctx.msg.audio) === null || _d === void 0 ? void 0 : _d.file_size,
                     is_banned: false,
                     // add performer section
                 };
