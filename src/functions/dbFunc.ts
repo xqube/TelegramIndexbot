@@ -412,8 +412,8 @@ export async function warn_user_file(data: any): Promise<any | null> {
             }
         }
         const doc_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        const vid_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        const aud_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const vid_result = await db.VideoCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const aud_result = await db.AudioCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
 
         if (doc_result) {
             const doc_mod_result = await db.DocumentCollection.updateOne(file_unique_id, updateDoc);
