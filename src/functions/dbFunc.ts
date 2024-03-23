@@ -1,6 +1,6 @@
 import { bot } from "../bot.js";
 import { botComposer } from "../controllers/botComposer.js";
-import { mongoconnect } from "../db/dbConfig.js";
+import { mongoclient, mongoconnect } from "../db/dbConfig.js";
 
 
 // const { DocumentCollection, VideoCollection, AudioCollection, UserCollection } = await mongoconnect()
@@ -85,7 +85,7 @@ export async function search_document(searchTerms: string, page: number): Promis
         // Combine the regex patterns using the OR operator
         const combinedRegex = {
             $and: [
-                { $or: regexPatterns.map(pattern => ({ file_name: pattern })) },
+                { $and: regexPatterns.map(pattern => ({ file_name: pattern })) },
                 { is_banned: false }
             ]
         };
@@ -113,7 +113,7 @@ export async function search_video(searchTerms: string, page: number): Promise<{
         // Combine the regex patterns using the OR operator
         const combinedRegex = {
             $and: [
-                { $or: regexPatterns.map(pattern => ({ file_name: pattern })) },
+                { $and: regexPatterns.map(pattern => ({ file_name: pattern })) },
                 { is_banned: false }
             ]
         };
@@ -140,7 +140,7 @@ export async function search_audio(searchTerms: string, page: number): Promise<{
         // Combine the regex patterns using the OR operator
         const combinedRegex = {
             $and: [
-                { $or: regexPatterns.map(pattern => ({ file_name: pattern })) },
+                { $and: regexPatterns.map(pattern => ({ file_name: pattern })) },
                 { is_banned: false }
             ]
         };
@@ -188,13 +188,6 @@ export async function search_audio_file_id(data: any): Promise<any | null> {
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-//moderation area
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
 export async function get_file_details(data: any): Promise<any | null> {
     try {
         const file_unique_id = { file_unique_id: data };
@@ -216,13 +209,46 @@ export async function get_file_details(data: any): Promise<any | null> {
 
 export async function get_user_data(data: any): Promise<any | null> {
     try {
-        const user_id = parseInt(data)
+        const user_id = data
         const user_data = await db.UserCollection.findOne({ user_id: user_id });
-        return { user_data };
+        return user_data;
     } catch (error: any) {
         console.log(error.message);
     }
 }
+
+
+export async function get_db_data(): Promise<any | null> {
+    try {
+        const dbdata = await db.database.command({
+            dbStats: 1,
+            scale: 1024,
+            freeStorage: 1
+        });
+
+        return { dbdata };
+    } catch (error: any) {
+        console.log(error.message);
+        return null; // Return null in case of error
+    }
+}
+
+export async function is_user_banned(data: any): Promise<any | null> {
+    try {
+        const user_id = parseInt(data)
+        const { is_banned } = await db.UserCollection.findOne({ user_id: user_id }, { projection: { is_banned: 1, _id: 0 } });
+        return { is_banned };
+    } catch (error: any) {
+        console.log(error.message);
+    }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//moderation area
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 
@@ -441,6 +467,3 @@ export async function unban_user(data: any): Promise<any | null> {
         console.log(error.message);
     }
 }
-
-
-

@@ -1,6 +1,6 @@
 import { Composer } from "grammy";
 import { sysinfo } from "../plugins/sysinfo.js";
-import { terminate_user_files, terminate_user_files_reply, remove_file, warn_user_file, reinstate_user_files, reinstate_user_files_reply, restore_file, rwarn_user, ban_user, unban_user, get_file_details, get_user_data } from "../functions/dbFunc.js";
+import { terminate_user_files, terminate_user_files_reply, remove_file, warn_user_file, reinstate_user_files, reinstate_user_files_reply, restore_file, rwarn_user, ban_user, unban_user, get_file_details, get_user_data, get_db_data } from "../functions/dbFunc.js";
 import { bot } from "../bot.js";
 
 export const ownerComposer = new Composer();
@@ -53,14 +53,33 @@ ownerComposer.command("user", async (ctx, next) => {
         if (from) {
             if (ctx.msg.chat.type === 'private' && admins.includes(from.id)) {
                 if (ctx.match) {
-                    const { user_data } = await get_user_data(parseInt(ctx.match))
+                    const user_data = await get_user_data(parseInt(ctx.match))
                     const data = JSON.stringify(user_data, null, 4)
                     await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" })
                 }
             }
         }
     } catch (error: any) {
-        console.log("Error at remove in owner Composer", error.message);
+        console.log("Error at user command in owner Composer", error.message);
+    }
+    await next();
+})
+
+
+
+ownerComposer.command("stats", async (ctx, next) => {
+    try {
+        const admins: any = process.env.OWNERS
+        const from = ctx.msg.from
+        if (from) {
+            if (ctx.msg.chat.type === 'private' && admins.includes(from.id)) {
+                const dbdata = await get_db_data()
+                const data = JSON.stringify(dbdata, null, 4)
+                await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" })
+            }
+        }
+    } catch (error: any) {
+        console.log("Error at user command in owner Composer", error.message);
     }
     await next();
 })
@@ -82,6 +101,7 @@ ownerComposer.command("info", async (ctx: any, next) => {
     }
     await next();
 })
+
 
 
 ownerComposer.command("terminate", async (ctx: any, next) => {

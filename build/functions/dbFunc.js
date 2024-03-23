@@ -79,7 +79,7 @@ export async function search_document(searchTerms, page) {
         // Combine the regex patterns using the OR operator
         const combinedRegex = {
             $and: [
-                { $or: regexPatterns.map(pattern => ({ file_name: pattern })) },
+                { $and: regexPatterns.map(pattern => ({ file_name: pattern })) },
                 { is_banned: false }
             ]
         };
@@ -105,7 +105,7 @@ export async function search_video(searchTerms, page) {
         // Combine the regex patterns using the OR operator
         const combinedRegex = {
             $and: [
-                { $or: regexPatterns.map(pattern => ({ file_name: pattern })) },
+                { $and: regexPatterns.map(pattern => ({ file_name: pattern })) },
                 { is_banned: false }
             ]
         };
@@ -131,7 +131,7 @@ export async function search_audio(searchTerms, page) {
         // Combine the regex patterns using the OR operator
         const combinedRegex = {
             $and: [
-                { $or: regexPatterns.map(pattern => ({ file_name: pattern })) },
+                { $and: regexPatterns.map(pattern => ({ file_name: pattern })) },
                 { is_banned: false }
             ]
         };
@@ -174,9 +174,6 @@ export async function search_audio_file_id(data) {
         console.log(error.message);
     }
 }
-///////////////////////////////////////////////////////////////////////////////////////////////
-//moderation area
-///////////////////////////////////////////////////////////////////////////////////////////////
 export async function get_file_details(data) {
     try {
         const file_unique_id = { file_unique_id: data };
@@ -196,14 +193,41 @@ export async function get_file_details(data) {
 }
 export async function get_user_data(data) {
     try {
-        const user_id = parseInt(data);
+        const user_id = data;
         const user_data = await db.UserCollection.findOne({ user_id: user_id });
-        return { user_data };
+        return user_data;
     }
     catch (error) {
         console.log(error.message);
     }
 }
+export async function get_db_data() {
+    try {
+        const dbdata = await db.database.command({
+            dbStats: 1,
+            scale: 1024,
+            freeStorage: 1
+        });
+        return { dbdata };
+    }
+    catch (error) {
+        console.log(error.message);
+        return null; // Return null in case of error
+    }
+}
+export async function is_user_banned(data) {
+    try {
+        const user_id = parseInt(data);
+        const { is_banned } = await db.UserCollection.findOne({ user_id: user_id }, { projection: { is_banned: 1, _id: 0 } });
+        return { is_banned };
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////
+//moderation area
+///////////////////////////////////////////////////////////////////////////////////////////////
 export async function terminate_user_files(data) {
     try {
         const user_id = { user_id: data };

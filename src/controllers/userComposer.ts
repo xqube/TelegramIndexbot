@@ -1,5 +1,5 @@
 import { Composer, Context } from "grammy";
-import { insert_audio, insert_document, insert_user, insert_video, search_audio_file_id, search_document_file_id, search_video_file_id } from "../functions/dbFunc.js";
+import { insert_audio, insert_document, insert_user, insert_video, is_user_banned, search_audio_file_id, search_document_file_id, search_video_file_id } from "../functions/dbFunc.js";
 import { cleanFileName, extractSearchTerm, keyboardlist } from "../functions/helperFunc.js";
 
 
@@ -128,7 +128,7 @@ userComposer.chatType("private").command("start", async (ctx) => {
                 }
                 await insert_user(data)
             }
-            ctx.reply(`👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase, and all files will be deleted upon stable release.</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`,{parse_mode:"HTML"})
+            ctx.reply(`👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase, and all files will be deleted upon stable release.</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`, { parse_mode: "HTML" })
         }
     } catch (error) {
 
@@ -163,49 +163,52 @@ userComposer.chatType("private").command("info", async (ctx, next) => {
 
 userComposer.chatType("private").on(":file", async (ctx, next) => {
     try {
-        if (ctx.msg.document) {
-            const file_name = cleanFileName(ctx.msg.document.file_name)
-            const file_caption = cleanFileName(ctx.msg.caption ?? '')
-            const data = {
-                user_id: ctx.msg.from?.id,
-                first_name: ctx.msg.from?.first_name,
-                file_id: ctx.msg.document.file_id,
-                file_name: file_name,
-                file_caption: file_caption,
-                file_unique_id: ctx.msg.document.file_unique_id,
-                file_size: ctx.msg.document.file_size,
-                is_banned: false,
+        const { is_banned } = await is_user_banned(ctx.from.id)
+        if (!is_banned) {
+            if (ctx.msg.document) {
+                const file_name = cleanFileName(ctx.msg.document.file_name)
+                const file_caption = cleanFileName(ctx.msg.caption ?? '')
+                const data = {
+                    user_id: ctx.msg.from?.id,
+                    first_name: ctx.msg.from?.first_name,
+                    file_id: ctx.msg.document.file_id,
+                    file_name: file_name,
+                    file_caption: file_caption,
+                    file_unique_id: ctx.msg.document.file_unique_id,
+                    file_size: ctx.msg.document.file_size,
+                    is_banned: false,
+                }
+                await insert_document(data)
+            } else if (ctx.msg.video) {
+                const file_name = cleanFileName(ctx.msg.video.file_name)
+                const file_caption = cleanFileName(ctx.msg.caption ?? '')
+                const data = {
+                    user_id: ctx.msg.from?.id,
+                    first_name: ctx.msg.from?.first_name,
+                    file_id: ctx.msg.video.file_id,
+                    file_name: file_name,
+                    file_caption: file_caption,
+                    file_unique_id: ctx.msg.video.file_unique_id,
+                    file_size: ctx.msg.video.file_size,
+                    is_banned: false,
+                }
+                await insert_video(data)
+            } else if (ctx.msg.audio) {
+                const file_name = cleanFileName(ctx.msg.audio.file_name)
+                const file_caption = cleanFileName(ctx.msg.caption ?? '')
+                const data = {
+                    user_id: ctx.msg.from?.id,
+                    first_name: ctx.msg.from?.first_name,
+                    file_id: ctx.msg.audio?.file_id,
+                    file_name: file_name,
+                    file_caption: file_caption,
+                    file_unique_id: ctx.msg.audio?.file_unique_id,
+                    file_size: ctx.msg.audio?.file_size,
+                    is_banned: false,
+                    // add performer section
+                }
+                await insert_audio(data)
             }
-            await insert_document(data)
-        } else if (ctx.msg.video) {
-            const file_name = cleanFileName(ctx.msg.video.file_name)
-            const file_caption = cleanFileName(ctx.msg.caption ?? '')
-            const data = {
-                user_id: ctx.msg.from?.id,
-                first_name: ctx.msg.from?.first_name,
-                file_id: ctx.msg.video.file_id,
-                file_name: file_name,
-                file_caption: file_caption,
-                file_unique_id: ctx.msg.video.file_unique_id,
-                file_size: ctx.msg.video.file_size,
-                is_banned: false,
-            }
-            await insert_video(data)
-        } else if (ctx.msg.audio) {
-            const file_name = cleanFileName(ctx.msg.audio.file_name)
-            const file_caption = cleanFileName(ctx.msg.caption ?? '')
-            const data = {
-                user_id: ctx.msg.from?.id,
-                first_name: ctx.msg.from?.first_name,
-                file_id: ctx.msg.audio?.file_id,
-                file_name: file_name,
-                file_caption: file_caption,
-                file_unique_id: ctx.msg.audio?.file_unique_id,
-                file_size: ctx.msg.audio?.file_size,
-                is_banned: false,
-                // add performer section
-            }
-            await insert_audio(data)
         }
     } catch (error: any) {
         console.log(error.message);
