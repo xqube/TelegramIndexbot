@@ -334,7 +334,7 @@ ownerComposer.command("warn", async (ctx, next) => {
                 }
             }
             else if (ctx.msg.reply_to_message.video) {
-                const { vid_mod_result, user_data, user_mod_result } = await warn_user_file(ctx.msg.reply_to_message.document.file_unique_id);
+                const { vid_mod_result, user_data, user_mod_result } = await warn_user_file(ctx.msg.reply_to_message.video.file_unique_id);
                 if ((vid_mod_result === null || vid_mod_result === void 0 ? void 0 : vid_mod_result.modifiedCount) != 0) {
                     if (user_mod_result) {
                         try {
@@ -354,7 +354,7 @@ ownerComposer.command("warn", async (ctx, next) => {
                 }
             }
             else if (ctx.msg.reply_to_message.audio) {
-                const { aud_mod_result, user_data, user_mod_result } = await warn_user_file(ctx.msg.reply_to_message.document.file_unique_id);
+                const { aud_mod_result, user_data, user_mod_result } = await warn_user_file(ctx.msg.reply_to_message.audio.file_unique_id);
                 if ((aud_mod_result === null || aud_mod_result === void 0 ? void 0 : aud_mod_result.modifiedCount) != 0) {
                     if (user_mod_result) {
                         try {
