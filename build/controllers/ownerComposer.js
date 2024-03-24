@@ -3,10 +3,10 @@ import { sysinfo } from "../plugins/sysinfo.js";
 import { terminate_user_files, terminate_user_files_reply, remove_file, warn_user_file, reinstate_user_files, reinstate_user_files_reply, restore_file, rwarn_user, ban_user, unban_user, get_file_details, get_user_data, get_db_data } from "../functions/dbFunc.js";
 import { bot } from "../bot.js";
 export const ownerComposer = new Composer();
-ownerComposer.command("sysinfo", async (ctx, next) => {
+ownerComposer.chatType("private").command("sysinfo", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (admins.includes(ctx.msg.from.id)) {
             await sysinfo(ctx);
         }
     }
@@ -15,10 +15,10 @@ ownerComposer.command("sysinfo", async (ctx, next) => {
     }
     await next();
 });
-ownerComposer.command("lookdb", async (ctx, next) => {
+ownerComposer.chatType("private").command("lookdb", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (admins.includes(ctx.msg.from.id)) {
             if (ctx.msg.reply_to_message.document) {
                 const { doc_result } = await get_file_details(ctx.msg.reply_to_message.document.file_unique_id);
                 const data = JSON.stringify(doc_result, null, 4);
@@ -66,9 +66,13 @@ ownerComposer.command("stats", async (ctx, next) => {
         const from = ctx.msg.from;
         if (from) {
             if (ctx.msg.chat.type === 'private' && admins.includes(from.id)) {
-                const dbdata = await get_db_data();
+                const { dbdata, doc_result, vid_result, aud_result, user_data } = await get_db_data();
                 const data = JSON.stringify(dbdata, null, 4);
-                await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" });
+                await ctx.reply(`<pre language="json">${data}</pre>
+                <b>Total Docs</b>: ${doc_result}
+                <b>Total Videos</b>: ${vid_result}
+                <b>Total Audios</b>: ${aud_result}
+                `, { parse_mode: "HTML" });
             }
         }
     }

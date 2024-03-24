@@ -5,10 +5,10 @@ import { bot } from "../bot.js";
 
 export const ownerComposer = new Composer();
 
-ownerComposer.command("sysinfo", async (ctx: any, next) => {
+ownerComposer.chatType("private").command("sysinfo", async (ctx: any, next) => {
     try {
         const admins: any = process.env.OWNERS
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (admins.includes(ctx.msg.from.id)) {
             await sysinfo(ctx)
         }
     } catch (error: any) {
@@ -18,12 +18,10 @@ ownerComposer.command("sysinfo", async (ctx: any, next) => {
 })
 
 
-
-ownerComposer.command("lookdb", async (ctx: any, next) => {
+ownerComposer.chatType("private").command("lookdb", async (ctx: any, next) => {
     try {
         const admins: any = process.env.OWNERS
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
-
+        if (admins.includes(ctx.msg.from.id)) {
             if (ctx.msg.reply_to_message.document) {
                 const { doc_result } = await get_file_details(ctx.msg.reply_to_message.document.file_unique_id)
                 const data = JSON.stringify(doc_result, null, 4)
@@ -73,9 +71,13 @@ ownerComposer.command("stats", async (ctx, next) => {
         const from = ctx.msg.from
         if (from) {
             if (ctx.msg.chat.type === 'private' && admins.includes(from.id)) {
-                const dbdata = await get_db_data()
+                const { dbdata, doc_result, vid_result, aud_result, user_data } = await get_db_data()
                 const data = JSON.stringify(dbdata, null, 4)
-                await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" })
+                await ctx.reply(`<pre language="json">${data}</pre>
+                <b>Total Docs</b>: ${doc_result}
+                <b>Total Videos</b>: ${vid_result}
+                <b>Total Audios</b>: ${aud_result}
+                `, { parse_mode: "HTML" })
             }
         }
     } catch (error: any) {

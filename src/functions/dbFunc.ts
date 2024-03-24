@@ -225,8 +225,12 @@ export async function get_db_data(): Promise<any | null> {
             scale: 1024,
             freeStorage: 1
         });
+        const doc_result = await db.DocumentCollection.countDocuments();
+        const vid_result = await db.VideoCollection.countDocuments();
+        const aud_result = await db.AudioCollection.countDocuments();
+        const user_data = await db.UserCollection.countDocuments();
 
-        return { dbdata };
+        return { dbdata, doc_result, vid_result, aud_result, user_data };
     } catch (error: any) {
         console.log(error.message);
         return null; // Return null in case of error
