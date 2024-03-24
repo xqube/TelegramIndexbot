@@ -2,13 +2,18 @@ import { InlineKeyboard } from "grammy";
 import { search_audio, search_document, search_video } from "./dbFunc.js";
 export async function keyboardlist(ctx, page, searchTerm, threadid) {
     try {
+        const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
         const inlineKeyboard = new InlineKeyboard();
         if (threadid == process.env.DOC_THREAD_ID) {
             const { filteredDocs, totalsize } = await search_document(searchTerm, page);
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                await ctx.reply("No documents found.", { message_thread_id: threadid });
+                const { message_id } = await ctx.reply("No Document found.", { message_thread_id: threadid });
+                setTimeout(async () => {
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    await ctx.deleteMessage();
+                }, msgDeleteTime);
                 return;
             }
             else {
@@ -38,7 +43,11 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                await ctx.reply("No documents found.", { message_thread_id: threadid });
+                const { message_id } = await ctx.reply("No Video found.", { message_thread_id: threadid });
+                setTimeout(async () => {
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    await ctx.deleteMessage();
+                }, msgDeleteTime);
                 return;
             }
             else {
@@ -68,7 +77,11 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                await ctx.reply("No documents found.", { message_thread_id: threadid });
+                const { message_id } = await ctx.reply("No Audio found.", { message_thread_id: threadid });
+                setTimeout(async () => {
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    await ctx.deleteMessage();
+                }, msgDeleteTime);
                 return;
             }
             else {

@@ -4,13 +4,18 @@ import { search_audio, search_document, search_video } from "./dbFunc.js";
 
 export async function keyboardlist(ctx: any, page: number, searchTerm: string, threadid: number | undefined) {
     try {
+        const msgDeleteTime: number = parseInt(process.env.MESSAGE_DELETE_TIME || "")
         const inlineKeyboard = new InlineKeyboard()
         if (threadid == process.env.DOC_THREAD_ID) {
             const { filteredDocs, totalsize } = await search_document(searchTerm, page);
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                await ctx.reply("No documents found.", { message_thread_id: threadid });
+                const { message_id } = await ctx.reply("No Document found.", { message_thread_id: threadid });
+                setTimeout(async () => {
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id)
+                    await ctx.deleteMessage()
+                }, msgDeleteTime)
                 return;
             } else {
                 (filteredDocs.map(async (doc: any) => {
@@ -38,7 +43,11 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                await ctx.reply("No documents found.", { message_thread_id: threadid });
+                const { message_id } = await ctx.reply("No Video found.", { message_thread_id: threadid });
+                setTimeout(async () => {
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id)
+                    await ctx.deleteMessage()
+                }, msgDeleteTime)
                 return;
             } else {
                 (filteredDocs.map(async (doc: any) => {
@@ -64,7 +73,11 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                await ctx.reply("No documents found.", { message_thread_id: threadid });
+                const { message_id } = await ctx.reply("No Audio found.", { message_thread_id: threadid });
+                setTimeout(async () => {
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id)
+                    await ctx.deleteMessage()
+                }, msgDeleteTime)
                 return;
             } else {
                 (filteredDocs.map(async (doc: any) => {
@@ -98,8 +111,6 @@ export function bytesToMegabytes(bytes: number) {
     return bytes / (1024 * 1024);
 }
 
-
-
 // export function cleanFileName(fileName: any): string {
 //     // Define a regular expression pattern to match characters to be removed
 //     const pattern = /[^a-zA-Z0-9\s]+/g;
@@ -109,7 +120,6 @@ export function bytesToMegabytes(bytes: number) {
 //     cleanedFileName = cleanedFileName.replace(/\s{2,}/g, " ");
 //     return cleanedFileName;
 // }
-
 
 export function cleanFileName(fileName: any): string {
     // Define a regular expression pattern to match characters to be removed
