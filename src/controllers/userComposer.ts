@@ -281,20 +281,20 @@ userComposer.on(":text", async (ctx, next) => {
             if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
                 const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.DOC_THREAD_ID });
                 setTimeout(async () => {
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id)
                     await ctx.deleteMessage()
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id)
                 }, msgDeleteTime)
             } else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
                 const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.VIDEO_THREAD_ID });
                 setTimeout(async () => {
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id)
                     await ctx.deleteMessage()
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id)
                 }, msgDeleteTime)
             } else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
                 const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.AUDIO_THREAD_ID });
                 setTimeout(async () => {
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id)
                     await ctx.deleteMessage()
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id)
                 }, msgDeleteTime)
             }
         }

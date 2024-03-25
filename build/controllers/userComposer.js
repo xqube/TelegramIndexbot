@@ -283,22 +283,22 @@ userComposer.on(":text", async (ctx, next) => {
             if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
                 const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.DOC_THREAD_ID });
                 setTimeout(async () => {
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
                     await ctx.deleteMessage();
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
                 }, msgDeleteTime);
             }
             else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
                 const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id}">${(_d = ctx.from) === null || _d === void 0 ? void 0 : _d.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.VIDEO_THREAD_ID });
                 setTimeout(async () => {
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
                     await ctx.deleteMessage();
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
                 }, msgDeleteTime);
             }
             else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
                 const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_e = ctx.from) === null || _e === void 0 ? void 0 : _e.id}">${(_f = ctx.from) === null || _f === void 0 ? void 0 : _f.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.AUDIO_THREAD_ID });
                 setTimeout(async () => {
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
                     await ctx.deleteMessage();
+                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
                 }, msgDeleteTime);
             }
         }
