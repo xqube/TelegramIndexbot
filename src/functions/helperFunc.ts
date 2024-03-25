@@ -13,6 +13,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
             if (filteredDocs.length === 0) {
                 const { message_id } = await ctx.reply("No Document found.", { message_thread_id: threadid });
                 setTimeout(async () => {
+                    await ctx.deleteMessage()
                     await ctx.api.deleteMessage(ctx.chat.id, message_id)
                 }, msgDeleteTime)
                 return;
@@ -44,6 +45,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
             if (filteredDocs.length === 0) {
                 const { message_id } = await ctx.reply("No Video found.", { message_thread_id: threadid });
                 setTimeout(async () => {
+                    await ctx.deleteMessage()
                     await ctx.api.deleteMessage(ctx.chat.id, message_id)
                 }, msgDeleteTime)
                 return;
@@ -73,6 +75,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string, t
             if (filteredDocs.length === 0) {
                 const { message_id } = await ctx.reply("No Audio found.", { message_thread_id: threadid });
                 setTimeout(async () => {
+                    await ctx.deleteMessage()
                     await ctx.api.deleteMessage(ctx.chat.id, message_id)
                 }, msgDeleteTime)
                 return;
