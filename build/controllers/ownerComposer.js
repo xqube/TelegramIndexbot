@@ -468,7 +468,7 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
     try {
         const totalsize = await db.DocumentCollection.countDocuments();
         const totalPages = Math.ceil(totalsize / 10);
-        for (page = 1; page <= totalPages; page++) {
+        async function senfiles() {
             const skip = (page - 1) * 10;
             const filteredDocs = await db.DocumentCollection.find().skip(skip).limit(10).toArray();
             if (filteredDocs.length === 0) {
@@ -482,6 +482,7 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
                         files = files + 1;
                         if (files == totalsize) {
                             await ctx.reply(`Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`);
+                            clearInterval(myInterval);
                         }
                     }
                     else {
@@ -489,7 +490,9 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
                     }
                 }));
             }
+            page++;
         }
+        const myInterval = setInterval(senfiles, 15000);
     }
     catch (error) {
         console.log(error.message);
