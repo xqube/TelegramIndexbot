@@ -474,8 +474,8 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
         const totalPages = Math.ceil(totalsize / 10)
 
         async function senfiles() {
-            const skip = (page - 1) * 10;
-            const filteredDocs = await db.DocumentCollection.find().skip(skip).limit(10).toArray();
+            const skip = (page - 1) * 1;
+            const filteredDocs = await db.DocumentCollection.find().skip(skip).limit(1).toArray();
             if (filteredDocs.length === 0) {
                 await ctx.reply("no files to");
                 return;
@@ -490,14 +490,13 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
                         }
                     } else {
                         await ctx.reply("error in sending")
-
                     }
                 }));
             }
             page++
         }
 
-        const myInterval = setInterval(senfiles, 15000)
+        const myInterval = setInterval(senfiles, 4000)
 
     } catch (error: any) {
         console.log(error.message);
