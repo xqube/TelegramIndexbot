@@ -12,6 +12,7 @@ type MyContext = Context
 
 export const bot = new Bot<MyContext>(process.env.TOKEN!);
 
+
 const db = await mongoconnect()
 if (db) {
     console.log('Connected successfully to DB server');

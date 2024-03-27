@@ -3,6 +3,14 @@ import { sysinfo } from "../plugins/sysinfo.js";
 import { terminate_user_files, terminate_user_files_reply, remove_file, warn_user_file, reinstate_user_files, reinstate_user_files_reply, restore_file, rwarn_user, ban_user, unban_user, get_file_details, get_user_data, get_db_data } from "../functions/dbFunc.js";
 import { bot } from "../bot.js";
 
+import { mongoclient, mongoconnect } from "../db/dbConfig.js";
+
+let page = 1
+let files = 0
+// const { DocumentCollection, VideoCollection, AudioCollection, UserCollection } = await mongoconnect()
+const db = await mongoconnect()
+
+
 export const ownerComposer = new Composer();
 
 ownerComposer.chatType("private").command("sysinfo", async (ctx: any, next) => {
@@ -456,4 +464,38 @@ ownerComposer.command("unban", async (ctx: any, next) => {
         console.log("Error at ubanning user in ownerComposer", error.message);
     }
     await next();
+})
+
+
+
+ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
+    try {
+        const totalsize = await db.DocumentCollection.countDocuments();
+        const totalPages = Math.ceil(totalsize / 10)
+        for (page = 1; page <= totalPages; page++) {
+            const skip = (page - 1) * 10;
+            const filteredDocs = await db.DocumentCollection.find().skip(skip).limit(10).toArray();
+            if (filteredDocs.length === 0) {
+                await ctx.reply("no files to");
+                return;
+            } else {
+                (filteredDocs.map(async (doc: any) => {
+                    const res = await ctx.replyWithDocument(doc.file_id, { caption: doc.file_name })
+                    if (res) {
+                        files = files + 1
+                        if (files == totalsize) {
+                            await ctx.reply(`Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`)
+                        }
+                    } else {
+                        await ctx.reply("error in sending")
+
+                    }
+                }));
+            }
+        }
+
+    } catch (error: any) {
+        console.log(error.message);
+    }
+
 })
