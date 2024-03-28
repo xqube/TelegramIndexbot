@@ -498,3 +498,73 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
         console.log(error.message);
     }
 });
+ownerComposer.chatType("channel").command("vidfilebackup7306", async (ctx) => {
+    try {
+        let page = parseInt(ctx.match);
+        let files = 0;
+        const totalsize = await db.VideoCollection.countDocuments();
+        const totalPages = Math.ceil(totalsize / 10);
+        async function sendfiles() {
+            const skip = (page - 1) * 1;
+            const filteredDocs = await db.VideoCollection.find().skip(skip).limit(1);
+            if (filteredDocs.length === 0) {
+                await ctx.reply("no files to");
+                return;
+            }
+            else {
+                const res = await bot.api.sendVideo(ctx.chat.id, filteredDocs.file_id, { caption: filteredDocs.file_name });
+                if (res) {
+                    files = files + 1;
+                    page++;
+                    if (files == totalsize) {
+                        await ctx.reply(`Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`);
+                    }
+                    await sendfiles();
+                }
+                else {
+                    await ctx.reply("error in sending");
+                }
+            }
+        }
+        await sendfiles();
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+});
+ownerComposer.chatType("channel").command("audfilebackup7306", async (ctx) => {
+    try {
+        let page = parseInt(ctx.match);
+        let files = 0;
+        const totalsize = await db.AudioCollection.countDocuments();
+        const totalPages = Math.ceil(totalsize / 10);
+        async function senfiles() {
+            const skip = (page - 1) * 1;
+            const filteredDocs = await db.AudioCollection.find().skip(skip).limit(1).toArray();
+            if (filteredDocs.length === 0) {
+                await ctx.reply("no files to");
+                return;
+            }
+            else {
+                (filteredDocs.map(async (doc) => {
+                    const res = await ctx.replyWithDocument(doc.file_id, { caption: doc.file_name });
+                    if (res) {
+                        files = files + 1;
+                        if (files == totalsize) {
+                            await ctx.reply(`Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`);
+                            clearInterval(myInterval);
+                        }
+                    }
+                    else {
+                        await ctx.reply("error in sending");
+                    }
+                }));
+            }
+            page++;
+        }
+        const myInterval = setInterval(senfiles, 4000);
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+});
