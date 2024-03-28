@@ -500,33 +500,34 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
 });
 ownerComposer.chatType("channel").command("vidfilebackup7306", async (ctx) => {
     try {
+        let thispage = 0;
         let page = parseInt(ctx.match);
         let files = 0;
         const totalsize = await db.VideoCollection.countDocuments();
         const totalPages = Math.ceil(totalsize / 10);
-        async function sendfiles() {
+        async function sendfiles(page) {
             const skip = (page - 1) * 1;
-            const filteredDocs = await db.VideoCollection.find().skip(skip).limit(1);
+            const filteredDocs = await db.VideoCollection.find().skip(skip).limit(1).toArray();
             if (filteredDocs.length === 0) {
-                await ctx.reply("no files to");
+                await ctx.reply("no files to send");
                 return;
             }
             else {
-                const res = await bot.api.sendVideo(ctx.chat.id, filteredDocs.file_id, { caption: filteredDocs.file_name });
+                const res = await bot.api.sendVideo(ctx.chat.id, filteredDocs[0].file_id, { caption: filteredDocs[0].file_name });
                 if (res) {
                     files = files + 1;
-                    page++;
+                    thispage = page + 1;
                     if (files == totalsize) {
                         await ctx.reply(`Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`);
                     }
-                    await sendfiles();
+                    await sendfiles(thispage);
                 }
                 else {
                     await ctx.reply("error in sending");
                 }
             }
         }
-        await sendfiles();
+        await sendfiles(page);
     }
     catch (error) {
         console.log(error.message);
