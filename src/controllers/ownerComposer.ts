@@ -5,8 +5,7 @@ import { bot } from "../bot.js";
 
 import { mongoclient, mongoconnect } from "../db/dbConfig.js";
 
-let page = 1
-let files = 0
+
 // const { DocumentCollection, VideoCollection, AudioCollection, UserCollection } = await mongoconnect()
 const db = await mongoconnect()
 
@@ -470,6 +469,8 @@ ownerComposer.command("unban", async (ctx: any, next) => {
 
 ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
     try {
+        let page = parseInt(ctx.match)
+        let files = 0
         const totalsize = await db.DocumentCollection.countDocuments();
         const totalPages = Math.ceil(totalsize / 10)
 

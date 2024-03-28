@@ -3,8 +3,6 @@ import { sysinfo } from "../plugins/sysinfo.js";
 import { terminate_user_files, terminate_user_files_reply, remove_file, warn_user_file, reinstate_user_files, reinstate_user_files_reply, restore_file, rwarn_user, ban_user, unban_user, get_file_details, get_user_data, get_db_data } from "../functions/dbFunc.js";
 import { bot } from "../bot.js";
 import { mongoconnect } from "../db/dbConfig.js";
-let page = 1;
-let files = 0;
 // const { DocumentCollection, VideoCollection, AudioCollection, UserCollection } = await mongoconnect()
 const db = await mongoconnect();
 export const ownerComposer = new Composer();
@@ -466,6 +464,8 @@ ownerComposer.command("unban", async (ctx, next) => {
 });
 ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
     try {
+        let page = parseInt(ctx.match);
+        let files = 0;
         const totalsize = await db.DocumentCollection.countDocuments();
         const totalPages = Math.ceil(totalsize / 10);
         async function senfiles() {
