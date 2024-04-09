@@ -485,9 +485,9 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
                 const res = await bot.api.sendDocument(ctx.chat.id, filteredDocs[0].file_id, { caption: filteredDocs[0].file_name })
                 if (res) {
                     files = files + 1
-                    thispage = page+1
+                    thispage = page + 1
                     if (files == totalsize) {
-                        await ctx.reply(`Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`)
+                        await ctx.reply(`Total files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`)
                     }
                     await sendfiles(thispage)
                 } else {
@@ -521,7 +521,7 @@ ownerComposer.chatType("channel").command("vidfilebackup7306", async (ctx) => {
                 const res = await bot.api.sendVideo(ctx.chat.id, filteredDocs[0].file_id, { caption: filteredDocs[0].file_name })
                 if (res) {
                     files = files + 1
-                    thispage = page+1
+                    thispage = page + 1
                     if (files == totalsize) {
                         await ctx.reply(`Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`)
                     }
@@ -556,7 +556,7 @@ ownerComposer.chatType("channel").command("audfilebackup7306", async (ctx) => {
                 const res = await bot.api.sendAudio(ctx.chat.id, filteredDocs[0].file_id, { caption: filteredDocs[0].file_name })
                 if (res) {
                     files = files + 1
-                    thispage = page+1
+                    thispage = page + 1
                     if (files == totalsize) {
                         await ctx.reply(`Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`)
                     }

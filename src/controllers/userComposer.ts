@@ -163,8 +163,9 @@ userComposer.chatType("private").command("info", async (ctx, next) => {
 
 userComposer.chatType("private").on(":file", async (ctx, next) => {
     try {
+        const admins: any = process.env.OWNERS
         const { is_banned } = await is_user_banned(ctx.from.id)
-        if (!is_banned) {
+        if (!is_banned && admins.includes(ctx.msg.from.id)) {
             if (ctx.msg.document) {
                 const file_name = cleanFileName(ctx.msg.document.file_name)
                 const file_caption = cleanFileName(ctx.msg.caption ?? '')
