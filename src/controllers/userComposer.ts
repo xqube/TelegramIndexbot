@@ -124,63 +124,63 @@ userComposer.on("callback_query:data", async (ctx: any) => {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-// userComposer.chatType("private").command("start", async (ctx) => {
-//     try {
-//         if (ctx.match) {
-//             const parts = ctx.match.split("__");
-//             const file_unique_id = parts[1];
-//             const type = parts[0];
-//             if (type == "doc") {
-//                 const { filteredDocs } = await search_document_file_id(file_unique_id);
-//                 if (filteredDocs.file_caption != "") {
-//                     await ctx.replyWithDocument(filteredDocs.file_id, {
-//                         caption: filteredDocs.file_caption,
-//                     });
-//                 } else {
-//                     await ctx.replyWithDocument(filteredDocs.file_id, {
-//                         caption: filteredDocs.file_name,
-//                     });
-//                 }
-//             } else if (type == "vid") {
-//                 const { filteredDocs } = await search_video_file_id(file_unique_id);
-//                 if (filteredDocs.file_caption != "") {
-//                     await ctx.replyWithDocument(filteredDocs.file_id, {
-//                         caption: filteredDocs.file_caption,
-//                     });
-//                 } else {
-//                     await ctx.replyWithDocument(filteredDocs.file_id, {
-//                         caption: filteredDocs.file_name,
-//                     });
-//                 }
-//             } else if (type == "aud") {
-//                 const { filteredDocs } = await search_audio_file_id(file_unique_id);
-//                 if (filteredDocs.file_caption != "") {
-//                     await ctx.replyWithDocument(filteredDocs.file_id, {
-//                         caption: filteredDocs.file_caption,
-//                     });
-//                 } else {
-//                     await ctx.replyWithDocument(filteredDocs.file_id, {
-//                         caption: filteredDocs.file_name,
-//                     });
-//                 }
-//             }
-//         } else {
-//             if (ctx.from) {
-//                 const data = {
-//                     user_id: ctx.from.id,
-//                     first_name: ctx.from.first_name,
-//                     warn: 0,
-//                     is_banned: false,
-//                 };
-//                 await insert_user(data);
-//             }
-//             ctx.reply(
-//                 `👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`,
-//                 { parse_mode: "HTML" }
-//             );
-//         }
-//     } catch (error) { }
-// });
+userComposer.chatType("private").command("start", async (ctx) => {
+    try {
+        if (ctx.match) {
+            const parts = ctx.match.split("__");
+            const file_unique_id = parts[1];
+            const type = parts[0];
+            if (type == "doc") {
+                const { filteredDocs } = await search_document_file_id(file_unique_id);
+                if (filteredDocs.file_caption != "") {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_caption,
+                    });
+                } else {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_name,
+                    });
+                }
+            } else if (type == "vid") {
+                const { filteredDocs } = await search_video_file_id(file_unique_id);
+                if (filteredDocs.file_caption != "") {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_caption,
+                    });
+                } else {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_name,
+                    });
+                }
+            } else if (type == "aud") {
+                const { filteredDocs } = await search_audio_file_id(file_unique_id);
+                if (filteredDocs.file_caption != "") {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_caption,
+                    });
+                } else {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_name,
+                    });
+                }
+            }
+        } else {
+            if (ctx.from) {
+                const data = {
+                    user_id: ctx.from.id,
+                    first_name: ctx.from.first_name,
+                    warn: 0,
+                    is_banned: false,
+                };
+                await insert_user(data);
+            }
+            // ctx.reply(
+            //     `👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`,
+            //     { parse_mode: "HTML" }
+            // );
+        }
+    } catch (error) { }
+});
 
 userComposer.chatType("private").command("info", async (ctx, next) => {
   try {
