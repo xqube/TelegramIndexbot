@@ -1,7 +1,7 @@
 import { Composer } from "grammy";
-import { insert_audio, insert_document, insert_user, insert_video, is_user_banned, search_audio_file_id, search_document_file_id, search_video_file_id } from "../functions/dbFunc.js";
-import { cleanFileName, extractSearchTerm, keyboardlist } from "../functions/helperFunc.js";
-export const userComposer = new Composer;
+import { insert_audio, insert_document, insert_video, search_audio_file_id, search_document_file_id, search_video_file_id, } from "../functions/dbFunc.js";
+import { cleanFileName, extractSearchTerm, keyboardlist, } from "../functions/helperFunc.js";
+export const userComposer = new Composer();
 userComposer.on("callback_query:data", async (ctx) => {
     var _a;
     try {
@@ -11,7 +11,7 @@ userComposer.on("callback_query:data", async (ctx) => {
         const calladatafile = calldata.match(/file/);
         const messageText = (_a = ctx.update.callback_query.message) === null || _a === void 0 ? void 0 : _a.text;
         const searchTerm = extractSearchTerm(messageText);
-        const data = calldata.split('__');
+        const data = calldata.split("__");
         ///below code is for nav button click
         const thread_id_nav = Number(data[2]);
         /////below code is for the file name button click
@@ -55,20 +55,29 @@ userComposer.on("callback_query:data", async (ctx) => {
                 // }
             }
         }
-        if (ctx.update.callback_query.message.entities[0].user.id == ctx.from.id) { //checks if the same user is clicking the button
+        if (ctx.update.callback_query.message.entities[0].user.id == ctx.from.id) {
+            //checks if the same user is clicking the button
             //get next page
             if (calladatanext) {
                 const page = Number(data[1]);
                 const nextpage = page + 1;
                 const inlineKeyboard = await keyboardlist(ctx, nextpage, searchTerm, thread_id_nav);
-                await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: thread_id_nav });
+                await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
+                    reply_markup: inlineKeyboard,
+                    parse_mode: "HTML",
+                    message_thread_id: thread_id_nav,
+                });
             }
             //get prev page
             if (calladataprev) {
                 const page = Number(data[1]);
                 const prevpage = page - 1;
                 const inlineKeyboard = await keyboardlist(ctx, prevpage, searchTerm, thread_id_nav);
-                await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: thread_id_nav });
+                await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
+                    reply_markup: inlineKeyboard,
+                    parse_mode: "HTML",
+                    message_thread_id: thread_id_nav,
+                });
             }
         }
         else {
@@ -83,61 +92,70 @@ userComposer.on("callback_query:data", async (ctx) => {
     }
 });
 //////////////////////////////////////////////////////////////////////////////////////////
-userComposer.chatType("private").command("start", async (ctx) => {
-    try {
-        if (ctx.match) {
-            const parts = ctx.match.split("__");
-            const file_unique_id = parts[1];
-            const type = parts[0];
-            if (type == "doc") {
-                const { filteredDocs } = await search_document_file_id(file_unique_id);
-                if (filteredDocs.file_caption != "") {
-                    await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_caption });
-                }
-                else {
-                    await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_name });
-                }
-            }
-            else if (type == "vid") {
-                const { filteredDocs } = await search_video_file_id(file_unique_id);
-                if (filteredDocs.file_caption != "") {
-                    await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_caption });
-                }
-                else {
-                    await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_name });
-                }
-            }
-            else if (type == "aud") {
-                const { filteredDocs } = await search_audio_file_id(file_unique_id);
-                if (filteredDocs.file_caption != "") {
-                    await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_caption });
-                }
-                else {
-                    await ctx.replyWithDocument(filteredDocs.file_id, { caption: filteredDocs.file_name });
-                }
-            }
-        }
-        else {
-            if (ctx.from) {
-                const data = {
-                    user_id: ctx.from.id,
-                    first_name: ctx.from.first_name,
-                    warn: 0,
-                    is_banned: false
-                };
-                await insert_user(data);
-            }
-            ctx.reply(`👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`, { parse_mode: "HTML" });
-        }
-    }
-    catch (error) {
-    }
-});
+// userComposer.chatType("private").command("start", async (ctx) => {
+//     try {
+//         if (ctx.match) {
+//             const parts = ctx.match.split("__");
+//             const file_unique_id = parts[1];
+//             const type = parts[0];
+//             if (type == "doc") {
+//                 const { filteredDocs } = await search_document_file_id(file_unique_id);
+//                 if (filteredDocs.file_caption != "") {
+//                     await ctx.replyWithDocument(filteredDocs.file_id, {
+//                         caption: filteredDocs.file_caption,
+//                     });
+//                 } else {
+//                     await ctx.replyWithDocument(filteredDocs.file_id, {
+//                         caption: filteredDocs.file_name,
+//                     });
+//                 }
+//             } else if (type == "vid") {
+//                 const { filteredDocs } = await search_video_file_id(file_unique_id);
+//                 if (filteredDocs.file_caption != "") {
+//                     await ctx.replyWithDocument(filteredDocs.file_id, {
+//                         caption: filteredDocs.file_caption,
+//                     });
+//                 } else {
+//                     await ctx.replyWithDocument(filteredDocs.file_id, {
+//                         caption: filteredDocs.file_name,
+//                     });
+//                 }
+//             } else if (type == "aud") {
+//                 const { filteredDocs } = await search_audio_file_id(file_unique_id);
+//                 if (filteredDocs.file_caption != "") {
+//                     await ctx.replyWithDocument(filteredDocs.file_id, {
+//                         caption: filteredDocs.file_caption,
+//                     });
+//                 } else {
+//                     await ctx.replyWithDocument(filteredDocs.file_id, {
+//                         caption: filteredDocs.file_name,
+//                     });
+//                 }
+//             }
+//         } else {
+//             if (ctx.from) {
+//                 const data = {
+//                     user_id: ctx.from.id,
+//                     first_name: ctx.from.first_name,
+//                     warn: 0,
+//                     is_banned: false,
+//                 };
+//                 await insert_user(data);
+//             }
+//             ctx.reply(
+//                 `👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`,
+//                 { parse_mode: "HTML" }
+//             );
+//         }
+//     } catch (error) { }
+// });
 userComposer.chatType("private").command("info", async (ctx, next) => {
     try {
-        if (ctx.msg.chat.type == 'private') {
+        if (ctx.msg.chat.type == "private") {
             const replyMessage = ctx.msg.reply_to_message;
-            if ((replyMessage === null || replyMessage === void 0 ? void 0 : replyMessage.document) || (replyMessage === null || replyMessage === void 0 ? void 0 : replyMessage.video) || (replyMessage === null || replyMessage === void 0 ? void 0 : replyMessage.audio)) {
+            if ((replyMessage === null || replyMessage === void 0 ? void 0 : replyMessage.document) ||
+                (replyMessage === null || replyMessage === void 0 ? void 0 : replyMessage.video) ||
+                (replyMessage === null || replyMessage === void 0 ? void 0 : replyMessage.audio)) {
                 if (replyMessage.document) {
                     ctx.reply(`<pre language="json">id: ${replyMessage.document.file_unique_id}</pre>`, { parse_mode: "HTML" });
                 }
@@ -161,11 +179,12 @@ userComposer.chatType("private").command("info", async (ctx, next) => {
 userComposer.chatType("private").on(":file", async (ctx, next) => {
     var _a, _b, _c, _d;
     try {
-        const { is_banned } = await is_user_banned(ctx.from.id);
-        if (!is_banned) {
+        const admins = process.env.OWNERS;
+        // const { is_banned } = await is_user_banned(ctx.from.id);
+        if (admins.includes(ctx.msg.from.id)) {
             if (ctx.msg.document) {
                 const file_name = cleanFileName(ctx.msg.document.file_name);
-                const file_caption = cleanFileName((_a = ctx.msg.caption) !== null && _a !== void 0 ? _a : '');
+                const file_caption = cleanFileName((_a = ctx.msg.caption) !== null && _a !== void 0 ? _a : "");
                 const data = {
                     user_id: ctx.msg.from.id,
                     first_name: ctx.msg.from.first_name,
@@ -180,7 +199,7 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.video) {
                 const file_name = cleanFileName(ctx.msg.video.file_name);
-                const file_caption = cleanFileName((_b = ctx.msg.caption) !== null && _b !== void 0 ? _b : '');
+                const file_caption = cleanFileName((_b = ctx.msg.caption) !== null && _b !== void 0 ? _b : "");
                 const data = {
                     user_id: ctx.msg.from.id,
                     first_name: ctx.msg.from.first_name,
@@ -195,7 +214,7 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.audio) {
                 const file_name = cleanFileName(ctx.msg.audio.file_name);
-                const file_caption = cleanFileName((_c = ctx.msg.caption) !== null && _c !== void 0 ? _c : '');
+                const file_caption = cleanFileName((_c = ctx.msg.caption) !== null && _c !== void 0 ? _c : "");
                 const data = {
                     user_id: ctx.msg.from.id,
                     first_name: ctx.msg.from.first_name,
@@ -222,7 +241,7 @@ userComposer.chatType("channel").on(":file", async (ctx, next) => {
         if (ctx.chat.id == parseInt(process.env.OFFICIAL_CHANNEL || "")) {
             if (ctx.msg.document) {
                 const file_name = cleanFileName(ctx.msg.document.file_name);
-                const file_caption = cleanFileName((_a = ctx.msg.caption) !== null && _a !== void 0 ? _a : '');
+                const file_caption = cleanFileName((_a = ctx.msg.caption) !== null && _a !== void 0 ? _a : "");
                 const data = {
                     user_id: 12345678,
                     first_name: "12345678",
@@ -237,7 +256,7 @@ userComposer.chatType("channel").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.video) {
                 const file_name = cleanFileName(ctx.msg.video.file_name);
-                const file_caption = cleanFileName((_b = ctx.msg.caption) !== null && _b !== void 0 ? _b : '');
+                const file_caption = cleanFileName((_b = ctx.msg.caption) !== null && _b !== void 0 ? _b : "");
                 const data = {
                     user_id: 12345678,
                     first_name: "12345678",
@@ -252,7 +271,7 @@ userComposer.chatType("channel").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.audio) {
                 const file_name = cleanFileName(ctx.msg.audio.file_name);
-                const file_caption = cleanFileName((_c = ctx.msg.caption) !== null && _c !== void 0 ? _c : '');
+                const file_caption = cleanFileName((_c = ctx.msg.caption) !== null && _c !== void 0 ? _c : "");
                 const data = {
                     user_id: 12345678,
                     first_name: "12345678",
@@ -281,24 +300,51 @@ userComposer.on(":text", async (ctx, next) => {
         const inlineKeyboard = await keyboardlist(ctx, 1, searchparam, ctx.msg.message_thread_id);
         if (inlineKeyboard) {
             if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.DOC_THREAD_ID });
+                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
+                    reply_markup: inlineKeyboard,
+                    parse_mode: "HTML",
+                    message_thread_id: process.env.DOC_THREAD_ID,
+                });
                 setTimeout(async () => {
                     await ctx.deleteMessage();
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    try {
+                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    }
+                    catch (error) {
+                        console.log(error);
+                    }
                 }, msgDeleteTime);
             }
             else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id}">${(_d = ctx.from) === null || _d === void 0 ? void 0 : _d.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.VIDEO_THREAD_ID });
+                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id}">${(_d = ctx.from) === null || _d === void 0 ? void 0 : _d.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
+                    reply_markup: inlineKeyboard,
+                    parse_mode: "HTML",
+                    message_thread_id: process.env.VIDEO_THREAD_ID,
+                });
                 setTimeout(async () => {
                     await ctx.deleteMessage();
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    try {
+                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    }
+                    catch (error) {
+                        console.log(error);
+                    }
                 }, msgDeleteTime);
             }
             else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_e = ctx.from) === null || _e === void 0 ? void 0 : _e.id}">${(_f = ctx.from) === null || _f === void 0 ? void 0 : _f.first_name}</a> , You Searched For: <code>${searchparam}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML", message_thread_id: process.env.AUDIO_THREAD_ID });
+                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_e = ctx.from) === null || _e === void 0 ? void 0 : _e.id}">${(_f = ctx.from) === null || _f === void 0 ? void 0 : _f.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
+                    reply_markup: inlineKeyboard,
+                    parse_mode: "HTML",
+                    message_thread_id: process.env.AUDIO_THREAD_ID,
+                });
                 setTimeout(async () => {
                     await ctx.deleteMessage();
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    try {
+                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    }
+                    catch (error) {
+                        console.log(error);
+                    }
                 }, msgDeleteTime);
             }
         }

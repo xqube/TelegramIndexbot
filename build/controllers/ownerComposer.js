@@ -1,6 +1,6 @@
 import { Composer } from "grammy";
 import { sysinfo } from "../plugins/sysinfo.js";
-import { terminate_user_files, terminate_user_files_reply, remove_file, warn_user_file, reinstate_user_files, reinstate_user_files_reply, restore_file, rwarn_user, ban_user, unban_user, get_file_details, get_user_data, get_db_data } from "../functions/dbFunc.js";
+import { terminate_user_files, terminate_user_files_reply, remove_file, warn_user_file, reinstate_user_files, reinstate_user_files_reply, restore_file, rwarn_user, ban_user, unban_user, get_file_details, get_user_data, get_db_data, } from "../functions/dbFunc.js";
 import { bot } from "../bot.js";
 import { mongoconnect } from "../db/dbConfig.js";
 // const { DocumentCollection, VideoCollection, AudioCollection, UserCollection } = await mongoconnect()
@@ -25,17 +25,23 @@ ownerComposer.chatType("private").command("lookdb", async (ctx, next) => {
             if (ctx.msg.reply_to_message.document) {
                 const { doc_result } = await get_file_details(ctx.msg.reply_to_message.document.file_unique_id);
                 const data = JSON.stringify(doc_result, null, 4);
-                await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" });
+                await ctx.reply(`<pre language="json">${data}</pre>`, {
+                    parse_mode: "HTML",
+                });
             }
             else if (ctx.msg.reply_to_message.video) {
                 const { vid_result } = await get_file_details(ctx.msg.reply_to_message.video.file_unique_id);
                 const data = JSON.stringify(vid_result, null, 4);
-                await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" });
+                await ctx.reply(`<pre language="json">${data}</pre>`, {
+                    parse_mode: "HTML",
+                });
             }
             else if (ctx.msg.reply_to_message.audio) {
                 const { aud_result } = await get_file_details(ctx.msg.reply_to_message.audio.file_unique_id);
                 const data = JSON.stringify(aud_result, null, 4);
-                await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" });
+                await ctx.reply(`<pre language="json">${data}</pre>`, {
+                    parse_mode: "HTML",
+                });
             }
         }
     }
@@ -49,11 +55,13 @@ ownerComposer.command("user", async (ctx, next) => {
         const admins = process.env.OWNERS;
         const from = ctx.msg.from;
         if (from) {
-            if (ctx.msg.chat.type === 'private' && admins.includes(from.id)) {
+            if (ctx.msg.chat.type === "private" && admins.includes(from.id)) {
                 if (ctx.match) {
                     const user_data = await get_user_data(parseInt(ctx.match));
                     const data = JSON.stringify(user_data, null, 4);
-                    await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" });
+                    await ctx.reply(`<pre language="json">${data}</pre>`, {
+                        parse_mode: "HTML",
+                    });
                 }
             }
         }
@@ -68,7 +76,7 @@ ownerComposer.command("stats", async (ctx, next) => {
         const admins = process.env.OWNERS;
         const from = ctx.msg.from;
         if (from) {
-            if (ctx.msg.chat.type === 'private' && admins.includes(from.id)) {
+            if (ctx.msg.chat.type === "private" && admins.includes(from.id)) {
                 const { dbdata, doc_result, vid_result, aud_result, user_data } = await get_db_data();
                 const data = JSON.stringify(dbdata, null, 4);
                 await ctx.reply(`<pre language="json">${data}</pre>\n<b>Total Docs</b>: ${doc_result}\n<b>Total Videos</b>: ${vid_result}\n<b>Total Audios</b>: ${aud_result}\n<b>Total Users</b>: ${user_data}
@@ -84,10 +92,12 @@ ownerComposer.command("stats", async (ctx, next) => {
 ownerComposer.command("info", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (ctx.msg.chat.type === "private" && admins.includes(ctx.msg.from.id)) {
             if (ctx.msg.reply_to_message) {
                 const data = JSON.stringify(ctx.msg.reply_to_message, null, 4);
-                await ctx.reply(`<pre language="json">${data}</pre>`, { parse_mode: "HTML" });
+                await ctx.reply(`<pre language="json">${data}</pre>`, {
+                    parse_mode: "HTML",
+                });
             }
         }
     }
@@ -99,11 +109,13 @@ ownerComposer.command("info", async (ctx, next) => {
 ownerComposer.command("terminate", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (ctx.msg.chat.type === "private" && admins.includes(ctx.msg.from.id)) {
             if (ctx.match) {
-                const { doc_mod_result, vid_mod_result, aud_mod_result, user_mod_result, user_data } = await terminate_user_files(parseInt(ctx.match));
+                const { doc_mod_result, vid_mod_result, aud_mod_result, user_mod_result, user_data, } = await terminate_user_files(parseInt(ctx.match));
                 console.log(user_data);
-                if (doc_mod_result.modifiedCount != 0 || vid_mod_result.modifiedCount != 0 || aud_mod_result.modifiedCount != 0) {
+                if (doc_mod_result.modifiedCount != 0 ||
+                    vid_mod_result.modifiedCount != 0 ||
+                    aud_mod_result.modifiedCount != 0) {
                     if (user_mod_result.modifiedCount != 0) {
                         try {
                             await bot.api.sendMessage(ctx.match, `<b>We regret to inform you that your access to our system has been revoked. You will no longer be able to index files.</b>`, { parse_mode: "HTML" });
@@ -121,9 +133,13 @@ ownerComposer.command("terminate", async (ctx, next) => {
                     await ctx.reply(`Users files already Banned ;)`);
                 }
             }
-            else if (ctx.msg.reply_to_message.document || ctx.msg.reply_to_message.video || ctx.msg.reply_to_message.audio) {
-                const { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result } = await terminate_user_files_reply(ctx.msg.reply_to_message.document.file_unique_id);
-                if (doc_mod_result.modifiedCount != 0 || vid_mod_result.modifiedCount != 0 || aud_mod_result.modifiedCount != 0) {
+            else if (ctx.msg.reply_to_message.document ||
+                ctx.msg.reply_to_message.video ||
+                ctx.msg.reply_to_message.audio) {
+                const { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result, } = await terminate_user_files_reply(ctx.msg.reply_to_message.document.file_unique_id);
+                if (doc_mod_result.modifiedCount != 0 ||
+                    vid_mod_result.modifiedCount != 0 ||
+                    aud_mod_result.modifiedCount != 0) {
                     if (user_mod_result.modifiedCount != 0) {
                         try {
                             await bot.api.sendMessage(user_data.user_id, `<b>We regret to inform you that your access to our system has been revoked. You will no longer be able to index files.</b>`, { parse_mode: "HTML" });
@@ -151,10 +167,12 @@ ownerComposer.command("terminate", async (ctx, next) => {
 ownerComposer.command("reinstate", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (ctx.msg.chat.type === "private" && admins.includes(ctx.msg.from.id)) {
             if (ctx.match) {
-                const { doc_mod_result, vid_mod_result, aud_mod_result, user_mod_result, user_data } = await reinstate_user_files(Number(ctx.match));
-                if (doc_mod_result.modifiedCount != 0 || vid_mod_result.modifiedCount != 0 || aud_mod_result.modifiedCount != 0) {
+                const { doc_mod_result, vid_mod_result, aud_mod_result, user_mod_result, user_data, } = await reinstate_user_files(Number(ctx.match));
+                if (doc_mod_result.modifiedCount != 0 ||
+                    vid_mod_result.modifiedCount != 0 ||
+                    aud_mod_result.modifiedCount != 0) {
                     if (user_mod_result.modifiedCount != 0) {
                         try {
                             await bot.api.sendMessage(ctx.match, `<b>🎉 Good news! Your access to our system has been reinstated, and your previously banned files are now unbanned. You are now able to index new files again. 📁</b>`, { parse_mode: "HTML" });
@@ -172,9 +190,13 @@ ownerComposer.command("reinstate", async (ctx, next) => {
                     await ctx.reply(`Users files already UnBanned ;)`);
                 }
             }
-            else if (ctx.msg.reply_to_message.document || ctx.msg.reply_to_message.video || ctx.msg.reply_to_message.audio) {
-                const { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result } = await reinstate_user_files_reply(ctx.msg.reply_to_message.document.file_unique_id);
-                if (doc_mod_result.modifiedCount != 0 || vid_mod_result.modifiedCount != 0 || aud_mod_result.modifiedCount != 0) {
+            else if (ctx.msg.reply_to_message.document ||
+                ctx.msg.reply_to_message.video ||
+                ctx.msg.reply_to_message.audio) {
+                const { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result, } = await reinstate_user_files_reply(ctx.msg.reply_to_message.document.file_unique_id);
+                if (doc_mod_result.modifiedCount != 0 ||
+                    vid_mod_result.modifiedCount != 0 ||
+                    aud_mod_result.modifiedCount != 0) {
                     if (user_mod_result.modifiedCount != 0) {
                         try {
                             await bot.api.sendMessage(user_data.user_id, `<b>🎉 Good news! Your access to our system has been reinstated, and your previously banned files are now unbanned. You are now able to index new files again. 📁</b>`, { parse_mode: "HTML" });
@@ -202,10 +224,12 @@ ownerComposer.command("reinstate", async (ctx, next) => {
 ownerComposer.command("remove", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (ctx.msg.chat.type === "private" && admins.includes(ctx.msg.from.id)) {
             if (ctx.match) {
                 const { doc_mod_result, vid_mod_result, aud_mod_result } = await remove_file(ctx.match);
-                if (doc_mod_result.modifiedCount != 0 || vid_mod_result.modifiedCount != 0 || aud_mod_result.modifiedCount != 0) {
+                if (doc_mod_result.modifiedCount != 0 ||
+                    vid_mod_result.modifiedCount != 0 ||
+                    aud_mod_result.modifiedCount != 0) {
                     await ctx.reply(`Banned ${doc_mod_result.modifiedCount} file in document Collection\n\nBanned ${vid_mod_result.modifiedCount} file in video Collection\n\nBanned ${aud_mod_result.modifiedCount} file in audio Collection`);
                 }
                 else {
@@ -249,10 +273,12 @@ ownerComposer.command("remove", async (ctx, next) => {
 ownerComposer.command("restore", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (ctx.msg.chat.type === "private" && admins.includes(ctx.msg.from.id)) {
             if (ctx.match) {
                 const { doc_mod_result, vid_mod_result, aud_mod_result } = await restore_file(ctx.match);
-                if (doc_mod_result.modifiedCount != 0 || vid_mod_result.modifiedCount != 0 || aud_mod_result.modifiedCount != 0) {
+                if (doc_mod_result.modifiedCount != 0 ||
+                    vid_mod_result.modifiedCount != 0 ||
+                    aud_mod_result.modifiedCount != 0) {
                     await ctx.reply(`UnBanned ${doc_mod_result.modifiedCount} file in document Collection\n\nUnBanned ${vid_mod_result.modifiedCount} file in video Collection\n\nUnBanned ${aud_mod_result.modifiedCount} file in audio Collection`);
                 }
                 else {
@@ -296,10 +322,12 @@ ownerComposer.command("restore", async (ctx, next) => {
 ownerComposer.command("warn", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (ctx.msg.chat.type === "private" && admins.includes(ctx.msg.from.id)) {
             if (ctx.match) {
-                const { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result } = await warn_user_file(ctx.match);
-                if ((doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount) != 0 || vid_mod_result.modifiedCount != 0 || aud_mod_result.modifiedCount != 0) {
+                const { doc_mod_result, vid_mod_result, aud_mod_result, user_data, user_mod_result, } = await warn_user_file(ctx.match);
+                if ((doc_mod_result === null || doc_mod_result === void 0 ? void 0 : doc_mod_result.modifiedCount) != 0 ||
+                    vid_mod_result.modifiedCount != 0 ||
+                    aud_mod_result.modifiedCount != 0) {
                     if (user_mod_result) {
                         try {
                             await bot.api.sendMessage(user_data.user_id, `<b>⚠️ Warning:</b> You have received a warning for sending inappropriate content or unwanted messages. \n\n🚫 Warn: ${user_data.warn + 1}/${process.env.WARN_LIMIT}. Each unwanted file sent will result in a warning. Please be mindful before sending files.`, { parse_mode: "HTML" });
@@ -387,7 +415,7 @@ ownerComposer.command("warn", async (ctx, next) => {
 ownerComposer.command("rwarn", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (ctx.msg.chat.type === "private" && admins.includes(ctx.msg.from.id)) {
             if (ctx.match) {
                 const { user_data, user_mod_result } = await rwarn_user(ctx.match);
                 if (user_mod_result.modifiedCount != 0) {
@@ -413,7 +441,7 @@ ownerComposer.command("rwarn", async (ctx, next) => {
 ownerComposer.command("ban", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (ctx.msg.chat.type === "private" && admins.includes(ctx.msg.from.id)) {
             if (ctx.match) {
                 const { user_data, user_mod_result } = await ban_user(ctx.match);
                 if (user_mod_result.modifiedCount != 0) {
@@ -439,7 +467,7 @@ ownerComposer.command("ban", async (ctx, next) => {
 ownerComposer.command("unban", async (ctx, next) => {
     try {
         const admins = process.env.OWNERS;
-        if (ctx.msg.chat.type === 'private' && admins.includes(ctx.msg.from.id)) {
+        if (ctx.msg.chat.type === "private" && admins.includes(ctx.msg.from.id)) {
             if (ctx.match) {
                 const { user_data, user_mod_result } = await unban_user(ctx.match);
                 if (user_mod_result.modifiedCount != 0) {
@@ -471,7 +499,10 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
         const totalPages = Math.ceil(totalsize / 10);
         async function sendfiles(page) {
             const skip = (page - 1) * 1;
-            const filteredDocs = await db.DocumentCollection.find().skip(skip).limit(1).toArray();
+            const filteredDocs = await db.DocumentCollection.find()
+                .skip(skip)
+                .limit(1)
+                .toArray();
             if (filteredDocs.length === 0) {
                 await ctx.reply("no files to send");
                 return;
@@ -482,7 +513,7 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
                     files = files + 1;
                     thispage = page + 1;
                     if (files == totalsize) {
-                        await ctx.reply(`Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`);
+                        await ctx.reply(`Total files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`);
                     }
                     await sendfiles(thispage);
                 }
@@ -506,7 +537,10 @@ ownerComposer.chatType("channel").command("vidfilebackup7306", async (ctx) => {
         const totalPages = Math.ceil(totalsize / 10);
         async function sendfiles(page) {
             const skip = (page - 1) * 1;
-            const filteredDocs = await db.VideoCollection.find().skip(skip).limit(1).toArray();
+            const filteredDocs = await db.VideoCollection.find()
+                .skip(skip)
+                .limit(1)
+                .toArray();
             if (filteredDocs.length === 0) {
                 await ctx.reply("no files to send");
                 return;
@@ -541,7 +575,10 @@ ownerComposer.chatType("channel").command("audfilebackup7306", async (ctx) => {
         const totalPages = Math.ceil(totalsize / 10);
         async function sendfiles(page) {
             const skip = (page - 1) * 1;
-            const filteredDocs = await db.AudioCollection.find().skip(skip).limit(1).toArray();
+            const filteredDocs = await db.AudioCollection.find()
+                .skip(skip)
+                .limit(1)
+                .toArray();
             if (filteredDocs.length === 0) {
                 await ctx.reply("no files to send");
                 return;

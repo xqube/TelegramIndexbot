@@ -75,24 +75,27 @@ export async function search_document(searchTerms, page) {
         // Split the search terms into individual words
         const searchWords = searchTerms.trim().split(/\s+/);
         // Construct an array of regex patterns, one for each search word
-        const regexPatterns = searchWords.map(word => new RegExp(`\\b${word}\\b`, "i"));
+        const regexPatterns = searchWords.map((word) => new RegExp(`\\b${word}\\b`, "i"));
         // Combine the regex patterns using the OR operator
         const combinedRegex = {
             $and: [
-                { $and: regexPatterns.map(pattern => ({ file_name: pattern })) },
-                { is_banned: false }
-            ]
+                { $and: regexPatterns.map((pattern) => ({ file_name: pattern })) },
+                { is_banned: false },
+            ],
         };
         // Count filtered documents
         const totalsize = await db.DocumentCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
-        const filteredDocs = await db.DocumentCollection.find(combinedRegex).skip(skip).limit(10).toArray();
+        const filteredDocs = await db.DocumentCollection.find(combinedRegex)
+            .skip(skip)
+            .limit(10)
+            .toArray();
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
     }
     catch (error) {
         console.error("Error in search_document at dbFunc.ts", error.message);
-        throw (error);
+        throw error;
     }
 }
 export async function search_video(searchTerms, page) {
@@ -101,24 +104,27 @@ export async function search_video(searchTerms, page) {
         // Split the search terms into individual words
         const searchWords = searchTerms.trim().split(/\s+/);
         // Construct an array of regex patterns, one for each search word
-        const regexPatterns = searchWords.map(word => new RegExp(`\\b${word}\\b`, "i"));
+        const regexPatterns = searchWords.map((word) => new RegExp(`\\b${word}\\b`, "i"));
         // Combine the regex patterns using the OR operator
         const combinedRegex = {
             $and: [
-                { $and: regexPatterns.map(pattern => ({ file_name: pattern })) },
-                { is_banned: false }
-            ]
+                { $and: regexPatterns.map((pattern) => ({ file_name: pattern })) },
+                { is_banned: false },
+            ],
         };
         // Count filtered documents
         const totalsize = await db.VideoCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
-        const filteredDocs = await db.VideoCollection.find(combinedRegex).skip(skip).limit(10).toArray();
+        const filteredDocs = await db.VideoCollection.find(combinedRegex)
+            .skip(skip)
+            .limit(10)
+            .toArray();
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
     }
     catch (error) {
         console.error("Error in search_video at dbFunc.ts", error.message);
-        throw (error);
+        throw error;
     }
 }
 export async function search_audio(searchTerms, page) {
@@ -127,24 +133,27 @@ export async function search_audio(searchTerms, page) {
         // Split the search terms into individual words
         const searchWords = searchTerms.trim().split(/\s+/);
         // Construct an array of regex patterns, one for each search word
-        const regexPatterns = searchWords.map(word => new RegExp(`\\b${word}\\b`, "i"));
+        const regexPatterns = searchWords.map((word) => new RegExp(`\\b${word}\\b`, "i"));
         // Combine the regex patterns using the OR operator
         const combinedRegex = {
             $and: [
-                { $and: regexPatterns.map(pattern => ({ file_name: pattern })) },
-                { is_banned: false }
-            ]
+                { $and: regexPatterns.map((pattern) => ({ file_name: pattern })) },
+                { is_banned: false },
+            ],
         };
         // Count filtered documents
         const totalsize = await db.AudioCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
-        const filteredDocs = await db.AudioCollection.find(combinedRegex).skip(skip).limit(10).toArray();
+        const filteredDocs = await db.AudioCollection.find(combinedRegex)
+            .skip(skip)
+            .limit(10)
+            .toArray();
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
     }
     catch (error) {
         console.error("Error in search_audio at dbFunc.ts", error.message);
-        throw (error);
+        throw error;
     }
 }
 export async function search_document_file_id(data) {
@@ -180,7 +189,7 @@ export async function get_file_details(data) {
         const updateDoc = {
             $set: {
                 is_banned: true,
-            }
+            },
         };
         const doc_result = await db.DocumentCollection.findOne(file_unique_id, updateDoc);
         const vid_result = await db.VideoCollection.findOne(file_unique_id, updateDoc);
@@ -206,7 +215,7 @@ export async function get_db_data() {
         const dbdata = await db.database.command({
             dbStats: 1,
             scale: 1024,
-            freeStorage: 1
+            freeStorage: 1,
         });
         const doc_result = await db.DocumentCollection.countDocuments();
         const vid_result = await db.VideoCollection.countDocuments();
@@ -238,14 +247,20 @@ export async function terminate_user_files(data) {
         const updateDoc = {
             $set: {
                 is_banned: true,
-            }
+            },
         };
         const user_data = await db.UserCollection.findOne(user_id);
         const doc_mod_result = await db.DocumentCollection.updateMany(user_id, updateDoc);
         const vid_mod_result = await db.VideoCollection.updateMany(user_id, updateDoc);
         const aud_mod_result = await db.AudioCollection.updateMany(user_id, updateDoc);
         const user_mod_result = await db.UserCollection.updateOne(user_id, updateDoc);
-        return { doc_mod_result, vid_mod_result, aud_mod_result, user_mod_result, user_data };
+        return {
+            doc_mod_result,
+            vid_mod_result,
+            aud_mod_result,
+            user_mod_result,
+            user_data,
+        };
     }
     catch (error) {
         console.log(error.message);
@@ -257,14 +272,20 @@ export async function reinstate_user_files(data) {
         const updateDoc = {
             $set: {
                 is_banned: false,
-            }
+            },
         };
         const user_data = await db.UserCollection.findOne(user_id);
         const doc_mod_result = await db.DocumentCollection.updateMany(user_id, updateDoc);
         const vid_mod_result = await db.VideoCollection.updateMany(user_id, updateDoc);
         const aud_mod_result = await db.AudioCollection.updateMany(user_id, updateDoc);
         const user_mod_result = await db.UserCollection.updateOne(user_id, updateDoc);
-        return { doc_mod_result, vid_mod_result, aud_mod_result, user_mod_result, user_data };
+        return {
+            doc_mod_result,
+            vid_mod_result,
+            aud_mod_result,
+            user_mod_result,
+            user_data,
+        };
     }
     catch (error) {
         console.log(error.message);
@@ -276,26 +297,38 @@ export async function terminate_user_files_reply(data) {
         const updateDoc = {
             $set: {
                 is_banned: true,
-            }
+            },
         };
-        const doc_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        const vid_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        const aud_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const doc_result = await db.DocumentCollection.findOne(file_unique_id, {
+            projection: { user_id: 1, _id: 0 },
+        });
+        const vid_result = await db.DocumentCollection.findOne(file_unique_id, {
+            projection: { user_id: 1, _id: 0 },
+        });
+        const aud_result = await db.DocumentCollection.findOne(file_unique_id, {
+            projection: { user_id: 1, _id: 0 },
+        });
         if (doc_result) {
             const doc_mod_result = await db.DocumentCollection.updateMany({ user_id: doc_result.user_id }, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: doc_result.user_id });
+            const user_data = await db.UserCollection.findOne({
+                user_id: doc_result.user_id,
+            });
             const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
             return { doc_mod_result, user_data, user_mod_result };
         }
         else if (vid_result) {
             const vid_mod_result = await db.VideoCollection.updateMany({ user_id: vid_result.user_id }, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: vid_result.user_id });
+            const user_data = await db.UserCollection.findOne({
+                user_id: vid_result.user_id,
+            });
             const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
             return { vid_mod_result, user_data, user_mod_result };
         }
         else if (aud_result) {
             const aud_mod_result = await db.AudioCollection.updateMany({ user_id: aud_result.user_id }, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: aud_result.user_id });
+            const user_data = await db.UserCollection.findOne({
+                user_id: aud_result.user_id,
+            });
             const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
             return { aud_mod_result, user_data, user_mod_result };
         }
@@ -310,26 +343,38 @@ export async function reinstate_user_files_reply(data) {
         const updateDoc = {
             $set: {
                 is_banned: false,
-            }
+            },
         };
-        const doc_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        const vid_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        const aud_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const doc_result = await db.DocumentCollection.findOne(file_unique_id, {
+            projection: { user_id: 1, _id: 0 },
+        });
+        const vid_result = await db.DocumentCollection.findOne(file_unique_id, {
+            projection: { user_id: 1, _id: 0 },
+        });
+        const aud_result = await db.DocumentCollection.findOne(file_unique_id, {
+            projection: { user_id: 1, _id: 0 },
+        });
         if (doc_result) {
             const doc_mod_result = await db.DocumentCollection.updateMany({ user_id: doc_result.user_id }, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: doc_result.user_id });
+            const user_data = await db.UserCollection.findOne({
+                user_id: doc_result.user_id,
+            });
             const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
             return { doc_mod_result, user_data, user_mod_result };
         }
         else if (vid_result) {
             const vid_mod_result = await db.VideoCollection.updateMany({ user_id: vid_result.user_id }, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: vid_result.user_id });
+            const user_data = await db.UserCollection.findOne({
+                user_id: vid_result.user_id,
+            });
             const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
             return { vid_mod_result, user_data, user_mod_result };
         }
         else if (aud_result) {
             const aud_mod_result = await db.AudioCollection.updateMany({ user_id: aud_result.user_id }, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: aud_result.user_id });
+            const user_data = await db.UserCollection.findOne({
+                user_id: aud_result.user_id,
+            });
             const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, updateDoc);
             return { aud_mod_result, user_data, user_mod_result };
         }
@@ -344,7 +389,7 @@ export async function remove_file(data) {
         const updateDoc = {
             $set: {
                 is_banned: true,
-            }
+            },
         };
         const doc_mod_result = await db.DocumentCollection.updateOne(file_unique_id, updateDoc);
         const vid_mod_result = await db.VideoCollection.updateOne(file_unique_id, updateDoc);
@@ -361,7 +406,7 @@ export async function restore_file(data) {
         const updateDoc = {
             $set: {
                 is_banned: false,
-            }
+            },
         };
         const doc_mod_result = await db.DocumentCollection.updateOne(file_unique_id, updateDoc);
         const vid_mod_result = await db.VideoCollection.updateOne(file_unique_id, updateDoc);
@@ -376,7 +421,7 @@ export async function warn_user_file(data) {
     try {
         const warn_limit = parseInt(process.env.WARN_LIMIT || "3");
         const file_unique_id = {
-            file_unique_id: data
+            file_unique_id: data,
         };
         const updateDoc = {
             $set: {
@@ -385,15 +430,23 @@ export async function warn_user_file(data) {
         };
         const userDoc = {
             $inc: {
-                warn: 1
-            }
+                warn: 1,
+            },
         };
-        const doc_result = await db.DocumentCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        const vid_result = await db.VideoCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
-        const aud_result = await db.AudioCollection.findOne(file_unique_id, { projection: { user_id: 1, _id: 0 } });
+        const doc_result = await db.DocumentCollection.findOne(file_unique_id, {
+            projection: { user_id: 1, _id: 0 },
+        });
+        const vid_result = await db.VideoCollection.findOne(file_unique_id, {
+            projection: { user_id: 1, _id: 0 },
+        });
+        const aud_result = await db.AudioCollection.findOne(file_unique_id, {
+            projection: { user_id: 1, _id: 0 },
+        });
         if (doc_result) {
             const doc_mod_result = await db.DocumentCollection.updateOne(file_unique_id, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: doc_result.user_id });
+            const user_data = await db.UserCollection.findOne({
+                user_id: doc_result.user_id,
+            });
             if (doc_mod_result.modifiedCount != 0) {
                 if (user_data && user_data.warn < warn_limit && !user_data.is_banned) {
                     const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
@@ -404,7 +457,9 @@ export async function warn_user_file(data) {
         }
         else if (vid_result) {
             const vid_mod_result = await db.VideoCollection.updateOne(file_unique_id, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: vid_result.user_id });
+            const user_data = await db.UserCollection.findOne({
+                user_id: vid_result.user_id,
+            });
             if (vid_mod_result.modifiedCount != 0) {
                 if (user_data && user_data.warn < warn_limit && !user_data.is_banned) {
                     const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
@@ -415,7 +470,9 @@ export async function warn_user_file(data) {
         }
         else if (aud_result) {
             const aud_mod_result = await db.AudioCollection.updateOne(file_unique_id, updateDoc);
-            const user_data = await db.UserCollection.findOne({ user_id: aud_result.user_id });
+            const user_data = await db.UserCollection.findOne({
+                user_id: aud_result.user_id,
+            });
             if (aud_mod_result.modifiedCount != 0) {
                 if (user_data && user_data.warn < warn_limit && !user_data.is_banned) {
                     const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
@@ -434,8 +491,8 @@ export async function rwarn_user(data) {
         const user_id = parseInt(data);
         const userDoc = {
             $set: {
-                warn: 0
-            }
+                warn: 0,
+            },
         };
         const user_data = await db.UserCollection.findOne({ user_id: user_id });
         const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
@@ -450,8 +507,8 @@ export async function ban_user(data) {
         const user_id = parseInt(data);
         const userDoc = {
             $set: {
-                is_banned: true
-            }
+                is_banned: true,
+            },
         };
         const user_data = await db.UserCollection.findOne({ user_id: user_id });
         const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);
@@ -466,8 +523,8 @@ export async function unban_user(data) {
         const user_id = parseInt(data);
         const userDoc = {
             $set: {
-                is_banned: false
-            }
+                is_banned: false,
+            },
         };
         const user_data = await db.UserCollection.findOne({ user_id: user_id });
         const user_mod_result = await db.UserCollection.updateOne({ user_id: user_data.user_id }, userDoc);

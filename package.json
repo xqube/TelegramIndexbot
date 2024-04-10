@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "DEBUG=* nodemon build/bot.js",
-    "start":"DEBUG=* node build/bot.js"
+    "start": "DEBUG=* node build/bot.js"
   },
   "author": "",
   "license": "ISC",
@@ -21,7 +21,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.28",
-    "nodemon": "^3.1.0",
-    "typescript": "^5.4.2"
+    "nodemon": "^3.1.0"
   }
 }

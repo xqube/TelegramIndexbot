@@ -9,30 +9,38 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                const { message_id } = await ctx.reply("No Document found.", { message_thread_id: threadid });
+                const { message_id } = await ctx.reply("No Document found.", {
+                    message_thread_id: threadid,
+                });
                 setTimeout(async () => {
                     await ctx.deleteMessage();
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    try {
+                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    }
+                    catch (error) {
+                        console.log(error.message);
+                    }
                 }, msgDeleteTime);
                 return;
             }
             else {
-                (filteredDocs.map(async (doc) => {
+                filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
                         .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`) //changed it to __ coz fileid can have an underscore
-                        .url(file_size.toFixed(1) + 'MB 📩', `https://t.me/${process.env.BOT_USERNAME}?start=doc__${doc.file_unique_id}`)
+                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=doc__${doc.file_unique_id}`)
                         .row();
-                }));
+                });
             }
             if (page == 1 && page < totalPages) {
-                inlineKeyboard
-                    .text("Next>>", `^next__${page}__${threadid}`).row();
+                inlineKeyboard.text("Next>>", `^next__${page}__${threadid}`).row();
             }
             else if (page > 1 && page < totalPages) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`)
+                inlineKeyboard
+                    .text("<<Prev", `^prev__${page}__${threadid}`)
                     .text(`${page}/${totalPages}📄`)
-                    .text("Next>>", `^next__${page}__${threadid}`).row();
+                    .text("Next>>", `^next__${page}__${threadid}`)
+                    .row();
             }
             else if (page == totalPages && page != 1) {
                 inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`).row();
@@ -43,30 +51,38 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                const { message_id } = await ctx.reply("No Video found.", { message_thread_id: threadid });
+                const { message_id } = await ctx.reply("No Video found.", {
+                    message_thread_id: threadid,
+                });
                 setTimeout(async () => {
                     await ctx.deleteMessage();
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    try {
+                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    }
+                    catch (error) {
+                        console.log(error.message);
+                    }
                 }, msgDeleteTime);
                 return;
             }
             else {
-                (filteredDocs.map(async (doc) => {
+                filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
                         .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`)
-                        .url(file_size.toFixed(1) + 'MB 📩', `https://t.me/${process.env.BOT_USERNAME}?start=vid__${doc.file_unique_id}`)
+                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=vid__${doc.file_unique_id}`)
                         .row();
-                }));
+                });
             }
             if (page == 1 && page < totalPages) {
-                inlineKeyboard
-                    .text("Next>>", `^next__${page}__${threadid}`).row();
+                inlineKeyboard.text("Next>>", `^next__${page}__${threadid}`).row();
             }
             else if (page > 1 && page < totalPages) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`)
+                inlineKeyboard
+                    .text("<<Prev", `^prev__${page}__${threadid}`)
                     .text(`${page}/${totalPages}📄`)
-                    .text("Next>>", `^next__${page}__${threadid}`).row();
+                    .text("Next>>", `^next__${page}__${threadid}`)
+                    .row();
             }
             else if (page == totalPages && page != 1) {
                 inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`);
@@ -77,30 +93,38 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                const { message_id } = await ctx.reply("No Audio found.", { message_thread_id: threadid });
+                const { message_id } = await ctx.reply("No Audio found.", {
+                    message_thread_id: threadid,
+                });
                 setTimeout(async () => {
                     await ctx.deleteMessage();
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    try {
+                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    }
+                    catch (error) {
+                        console.log(error.message);
+                    }
                 }, msgDeleteTime);
                 return;
             }
             else {
-                (filteredDocs.map(async (doc) => {
+                filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
                         .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`)
-                        .url(file_size.toFixed(1) + 'MB 📩', `https://t.me/${process.env.BOT_USERNAME}?start=aud__${doc.file_unique_id}`)
+                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=aud__${doc.file_unique_id}`)
                         .row();
-                }));
+                });
             }
             if (page == 1 && page < totalPages) {
-                inlineKeyboard
-                    .text("Next>>", `^next__${page}__${threadid}`).row();
+                inlineKeyboard.text("Next>>", `^next__${page}__${threadid}`).row();
             }
             else if (page > 1 && page < totalPages) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`)
+                inlineKeyboard
+                    .text("<<Prev", `^prev__${page}__${threadid}`)
                     .text(`${page}/${totalPages}📄`)
-                    .text("Next>>", `^next__${page}__${threadid}`).row();
+                    .text("Next>>", `^next__${page}__${threadid}`)
+                    .row();
             }
             else if (page == totalPages && page != 1) {
                 inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`);
