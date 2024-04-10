@@ -313,8 +313,8 @@ userComposer.on(":text", async (ctx, next) => {
                     message_thread_id: process.env.DOC_THREAD_ID,
                 });
                 setTimeout(async () => {
-                    await ctx.deleteMessage();
                     try {
+                        await ctx.deleteMessage();
                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
                     }
                     catch (error) {
@@ -329,8 +329,8 @@ userComposer.on(":text", async (ctx, next) => {
                     message_thread_id: process.env.VIDEO_THREAD_ID,
                 });
                 setTimeout(async () => {
-                    await ctx.deleteMessage();
                     try {
+                        await ctx.deleteMessage();
                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
                     }
                     catch (error) {
@@ -345,8 +345,8 @@ userComposer.on(":text", async (ctx, next) => {
                     message_thread_id: process.env.AUDIO_THREAD_ID,
                 });
                 setTimeout(async () => {
-                    await ctx.deleteMessage();
                     try {
+                        await ctx.deleteMessage();
                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
                     }
                     catch (error) {

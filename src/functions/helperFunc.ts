@@ -24,8 +24,8 @@ export async function keyboardlist(
           message_thread_id: threadid,
         });
         setTimeout(async () => {
-          await ctx.deleteMessage();
           try {
+            await ctx.deleteMessage();
             await ctx.api.deleteMessage(ctx.chat.id, message_id);
           } catch (error: any) {
             console.log(error.message);
@@ -65,8 +65,8 @@ export async function keyboardlist(
           message_thread_id: threadid,
         });
         setTimeout(async () => {
-          await ctx.deleteMessage();
           try {
+            await ctx.deleteMessage();
             await ctx.api.deleteMessage(ctx.chat.id, message_id);
           } catch (error: any) {
             console.log(error.message);
@@ -105,8 +105,8 @@ export async function keyboardlist(
           message_thread_id: threadid,
         });
         setTimeout(async () => {
-          await ctx.deleteMessage();
           try {
+            await ctx.deleteMessage();
             await ctx.api.deleteMessage(ctx.chat.id, message_id);
           } catch (error: any) {
             console.log(error.message);

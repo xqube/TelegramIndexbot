@@ -352,8 +352,8 @@ userComposer.on(":text", async (ctx, next) => {
           }
         );
         setTimeout(async () => {
-          await ctx.deleteMessage();
           try {
+            await ctx.deleteMessage();
             await ctx.api.deleteMessage(ctx.chat.id, message_id);
           } catch (error) {
             console.log(error);
@@ -369,8 +369,8 @@ userComposer.on(":text", async (ctx, next) => {
           }
         );
         setTimeout(async () => {
-          await ctx.deleteMessage();
           try {
+            await ctx.deleteMessage();
             await ctx.api.deleteMessage(ctx.chat.id, message_id);
           } catch (error) {
             console.log(error);
@@ -386,8 +386,8 @@ userComposer.on(":text", async (ctx, next) => {
           }
         );
         setTimeout(async () => {
-          await ctx.deleteMessage();
           try {
+            await ctx.deleteMessage();
             await ctx.api.deleteMessage(ctx.chat.id, message_id);
           } catch (error) {
             console.log(error);
