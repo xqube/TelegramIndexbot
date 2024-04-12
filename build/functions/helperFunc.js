@@ -13,7 +13,6 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                     message_thread_id: threadid,
                 });
                 setTimeout(async () => {
-                    await ctx.deleteMessage();
                     try {
                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
                     }
@@ -55,7 +54,6 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                     message_thread_id: threadid,
                 });
                 setTimeout(async () => {
-                    await ctx.deleteMessage();
                     try {
                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
                     }
@@ -97,7 +95,6 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                     message_thread_id: threadid,
                 });
                 setTimeout(async () => {
-                    await ctx.deleteMessage();
                     try {
                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
                     }
