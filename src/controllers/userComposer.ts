@@ -92,7 +92,7 @@ userComposer.on("callback_query:data", async (ctx: any) => {
           }
         );
       }
-      //get prev page
+      //get prev page ;)
       if (calladataprev) {
         const page = Number(data[1]);
         const prevpage = page - 1;

@@ -23,6 +23,43 @@ import { mongoclient, mongoconnect } from "../db/dbConfig.js";
 const db = await mongoconnect();
 
 export const ownerComposer = new Composer();
+type Task = () => Promise<void>;
+
+interface TaskQueue {
+  tasks: Task[];
+  enqueue(task: Task): void;
+  dequeue(): Task | undefined;
+  isEmpty(): boolean;
+}
+
+const taskQueue: TaskQueue = {
+  tasks: [],
+  enqueue(task) {
+    this.tasks.push(task);
+  },
+  dequeue() {
+    return this.tasks.shift();
+  },
+  isEmpty() {
+    return this.tasks.length === 0;
+  },
+};
+
+setInterval(async () => {
+  // To execute the task, you could call dequeue and then execute the returned function
+  if (!taskQueue.isEmpty()) {
+    const taskToExecute = taskQueue.dequeue();
+    if (taskToExecute) {
+      await taskToExecute()
+        .then(() => {
+          console.log("Task executed");
+        })
+        .catch((error) => {
+          console.error("Task execution failed", error);
+        });
+    }
+  }
+}, 2000);
 
 ownerComposer.chatType("private").command("sysinfo", async (ctx: any, next) => {
   try {
@@ -705,42 +742,45 @@ ownerComposer.command("unban", async (ctx: any, next) => {
 
 ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
   try {
-    let thispage = 0;
-    let page = parseInt(ctx.match);
-    let files = 0;
-    const totalsize = await db.DocumentCollection.countDocuments();
-    const totalPages = Math.ceil(totalsize / 10);
+    async function doclongtask() {
+      let thispage = 0;
+      let page = parseInt(ctx.match);
+      let files = 0;
+      const totalsize = await db.DocumentCollection.countDocuments();
+      const totalPages = Math.ceil(totalsize / 10);
 
-    async function sendfiles(page: number) {
-      const skip = (page - 1) * 1;
-      const filteredDocs = await db.DocumentCollection.find()
-        .skip(skip)
-        .limit(1)
-        .toArray();
-      if (filteredDocs.length === 0) {
-        await ctx.reply("no files to send");
-        return;
-      } else {
-        const res = await bot.api.sendDocument(
-          ctx.chat.id,
-          filteredDocs[0].file_id,
-          { caption: filteredDocs[0].file_name }
-        );
-        if (res) {
-          files = files + 1;
-          thispage = page + 1;
-          if (files == totalsize) {
-            await ctx.reply(
-              `Total files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`
-            );
-          }
-          await sendfiles(thispage);
+      async function sendfiles(page: number) {
+        const skip = (page - 1) * 1;
+        const filteredDocs = await db.DocumentCollection.find()
+          .skip(skip)
+          .limit(1)
+          .toArray();
+        if (filteredDocs.length === 0) {
+          await ctx.reply("no files to send");
+          return;
         } else {
-          await ctx.reply("error in sending");
+          const res = await bot.api.sendDocument(
+            ctx.chat.id,
+            filteredDocs[0].file_id,
+            { caption: filteredDocs[0].file_name }
+          );
+          if (res) {
+            files = files + 1;
+            thispage = page + 1;
+            if (files == totalsize) {
+              await ctx.reply(
+                `Total files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`
+              );
+            }
+            await sendfiles(thispage);
+          } else {
+            await ctx.reply("error in sending");
+          }
         }
       }
+      await sendfiles(page);
     }
-    await sendfiles(page);
+    taskQueue.enqueue(doclongtask);
   } catch (error: any) {
     console.log(error.message);
   }
@@ -748,42 +788,45 @@ ownerComposer.chatType("channel").command("docfilebackup7306", async (ctx) => {
 
 ownerComposer.chatType("channel").command("vidfilebackup7306", async (ctx) => {
   try {
-    let thispage = 0;
-    let page = parseInt(ctx.match);
-    let files = 0;
-    const totalsize = await db.VideoCollection.countDocuments();
-    const totalPages = Math.ceil(totalsize / 10);
+    async function vidlongtask() {
+      let thispage = 0;
+      let page = parseInt(ctx.match);
+      let files = 0;
+      const totalsize = await db.VideoCollection.countDocuments();
+      const totalPages = Math.ceil(totalsize / 10);
 
-    async function sendfiles(page: number) {
-      const skip = (page - 1) * 1;
-      const filteredDocs = await db.VideoCollection.find()
-        .skip(skip)
-        .limit(1)
-        .toArray();
-      if (filteredDocs.length === 0) {
-        await ctx.reply("no files to send");
-        return;
-      } else {
-        const res = await bot.api.sendVideo(
-          ctx.chat.id,
-          filteredDocs[0].file_id,
-          { caption: filteredDocs[0].file_name }
-        );
-        if (res) {
-          files = files + 1;
-          thispage = page + 1;
-          if (files == totalsize) {
-            await ctx.reply(
-              `Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`
-            );
-          }
-          await sendfiles(thispage);
+      async function sendfiles(page: number) {
+        const skip = (page - 1) * 1;
+        const filteredDocs = await db.VideoCollection.find()
+          .skip(skip)
+          .limit(1)
+          .toArray();
+        if (filteredDocs.length === 0) {
+          await ctx.reply("no files to send");
+          return;
         } else {
-          await ctx.reply("error in sending");
+          const res = await bot.api.sendVideo(
+            ctx.chat.id,
+            filteredDocs[0].file_id,
+            { caption: filteredDocs[0].file_name }
+          );
+          if (res) {
+            files = files + 1;
+            thispage = page + 1;
+            if (files == totalsize) {
+              await ctx.reply(
+                `Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`
+              );
+            }
+            await sendfiles(thispage);
+          } else {
+            await ctx.reply("error in sending");
+          }
         }
       }
+      await sendfiles(page);
     }
-    await sendfiles(page);
+    taskQueue.enqueue(vidlongtask);
   } catch (error: any) {
     console.log(error.message);
   }
@@ -791,42 +834,45 @@ ownerComposer.chatType("channel").command("vidfilebackup7306", async (ctx) => {
 
 ownerComposer.chatType("channel").command("audfilebackup7306", async (ctx) => {
   try {
-    let thispage = 0;
-    let page = parseInt(ctx.match);
-    let files = 0;
-    const totalsize = await db.AudioCollection.countDocuments();
-    const totalPages = Math.ceil(totalsize / 10);
+    async function audlongtask() {
+      let thispage = 0;
+      let page = parseInt(ctx.match);
+      let files = 0;
+      const totalsize = await db.AudioCollection.countDocuments();
+      const totalPages = Math.ceil(totalsize / 10);
 
-    async function sendfiles(page: number) {
-      const skip = (page - 1) * 1;
-      const filteredDocs = await db.AudioCollection.find()
-        .skip(skip)
-        .limit(1)
-        .toArray();
-      if (filteredDocs.length === 0) {
-        await ctx.reply("no files to send");
-        return;
-      } else {
-        const res = await bot.api.sendAudio(
-          ctx.chat.id,
-          filteredDocs[0].file_id,
-          { caption: filteredDocs[0].file_name }
-        );
-        if (res) {
-          files = files + 1;
-          thispage = page + 1;
-          if (files == totalsize) {
-            await ctx.reply(
-              `Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`
-            );
-          }
-          await sendfiles(thispage);
+      async function sendfiles(page: number) {
+        const skip = (page - 1) * 1;
+        const filteredDocs = await db.AudioCollection.find()
+          .skip(skip)
+          .limit(1)
+          .toArray();
+        if (filteredDocs.length === 0) {
+          await ctx.reply("no files to send");
+          return;
         } else {
-          await ctx.reply("error in sending");
+          const res = await bot.api.sendAudio(
+            ctx.chat.id,
+            filteredDocs[0].file_id,
+            { caption: filteredDocs[0].file_name }
+          );
+          if (res) {
+            files = files + 1;
+            thispage = page + 1;
+            if (files == totalsize) {
+              await ctx.reply(
+                `Full files sended : ${files}, totalskipped: ${skip}, totalPages: ${totalPages}`
+              );
+            }
+            await sendfiles(thispage);
+          } else {
+            await ctx.reply("error in sending");
+          }
         }
       }
+      await sendfiles(page);
     }
-    await sendfiles(page);
+    taskQueue.enqueue(audlongtask);
   } catch (error: any) {
     console.log(error.message);
   }

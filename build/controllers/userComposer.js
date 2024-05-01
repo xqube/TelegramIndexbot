@@ -67,7 +67,7 @@ userComposer.on("callback_query:data", async (ctx) => {
                     message_thread_id: thread_id_nav,
                 });
             }
-            //get prev page
+            //get prev page ;)
             if (calladataprev) {
                 const page = Number(data[1]);
                 const prevpage = page - 1;
