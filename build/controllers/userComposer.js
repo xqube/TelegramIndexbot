@@ -3,12 +3,13 @@ import { insert_audio, insert_document, insert_user, insert_video, search_audio_
 import { cleanFileName, extractSearchTerm, keyboardlist, } from "../functions/helperFunc.js";
 export const userComposer = new Composer();
 userComposer.on("callback_query:data", async (ctx) => {
+    var _a;
     try {
         const calldata = ctx.update.callback_query.data;
         const calladatanext = calldata.match(/\^next/);
         const calladataprev = calldata.match(/\^prev/);
         const calladatafile = calldata.match(/file/);
-        const messageText = ctx.update.callback_query.message?.text;
+        const messageText = (_a = ctx.update.callback_query.message) === null || _a === void 0 ? void 0 : _a.text;
         const searchTerm = extractSearchTerm(messageText);
         const data = calldata.split("__");
         ///below code is for nav button click
@@ -102,11 +103,13 @@ userComposer.chatType("private").command("start", async (ctx) => {
                 if (filteredDocs.file_caption != "") {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_caption,
+                        protect_content: true
                     });
                 }
                 else {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_name,
+                        protect_content: true
                     });
                 }
             }
@@ -115,11 +118,13 @@ userComposer.chatType("private").command("start", async (ctx) => {
                 if (filteredDocs.file_caption != "") {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_caption,
+                        protect_content: true
                     });
                 }
                 else {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_name,
+                        protect_content: true
                     });
                 }
             }
@@ -128,11 +133,13 @@ userComposer.chatType("private").command("start", async (ctx) => {
                 if (filteredDocs.file_caption != "") {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_caption,
+                        protect_content: true
                     });
                 }
                 else {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_name,
+                        protect_content: true
                     });
                 }
             }
@@ -159,9 +166,9 @@ userComposer.chatType("private").command("info", async (ctx, next) => {
     try {
         if (ctx.msg.chat.type == "private") {
             const replyMessage = ctx.msg.reply_to_message;
-            if (replyMessage?.document ||
-                replyMessage?.video ||
-                replyMessage?.audio) {
+            if ((replyMessage === null || replyMessage === void 0 ? void 0 : replyMessage.document) ||
+                (replyMessage === null || replyMessage === void 0 ? void 0 : replyMessage.video) ||
+                (replyMessage === null || replyMessage === void 0 ? void 0 : replyMessage.audio)) {
                 if (replyMessage.document) {
                     ctx.reply(`<pre language="json">id: ${replyMessage.document.file_unique_id}</pre>`, { parse_mode: "HTML" });
                 }
@@ -183,13 +190,14 @@ userComposer.chatType("private").command("info", async (ctx, next) => {
     await next();
 });
 userComposer.chatType("private").on(":file", async (ctx, next) => {
+    var _a, _b, _c, _d;
     try {
         const admins = process.env.OWNERS;
         // const { is_banned } = await is_user_banned(ctx.from.id);
         if (admins.includes(ctx.msg.from.id)) {
             if (ctx.msg.document) {
                 const file_name = cleanFileName(ctx.msg.document.file_name);
-                const file_caption = cleanFileName(ctx.msg.caption ?? "");
+                const file_caption = cleanFileName((_a = ctx.msg.caption) !== null && _a !== void 0 ? _a : "");
                 const data = {
                     user_id: ctx.msg.from.id,
                     first_name: ctx.msg.from.first_name,
@@ -204,7 +212,7 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.video) {
                 const file_name = cleanFileName(ctx.msg.video.file_name);
-                const file_caption = cleanFileName(ctx.msg.caption ?? "");
+                const file_caption = cleanFileName((_b = ctx.msg.caption) !== null && _b !== void 0 ? _b : "");
                 const data = {
                     user_id: ctx.msg.from.id,
                     first_name: ctx.msg.from.first_name,
@@ -219,7 +227,7 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.audio) {
                 const file_name = cleanFileName(ctx.msg.audio.file_name);
-                const file_caption = cleanFileName(ctx.msg.caption ?? "");
+                const file_caption = cleanFileName((_c = ctx.msg.caption) !== null && _c !== void 0 ? _c : "");
                 const data = {
                     user_id: ctx.msg.from.id,
                     first_name: ctx.msg.from.first_name,
@@ -227,7 +235,7 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
                     file_name: file_name,
                     file_caption: file_caption,
                     file_unique_id: ctx.msg.audio.file_unique_id,
-                    file_size: ctx.msg.audio?.file_size,
+                    file_size: (_d = ctx.msg.audio) === null || _d === void 0 ? void 0 : _d.file_size,
                     is_banned: false,
                     // add performer section
                 };
@@ -241,11 +249,12 @@ userComposer.chatType("private").on(":file", async (ctx, next) => {
     await next();
 });
 userComposer.chatType("channel").on(":file", async (ctx, next) => {
+    var _a, _b, _c, _d;
     try {
         if (ctx.chat.id == parseInt(process.env.OFFICIAL_CHANNEL || "")) {
             if (ctx.msg.document) {
                 const file_name = cleanFileName(ctx.msg.document.file_name);
-                const file_caption = cleanFileName(ctx.msg.caption ?? "");
+                const file_caption = cleanFileName((_a = ctx.msg.caption) !== null && _a !== void 0 ? _a : "");
                 const data = {
                     user_id: 12345678,
                     first_name: "12345678",
@@ -260,7 +269,7 @@ userComposer.chatType("channel").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.video) {
                 const file_name = cleanFileName(ctx.msg.video.file_name);
-                const file_caption = cleanFileName(ctx.msg.caption ?? "");
+                const file_caption = cleanFileName((_b = ctx.msg.caption) !== null && _b !== void 0 ? _b : "");
                 const data = {
                     user_id: 12345678,
                     first_name: "12345678",
@@ -275,7 +284,7 @@ userComposer.chatType("channel").on(":file", async (ctx, next) => {
             }
             else if (ctx.msg.audio) {
                 const file_name = cleanFileName(ctx.msg.audio.file_name);
-                const file_caption = cleanFileName(ctx.msg.caption ?? "");
+                const file_caption = cleanFileName((_c = ctx.msg.caption) !== null && _c !== void 0 ? _c : "");
                 const data = {
                     user_id: 12345678,
                     first_name: "12345678",
@@ -283,7 +292,7 @@ userComposer.chatType("channel").on(":file", async (ctx, next) => {
                     file_name: file_name,
                     file_caption: file_caption,
                     file_unique_id: ctx.msg.audio.file_unique_id,
-                    file_size: ctx.msg.audio?.file_size,
+                    file_size: (_d = ctx.msg.audio) === null || _d === void 0 ? void 0 : _d.file_size,
                     is_banned: false,
                     // add performer section
                 };
@@ -297,13 +306,14 @@ userComposer.chatType("channel").on(":file", async (ctx, next) => {
     await next();
 });
 userComposer.on(":text", async (ctx, next) => {
+    var _a, _b, _c, _d, _e, _f;
     try {
         const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
         const searchparam = ctx.msg.text;
         const inlineKeyboard = await keyboardlist(ctx, 1, searchparam, ctx.msg.message_thread_id);
         if (inlineKeyboard) {
             if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
+                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
                     reply_markup: inlineKeyboard,
                     parse_mode: "HTML",
                     message_thread_id: process.env.DOC_THREAD_ID,
@@ -319,7 +329,7 @@ userComposer.on(":text", async (ctx, next) => {
                 }, msgDeleteTime);
             }
             else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
+                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id}">${(_d = ctx.from) === null || _d === void 0 ? void 0 : _d.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
                     reply_markup: inlineKeyboard,
                     parse_mode: "HTML",
                     message_thread_id: process.env.VIDEO_THREAD_ID,
@@ -335,7 +345,7 @@ userComposer.on(":text", async (ctx, next) => {
                 }, msgDeleteTime);
             }
             else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
+                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_e = ctx.from) === null || _e === void 0 ? void 0 : _e.id}">${(_f = ctx.from) === null || _f === void 0 ? void 0 : _f.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
                     reply_markup: inlineKeyboard,
                     parse_mode: "HTML",
                     message_thread_id: process.env.AUDIO_THREAD_ID,

@@ -135,10 +135,12 @@ userComposer.chatType("private").command("start", async (ctx) => {
                 if (filteredDocs.file_caption != "") {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_caption,
+                        protect_content: true
                     });
                 } else {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_name,
+                        protect_content: true
                     });
                 }
             } else if (type == "vid") {
@@ -146,10 +148,12 @@ userComposer.chatType("private").command("start", async (ctx) => {
                 if (filteredDocs.file_caption != "") {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_caption,
+                        protect_content: true
                     });
                 } else {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_name,
+                        protect_content: true
                     });
                 }
             } else if (type == "aud") {
@@ -157,10 +161,12 @@ userComposer.chatType("private").command("start", async (ctx) => {
                 if (filteredDocs.file_caption != "") {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_caption,
+                        protect_content: true
                     });
                 } else {
                     await ctx.replyWithDocument(filteredDocs.file_id, {
                         caption: filteredDocs.file_name,
+                        protect_content: true
                     });
                 }
             }
