@@ -110,36 +110,20 @@ export async function search_document(
   try {
     const skip = (page - 1) * 10;
     // Split the search terms into individual words
-    const formattedSearchString =
-      '"' +
-      searchTerms
-        .split(" ")
-        .map((term) => `\\"${term}\\"`)
-        .join(" ") +
-      '"';
-    console.log(formattedSearchString); // Output: "\"thrones\" \"s02\" \"psa\" \"720p\""
+    const termsArray = searchTerms.split(" ");
+    // Map over the array of terms and enclose each word in double quotes with a backslash
+    const formattedTermsArray = termsArray.map((term) => `\\"${term}\\"`);
+    // Join the formatted terms array back into a string with space as separator
+    const output = formattedTermsArray.join(" ");
+    console.log(output); // Output: "\"thrones\" \"s02\" \"psa\" \"720p\""
     const searchterm = {
-      $text: { $search: formattedSearchString },
+      $text: { $search: `"${output}"` },
     };
 
     // Count filtered documents
-    const totalsize = await db.DocumentCollection.countDocuments(
-      '"' +
-        searchTerms
-          .split(" ")
-          .map((term) => `\\"${term}\\"`)
-          .join(" ") +
-        '"'
-    );
+    const totalsize = await db.DocumentCollection.countDocuments(searchterm);
     // Fetch filtered documents for the specified page
-    const filteredDocs = await db.DocumentCollection.find(
-      '"' +
-        searchTerms
-          .split(" ")
-          .map((term) => `\\"${term}\\"`)
-          .join(" ") +
-        '"'
-    )
+    const filteredDocs = await db.DocumentCollection.find(searchterm)
       .skip(skip)
       .limit(10)
       .toArray();
