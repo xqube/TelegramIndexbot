@@ -106,14 +106,18 @@ export async function search_document(searchTerms, page) {
     try {
         const skip = (page - 1) * 10;
         // Split the search terms into individual words
-        const custom = "\"thrones\" \"s02\" \"psa\" \"720p\"";
+        // Join the formatted terms array back into a string with space as separator
+        const term = `${searchTerms
+            .split(" ")
+            .map((term) => `\"${term}\"`)
+            .join(" ")}`;
         // Count filtered documents
         const totalsize = await db.DocumentCollection.countDocuments({
-            $text: { $search: custom },
+            $text: { $search: term },
         });
         // Fetch filtered documents for the specified page
         const filteredDocs = await db.DocumentCollection.find({
-            $text: { $search: custom },
+            $text: { $search: term },
         })
             .skip(skip)
             .limit(10)
