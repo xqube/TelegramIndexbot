@@ -124,6 +124,7 @@ export async function search_document(searchTerms, page) {
             .skip(skip)
             .limit(10)
             .toArray();
+        console.log(filteredDocs);
         // Return an object containing both filtered documents and total size
         return { filteredDocs, totalsize };
     }
