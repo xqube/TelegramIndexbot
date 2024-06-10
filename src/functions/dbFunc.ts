@@ -121,18 +121,16 @@ export async function search_document(
 
     // Count filtered documents
     const totalsize = await db.DocumentCollection.countDocuments({
-      $text: { $search: formattedSearchString },
-    });
+      $text: { $search: formattedSearchString } });
     // Fetch filtered documents for the specified page
     const filteredDocs = await db.DocumentCollection.find({
-      $text: { $search: formattedSearchString },
-    })
+      $text: { $search: formattedSearchString } })
       .skip(skip)
       .limit(10)
       .toArray();
 
-      console.log(filteredDocs);
-      
+    console.log(filteredDocs);
+
     // Return an object containing both filtered documents and total size
     return { filteredDocs, totalsize };
   } catch (error: any) {
