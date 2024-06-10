@@ -123,9 +123,23 @@ export async function search_document(
     };
 
     // Count filtered documents
-    const totalsize = await db.DocumentCollection.countDocuments(searchterm);
+    const totalsize = await db.DocumentCollection.countDocuments(
+      '"' +
+        searchTerms
+          .split(" ")
+          .map((term) => `\\"${term}\\"`)
+          .join(" ") +
+        '"'
+    );
     // Fetch filtered documents for the specified page
-    const filteredDocs = await db.DocumentCollection.find(searchterm)
+    const filteredDocs = await db.DocumentCollection.find(
+      '"' +
+        searchTerms
+          .split(" ")
+          .map((term) => `\\"${term}\\"`)
+          .join(" ") +
+        '"'
+    )
       .skip(skip)
       .limit(10)
       .toArray();
