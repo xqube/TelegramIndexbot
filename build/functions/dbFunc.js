@@ -69,24 +69,59 @@ export async function insert_user(data) {
         }
     }
 }
+// export async function search_document(
+//   searchTerms: string,
+//   page: number
+// ): Promise<{ filteredDocs: any[]; totalsize: number }> {
+//   try {
+//     const skip = (page - 1) * 10;
+//     // Split the search terms into individual words
+//     const searchWords = searchTerms.trim().split(/\s+/);
+//     // Construct an array of regex patterns, one for each search word
+//     const regexPatterns = searchWords.map(
+//       (word) => new RegExp(`\\b${word}\\b`, "i")
+//     );
+//     // Combine the regex patterns using the OR operator
+//     const combinedRegex = {
+//       $and: [
+//         { $and: regexPatterns.map((pattern) => ({ file_name: pattern })) },
+//         { is_banned: false },
+//       ],
+//     };
+//     // Count filtered documents
+//     const totalsize = await db.DocumentCollection.countDocuments(combinedRegex);
+//     // Fetch filtered documents for the specified page
+//     const filteredDocs = await db.DocumentCollection.find(combinedRegex)
+//       .skip(skip)
+//       .limit(10)
+//       .toArray();
+//     // Return an object containing both filtered documents and total size
+//     return { filteredDocs, totalsize };
+//   } catch (error: any) {
+//     console.error("Error in search_document at dbFunc.ts", error.message);
+//     throw error;
+//   }
+// }
 export async function search_document(searchTerms, page) {
     try {
         const skip = (page - 1) * 10;
         // Split the search terms into individual words
-        const searchWords = searchTerms.trim().split(/\s+/);
-        // Construct an array of regex patterns, one for each search word
-        const regexPatterns = searchWords.map((word) => new RegExp(`\\b${word}\\b`, "i"));
-        // Combine the regex patterns using the OR operator
-        const combinedRegex = {
-            $and: [
-                { $and: regexPatterns.map((pattern) => ({ file_name: pattern })) },
-                { is_banned: false },
-            ],
-        };
+        const formattedSearchString = '"' +
+            searchTerms
+                .split(" ")
+                .map((term) => `\\"${term}\\"`)
+                .join(" ") +
+            '"';
+        console.log(formattedSearchString); // Output: "\"thrones\" \"s02\" \"psa\" \"720p\""
+        db.documents.find;
         // Count filtered documents
-        const totalsize = await db.DocumentCollection.countDocuments(combinedRegex);
+        const totalsize = await db.DocumentCollection.countDocuments({
+            $text: { $search: formattedSearchString },
+        });
         // Fetch filtered documents for the specified page
-        const filteredDocs = await db.DocumentCollection.find(combinedRegex)
+        const filteredDocs = await db.DocumentCollection.find({
+            $text: { $search: formattedSearchString },
+        })
             .skip(skip)
             .limit(10)
             .toArray();
