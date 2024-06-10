@@ -110,20 +110,24 @@ export async function search_document(
   try {
     const skip = (page - 1) * 10;
     // Split the search terms into individual words
-    const termsArray = searchTerms.split(" ");
-    // Map over the array of terms and enclose each word in double quotes with a backslash
-    const formattedTermsArray = termsArray.map((term) => `\\"${term}\\"`);
-    // Join the formatted terms array back into a string with space as separator
-    const output = formattedTermsArray.join(" "); // Output: "\"thrones\" \"s02\" \"psa\" \"720p\""
-    const term = `"${output}"`;
 
     // Count filtered documents
     const totalsize = await db.DocumentCollection.countDocuments({
-      $text: { $search: term },
+      $text: {
+        $search: `"${searchTerms
+          .split(" ")
+          .map((term) => `\\"${term}\\"`)
+          .join(" ")}"`,
+      },
     });
     // Fetch filtered documents for the specified page
     const filteredDocs = await db.DocumentCollection.find({
-      $text: { $search: term },
+      $text: {
+        $search: `"${searchTerms
+          .split(" ")
+          .map((term) => `\\"${term}\\"`)
+          .join(" ")}"`,
+      },
     })
       .skip(skip)
       .limit(10)
