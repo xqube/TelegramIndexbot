@@ -114,16 +114,17 @@ export async function search_document(
     // Map over the array of terms and enclose each word in double quotes with a backslash
     const formattedTermsArray = termsArray.map((term) => `\\"${term}\\"`);
     // Join the formatted terms array back into a string with space as separator
-    const output = formattedTermsArray.join(" ");
-    console.log(output); // Output: "\"thrones\" \"s02\" \"psa\" \"720p\""
-    const searchterm = {
-      $text: { $search: `"${output}"` },
-    };
+    const output = formattedTermsArray.join(" "); // Output: "\"thrones\" \"s02\" \"psa\" \"720p\""
+    const term = `"${output}"`;
 
     // Count filtered documents
-    const totalsize = await db.DocumentCollection.countDocuments(searchterm);
+    const totalsize = await db.DocumentCollection.countDocuments({
+      $text: { $search: term },
+    });
     // Fetch filtered documents for the specified page
-    const filteredDocs = await db.DocumentCollection.find(searchterm)
+    const filteredDocs = await db.DocumentCollection.find({
+      $text: { $search: term },
+    })
       .skip(skip)
       .limit(10)
       .toArray();
