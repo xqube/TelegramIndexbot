@@ -113,7 +113,6 @@ export async function search_document(searchTerms, page) {
                 .join(" ") +
             '"';
         console.log(formattedSearchString); // Output: "\"thrones\" \"s02\" \"psa\" \"720p\""
-        db.documents.find;
         // Count filtered documents
         const totalsize = await db.DocumentCollection.countDocuments({
             $text: { $search: formattedSearchString },
