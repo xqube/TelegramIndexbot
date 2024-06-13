@@ -125,67 +125,67 @@ userComposer.on("callback_query:data", async (ctx: any) => {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 userComposer.chatType("private").command("start", async (ctx) => {
-    try {
-        if (ctx.match) {
-            const parts = ctx.match.split("__");
-            const file_unique_id = parts[1];
-            const type = parts[0];
-            if (type == "doc") {
-                const { filteredDocs } = await search_document_file_id(file_unique_id);
-                if (filteredDocs.file_caption != "") {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_caption,
-                        protect_content: true
-                    });
-                } else {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_name,
-                        protect_content: true
-                    });
-                }
-            } else if (type == "vid") {
-                const { filteredDocs } = await search_video_file_id(file_unique_id);
-                if (filteredDocs.file_caption != "") {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_caption,
-                        protect_content: true
-                    });
-                } else {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_name,
-                        protect_content: true
-                    });
-                }
-            } else if (type == "aud") {
-                const { filteredDocs } = await search_audio_file_id(file_unique_id);
-                if (filteredDocs.file_caption != "") {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_caption,
-                        protect_content: true
-                    });
-                } else {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_name,
-                        protect_content: true
-                    });
-                }
-            }
+  try {
+    if (ctx.match) {
+      const parts = ctx.match.split("__");
+      const file_unique_id = parts[1];
+      const type = parts[0];
+      if (type == "doc") {
+        const { filteredDocs } = await search_document_file_id(file_unique_id);
+        if (filteredDocs.file_caption != "") {
+          await ctx.replyWithDocument(filteredDocs.file_id, {
+            caption: filteredDocs.file_caption,
+            protect_content: true,
+          });
         } else {
-            if (ctx.from) {
-                const data = {
-                    user_id: ctx.from.id,
-                    first_name: ctx.from.first_name,
-                    warn: 0,
-                    is_banned: false,
-                };
-                await insert_user(data);
-            }
-            // ctx.reply(
-            //     `👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`,
-            //     { parse_mode: "HTML" }
-            // );
+          await ctx.replyWithDocument(filteredDocs.file_id, {
+            caption: filteredDocs.file_name,
+            protect_content: true,
+          });
         }
-    } catch (error) { }
+      } else if (type == "vid") {
+        const { filteredDocs } = await search_video_file_id(file_unique_id);
+        if (filteredDocs.file_caption != "") {
+          await ctx.replyWithDocument(filteredDocs.file_id, {
+            caption: filteredDocs.file_caption,
+            protect_content: true,
+          });
+        } else {
+          await ctx.replyWithDocument(filteredDocs.file_id, {
+            caption: filteredDocs.file_name,
+            protect_content: true,
+          });
+        }
+      } else if (type == "aud") {
+        const { filteredDocs } = await search_audio_file_id(file_unique_id);
+        if (filteredDocs.file_caption != "") {
+          await ctx.replyWithDocument(filteredDocs.file_id, {
+            caption: filteredDocs.file_caption,
+            protect_content: true,
+          });
+        } else {
+          await ctx.replyWithDocument(filteredDocs.file_id, {
+            caption: filteredDocs.file_name,
+            protect_content: true,
+          });
+        }
+      }
+    } else {
+      if (ctx.from) {
+        const data = {
+          user_id: ctx.from.id,
+          first_name: ctx.from.first_name,
+          warn: 0,
+          is_banned: false,
+        };
+        await insert_user(data);
+      }
+      // ctx.reply(
+      //     `👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`,
+      //     { parse_mode: "HTML" }
+      // );
+    }
+  } catch (error) {}
 });
 
 userComposer.chatType("private").command("info", async (ctx, next) => {
@@ -335,72 +335,141 @@ userComposer.chatType("channel").on(":file", async (ctx, next) => {
   await next();
 });
 
-userComposer.on(":text", async (ctx, next) => {
-  try {
-    const msgDeleteTime: number = parseInt(
-      process.env.MESSAGE_DELETE_TIME || ""
-    );
-    const searchparam = ctx.msg.text;
-    const inlineKeyboard = await keyboardlist(
-      ctx,
-      1,
-      searchparam,
-      ctx.msg.message_thread_id
-    );
-    if (inlineKeyboard) {
-      if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-        const { message_id } = await ctx.reply(
-          `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`,
-          {
-            reply_markup: inlineKeyboard,
-            parse_mode: "HTML",
-            message_thread_id: process.env.DOC_THREAD_ID,
-          }
-        );
-        setTimeout(async () => {
-          try {
-            await ctx.deleteMessage();
-            await ctx.api.deleteMessage(ctx.chat.id, message_id);
-          } catch (error) {
-            console.log(error);
-          }
-        }, msgDeleteTime);
-      } else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-        const { message_id } = await ctx.reply(
-          `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`,
-          {
-            reply_markup: inlineKeyboard,
-            parse_mode: "HTML",
-            message_thread_id: process.env.VIDEO_THREAD_ID,
-          }
-        );
-        setTimeout(async () => {
-          try {
-            await ctx.deleteMessage();
-            await ctx.api.deleteMessage(ctx.chat.id, message_id);
-          } catch (error) {
-            console.log(error);
-          }
-        }, msgDeleteTime);
-      } else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-        const { message_id } = await ctx.reply(
-          `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`,
-          {
-            reply_markup: inlineKeyboard,
-            parse_mode: "HTML",
-            message_thread_id: process.env.AUDIO_THREAD_ID,
-          }
-        );
-        setTimeout(async () => {
-          try {
-            await ctx.deleteMessage();
-            await ctx.api.deleteMessage(ctx.chat.id, message_id);
-          } catch (error) {
-            console.log(error);
-          }
-        }, msgDeleteTime);
+class Queue<T> {
+  private items: T[] = [];
+
+  // Enqueue: Add an element to the end of the queue
+  enqueue(element: T): void {
+    this.items.push(element);
+  }
+
+  // Dequeue: Remove an element from the front of the queue
+  dequeue(): T | undefined {
+    return this.items.shift();
+  }
+
+  // Peek: Get the front element of the queue without removing it
+  peek(): T | undefined {
+    return this.items[0];
+  }
+
+  // Check if the queue is empty
+  isEmpty(): boolean {
+    return this.items.length === 0;
+  }
+
+  // Get the size of the queue
+  size(): number {
+    return this.items.length;
+  }
+
+  // Clear the queue
+  clear(): void {
+    this.items = [];
+  }
+
+  // Print the queue
+  print(): void {
+    console.log(this.items.toString());
+  }
+}
+
+class TaskQueue extends Queue<() => Promise<void>> {
+  // Execute all tasks in the queue
+  async execute(): Promise<void> {
+    while (!this.isEmpty()) {
+      const task = this.dequeue();
+      if (task) {
+        try {
+          await task();
+        } catch (error) {
+          console.error("Error executing task:", error);
+        }
       }
     }
+  }
+}
+
+userComposer.on(":text", async (ctx, next) => {
+  try {
+    // Create a task queue
+    const taskQueue = new TaskQueue();
+
+    // Define some tasks
+    const task1 = (): Promise<void> =>
+      new Promise(async (resolve) => {
+        const msgDeleteTime: number = parseInt(
+          process.env.MESSAGE_DELETE_TIME || ""
+        );
+        const searchparam = ctx.msg.text;
+        const inlineKeyboard = await keyboardlist(
+          ctx,
+          1,
+          searchparam,
+          ctx.msg.message_thread_id
+        );
+        if (inlineKeyboard) {
+          if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
+            const { message_id } = await ctx.reply(
+              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`,
+              {
+                reply_markup: inlineKeyboard,
+                parse_mode: "HTML",
+                message_thread_id: process.env.DOC_THREAD_ID,
+              }
+            );
+            setTimeout(async () => {
+              try {
+                await ctx.deleteMessage();
+                await ctx.api.deleteMessage(ctx.chat.id, message_id);
+              } catch (error) {
+                console.log(error);
+              }
+            }, msgDeleteTime);
+          } else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
+            const { message_id } = await ctx.reply(
+              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`,
+              {
+                reply_markup: inlineKeyboard,
+                parse_mode: "HTML",
+                message_thread_id: process.env.VIDEO_THREAD_ID,
+              }
+            );
+            setTimeout(async () => {
+              try {
+                await ctx.deleteMessage();
+                await ctx.api.deleteMessage(ctx.chat.id, message_id);
+              } catch (error) {
+                console.log(error);
+              }
+            }, msgDeleteTime);
+          } else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
+            const { message_id } = await ctx.reply(
+              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`,
+              {
+                reply_markup: inlineKeyboard,
+                parse_mode: "HTML",
+                message_thread_id: process.env.AUDIO_THREAD_ID,
+              }
+            );
+            setTimeout(async () => {
+              try {
+                await ctx.deleteMessage();
+                await ctx.api.deleteMessage(ctx.chat.id, message_id);
+              } catch (error) {
+                console.log(error);
+              }
+            }, msgDeleteTime);
+          }
+        }
+        resolve();
+      });
+    // Enqueue tasks
+    taskQueue.enqueue(task1);
+    // Execute tasks in the queue
+    taskQueue.execute().then(() => {
+      console.log("task executed");
+    });
   } catch (error: any) {
     console.log(error.message);
   }
