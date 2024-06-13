@@ -486,8 +486,11 @@ userComposer.on(":text", async (ctx, next) => {
         console.log("task executed");
       });
     } else {
+      const msgDeleteTime: number = parseInt(
+        process.env.MESSAGE_DELETE_TIME || ""
+      );
       if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-        await ctx.reply(
+        const { message_id } = await ctx.reply(
           `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
           {
             parse_mode: "HTML",
@@ -497,8 +500,15 @@ userComposer.on(":text", async (ctx, next) => {
             },
           }
         );
+        setTimeout(async () => {
+          try {
+            await ctx.api.deleteMessage(ctx.chat.id, message_id);
+          } catch (error) {
+            console.log(error);
+          }
+        }, msgDeleteTime);
       } else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-        await ctx.reply(
+        const { message_id } = await ctx.reply(
           `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
           {
             parse_mode: "HTML",
@@ -508,8 +518,15 @@ userComposer.on(":text", async (ctx, next) => {
             },
           }
         );
+        setTimeout(async () => {
+          try {
+            await ctx.api.deleteMessage(ctx.chat.id, message_id);
+          } catch (error) {
+            console.log(error);
+          }
+        }, msgDeleteTime);
       } else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-        await ctx.reply(
+        const { message_id } = await ctx.reply(
           `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
           {
             parse_mode: "HTML",
@@ -519,6 +536,13 @@ userComposer.on(":text", async (ctx, next) => {
             },
           }
         );
+        setTimeout(async () => {
+          try {
+            await ctx.api.deleteMessage(ctx.chat.id, message_id);
+          } catch (error) {
+            console.log(error);
+          }
+        }, msgDeleteTime);
       }
     }
   } catch (error: any) {
