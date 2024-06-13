@@ -439,18 +439,27 @@ userComposer.on(":text", async (ctx, next) => {
                 await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {
                     parse_mode: "HTML",
                     message_thread_id: process.env.DOC_THREAD_ID,
+                    reply_parameters: {
+                        message_id: ctx.msg.message_id,
+                    },
                 });
             }
             else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
                 await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {
                     parse_mode: "HTML",
                     message_thread_id: process.env.VIDEO_THREAD_ID,
+                    reply_parameters: {
+                        message_id: ctx.msg.message_id,
+                    },
                 });
             }
             else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
                 await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {
                     parse_mode: "HTML",
                     message_thread_id: process.env.AUDIO_THREAD_ID,
+                    reply_parameters: {
+                        message_id: ctx.msg.message_id,
+                    },
                 });
             }
         }
