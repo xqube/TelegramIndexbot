@@ -363,7 +363,12 @@ userComposer.on(":text", async (ctx, next) => {
             var _a, _b, _c, _d, _e, _f;
             const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
             setTimeout(async () => {
-                await ctx.deleteMessage();
+                try {
+                    await ctx.deleteMessage();
+                }
+                catch (error) {
+                    console.log(error);
+                }
             }, msgDeleteTime);
             const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text, ctx.msg.message_thread_id);
             if (inlineKeyboard) {
