@@ -400,30 +400,30 @@ function hasFiveParts(inputString: string): boolean {
 
 userComposer.on(":text", async (ctx, next) => {
   try {
-    // Create a task queue
-    const taskQueue = new TaskQueue();
-    // Define some tasks
-    const task1 = (): Promise<void> =>
-      new Promise(async (resolve) => {
-        const msgDeleteTime: number = parseInt(
-          process.env.MESSAGE_DELETE_TIME || ""
-        );
-        setTimeout(async () => {
-          try {
-            await ctx.deleteMessage();
-          } catch (error) {
-            console.log(error);
-          }
-        }, msgDeleteTime);
-        const inlineKeyboard = await keyboardlist(
-          ctx,
-          1,
-          ctx.msg.text,
-          ctx.msg.message_thread_id
-        );
-        if (inlineKeyboard) {
-          if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-            if (hasFiveParts(ctx.msg.text)) {
+    if (hasFiveParts(ctx.msg.text)) {
+      // Create a task queue
+      const taskQueue = new TaskQueue();
+      // Define some tasks
+      const task1 = (): Promise<void> =>
+        new Promise(async (resolve) => {
+          const msgDeleteTime: number = parseInt(
+            process.env.MESSAGE_DELETE_TIME || ""
+          );
+          setTimeout(async () => {
+            try {
+              await ctx.deleteMessage();
+            } catch (error) {
+              console.log(error);
+            }
+          }, msgDeleteTime);
+          const inlineKeyboard = await keyboardlist(
+            ctx,
+            1,
+            ctx.msg.text,
+            ctx.msg.message_thread_id
+          );
+          if (inlineKeyboard) {
+            if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
               const { message_id } = await ctx.reply(
                 `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
                 {
@@ -439,17 +439,9 @@ userComposer.on(":text", async (ctx, next) => {
                   console.log(error);
                 }
               }, msgDeleteTime);
-            } else {
-              await ctx.reply(
-                `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
-                {
-                  parse_mode: "HTML",
-                  message_thread_id: process.env.DOC_THREAD_ID,
-                }
-              );
-            }
-          } else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-            if (hasFiveParts(ctx.msg.text)) {
+            } else if (
+              ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID
+            ) {
               const { message_id } = await ctx.reply(
                 `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
                 {
@@ -465,17 +457,9 @@ userComposer.on(":text", async (ctx, next) => {
                   console.log(error);
                 }
               }, msgDeleteTime);
-            } else {
-              await ctx.reply(
-                `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
-                {
-                  parse_mode: "HTML",
-                  message_thread_id: process.env.VIDEO_THREAD_ID,
-                }
-              );
-            }
-          } else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-            if (hasFiveParts(ctx.msg.text)) {
+            } else if (
+              ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID
+            ) {
               const { message_id } = await ctx.reply(
                 `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
                 {
@@ -491,25 +475,43 @@ userComposer.on(":text", async (ctx, next) => {
                   console.log(error);
                 }
               }, msgDeleteTime);
-            } else {
-              await ctx.reply(
-                `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
-                {
-                  parse_mode: "HTML",
-                  message_thread_id: process.env.AUDIO_THREAD_ID,
-                }
-              );
             }
           }
-        }
-        resolve();
+          resolve();
+        });
+      // Enqueue tasks
+      taskQueue.enqueue(task1);
+      // Execute tasks in the queue
+      taskQueue.execute().then(() => {
+        console.log("task executed");
       });
-    // Enqueue tasks
-    taskQueue.enqueue(task1);
-    // Execute tasks in the queue
-    taskQueue.execute().then(() => {
-      console.log("task executed");
-    });
+    } else {
+      if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
+        await ctx.reply(
+          `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
+          {
+            parse_mode: "HTML",
+            message_thread_id: process.env.DOC_THREAD_ID,
+          }
+        );
+      } else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
+        await ctx.reply(
+          `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
+          {
+            parse_mode: "HTML",
+            message_thread_id: process.env.VIDEO_THREAD_ID,
+          }
+        );
+      } else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
+        await ctx.reply(
+          `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
+          {
+            parse_mode: "HTML",
+            message_thread_id: process.env.AUDIO_THREAD_ID,
+          }
+        );
+      }
+    }
   } catch (error: any) {
     console.log(error.message);
   }
