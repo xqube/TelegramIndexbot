@@ -362,13 +362,13 @@ function hasFiveParts(inputString) {
 }
 userComposer.on(":text", async (ctx, next) => {
     try {
+        const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
         if (hasFiveParts(ctx.msg.text)) {
             // Create a task queue
             const taskQueue = new TaskQueue();
             // Define some tasks
             const task1 = () => new Promise(async (resolve) => {
                 var _a, _b, _c, _d, _e, _f;
-                const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
                 setTimeout(async () => {
                     try {
                         await ctx.deleteMessage();
@@ -435,7 +435,14 @@ userComposer.on(":text", async (ctx, next) => {
             });
         }
         else {
-            const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
+            setTimeout(async () => {
+                try {
+                    await ctx.deleteMessage();
+                }
+                catch (error) {
+                    console.log(error);
+                }
+            }, msgDeleteTime);
             if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
                 const { message_id } = await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {
                     parse_mode: "HTML",

@@ -400,15 +400,15 @@ function hasFiveParts(inputString: string): boolean {
 
 userComposer.on(":text", async (ctx, next) => {
   try {
+    const msgDeleteTime: number = parseInt(
+      process.env.MESSAGE_DELETE_TIME || ""
+    );
     if (hasFiveParts(ctx.msg.text)) {
       // Create a task queue
       const taskQueue = new TaskQueue();
       // Define some tasks
       const task1 = (): Promise<void> =>
         new Promise(async (resolve) => {
-          const msgDeleteTime: number = parseInt(
-            process.env.MESSAGE_DELETE_TIME || ""
-          );
           setTimeout(async () => {
             try {
               await ctx.deleteMessage();
@@ -486,9 +486,13 @@ userComposer.on(":text", async (ctx, next) => {
         console.log("task executed");
       });
     } else {
-      const msgDeleteTime: number = parseInt(
-        process.env.MESSAGE_DELETE_TIME || ""
-      );
+      setTimeout(async () => {
+        try {
+          await ctx.deleteMessage();
+        } catch (error) {
+          console.log(error);
+        }
+      }, msgDeleteTime);
       if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
         const { message_id } = await ctx.reply(
           `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
