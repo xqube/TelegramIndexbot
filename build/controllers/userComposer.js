@@ -358,7 +358,7 @@ function hasFiveParts(inputString) {
     // Split the input string by spaces
     const parts = inputString.split(" ");
     // Check if the length of the resulting array is 4
-    return parts.length === 5;
+    return parts.length <= 5;
 }
 userComposer.on(":text", async (ctx, next) => {
     try {

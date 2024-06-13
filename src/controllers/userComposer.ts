@@ -395,7 +395,7 @@ function hasFiveParts(inputString: string): boolean {
   const parts: string[] = inputString.split(" ");
 
   // Check if the length of the resulting array is 4
-  return parts.length === 5;
+  return parts.length <= 5;
 }
 
 userComposer.on(":text", async (ctx, next) => {
