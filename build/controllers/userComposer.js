@@ -362,6 +362,14 @@ userComposer.on(":text", async (ctx, next) => {
         const task1 = () => new Promise(async (resolve) => {
             var _a, _b, _c, _d, _e, _f;
             const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
+            setTimeout(async () => {
+                try {
+                    await ctx.deleteMessage();
+                }
+                catch (error) {
+                    console.log(error);
+                }
+            }, msgDeleteTime);
             const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text, ctx.msg.message_thread_id);
             if (inlineKeyboard) {
                 if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
@@ -372,7 +380,6 @@ userComposer.on(":text", async (ctx, next) => {
                     });
                     setTimeout(async () => {
                         try {
-                            await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                             await ctx.api.deleteMessage(ctx.chat.id, message_id);
                         }
                         catch (error) {
@@ -388,7 +395,6 @@ userComposer.on(":text", async (ctx, next) => {
                     });
                     setTimeout(async () => {
                         try {
-                            await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                             await ctx.api.deleteMessage(ctx.chat.id, message_id);
                         }
                         catch (error) {
@@ -404,7 +410,6 @@ userComposer.on(":text", async (ctx, next) => {
                     });
                     setTimeout(async () => {
                         try {
-                            await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                             await ctx.api.deleteMessage(ctx.chat.id, message_id);
                         }
                         catch (error) {

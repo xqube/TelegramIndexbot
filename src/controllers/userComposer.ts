@@ -401,6 +401,13 @@ userComposer.on(":text", async (ctx, next) => {
         const msgDeleteTime: number = parseInt(
           process.env.MESSAGE_DELETE_TIME || ""
         );
+        setTimeout(async () => {
+          try {
+            await ctx.deleteMessage();
+          } catch (error) {
+            console.log(error);
+          }
+        }, msgDeleteTime);
         const inlineKeyboard = await keyboardlist(
           ctx,
           1,
@@ -419,7 +426,6 @@ userComposer.on(":text", async (ctx, next) => {
             );
             setTimeout(async () => {
               try {
-                await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                 await ctx.api.deleteMessage(ctx.chat.id, message_id);
               } catch (error) {
                 console.log(error);
@@ -436,7 +442,6 @@ userComposer.on(":text", async (ctx, next) => {
             );
             setTimeout(async () => {
               try {
-                await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                 await ctx.api.deleteMessage(ctx.chat.id, message_id);
               } catch (error) {
                 console.log(error);
@@ -453,7 +458,6 @@ userComposer.on(":text", async (ctx, next) => {
             );
             setTimeout(async () => {
               try {
-                await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                 await ctx.api.deleteMessage(ctx.chat.id, message_id);
               } catch (error) {
                 console.log(error);
