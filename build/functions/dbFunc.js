@@ -119,6 +119,11 @@ export async function search_document(searchTerms, page) {
         const filteredDocs = await db.DocumentCollection.find({
             $text: { $search: term },
         })
+            .project({
+            file_name: 1,
+            file_unique_id: 1,
+            _id: 0, // Optionally, exclude the default _id field if not needed
+        })
             .skip(skip)
             .limit(10)
             .toArray();

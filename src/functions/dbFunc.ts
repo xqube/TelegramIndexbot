@@ -110,7 +110,7 @@ export async function search_document(
   try {
     const skip = (page - 1) * 10;
     // Split the search terms into individual words
-    
+
     // Join the formatted terms array back into a string with space as separator
     const term = `${searchTerms
       .split(" ")
@@ -125,6 +125,11 @@ export async function search_document(
     const filteredDocs = await db.DocumentCollection.find({
       $text: { $search: term },
     })
+      .project({
+        file_name: 1,
+        file_unique_id: 1,
+        _id: 0, // Optionally, exclude the default _id field if not needed
+      })
       .skip(skip)
       .limit(10)
       .toArray();
