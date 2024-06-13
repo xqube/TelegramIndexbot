@@ -390,7 +390,7 @@ class TaskQueue extends Queue<() => Promise<void>> {
   }
 }
 
-function hasFourParts(inputString: string): boolean {
+function hasFiveParts(inputString: string): boolean {
   // Split the input string by spaces
   const parts: string[] = inputString.split(" ");
 
@@ -398,40 +398,32 @@ function hasFourParts(inputString: string): boolean {
   return parts.length === 5;
 }
 
-// Example usage
-const testString: string = "money heist s04 1080p";
-console.log(hasFourParts(testString)); // Output: true
-
-const anotherTestString: string = "money heist s04";
-console.log(hasFourParts(anotherTestString)); // Output: false
-
 userComposer.on(":text", async (ctx, next) => {
   try {
     // Create a task queue
     const taskQueue = new TaskQueue();
-
-    if (hasFourParts(ctx.msg.text)) {
-      // Define some tasks
-      const task1 = (): Promise<void> =>
-        new Promise(async (resolve) => {
-          const msgDeleteTime: number = parseInt(
-            process.env.MESSAGE_DELETE_TIME || ""
-          );
-          setTimeout(async () => {
-            try {
-              await ctx.deleteMessage();
-            } catch (error) {
-              console.log(error);
-            }
-          }, msgDeleteTime);
-          const inlineKeyboard = await keyboardlist(
-            ctx,
-            1,
-            ctx.msg.text,
-            ctx.msg.message_thread_id
-          );
-          if (inlineKeyboard) {
-            if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
+    // Define some tasks
+    const task1 = (): Promise<void> =>
+      new Promise(async (resolve) => {
+        const msgDeleteTime: number = parseInt(
+          process.env.MESSAGE_DELETE_TIME || ""
+        );
+        setTimeout(async () => {
+          try {
+            await ctx.deleteMessage();
+          } catch (error) {
+            console.log(error);
+          }
+        }, msgDeleteTime);
+        const inlineKeyboard = await keyboardlist(
+          ctx,
+          1,
+          ctx.msg.text,
+          ctx.msg.message_thread_id
+        );
+        if (inlineKeyboard) {
+          if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
+            if (hasFiveParts(ctx.msg.text)) {
               const { message_id } = await ctx.reply(
                 `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
                 {
@@ -447,9 +439,17 @@ userComposer.on(":text", async (ctx, next) => {
                   console.log(error);
                 }
               }, msgDeleteTime);
-            } else if (
-              ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID
-            ) {
+            } else {
+              await ctx.reply(
+                `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
+                {
+                  parse_mode: "HTML",
+                  message_thread_id: process.env.DOC_THREAD_ID,
+                }
+              );
+            }
+          } else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
+            if (hasFiveParts(ctx.msg.text)) {
               const { message_id } = await ctx.reply(
                 `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
                 {
@@ -465,9 +465,17 @@ userComposer.on(":text", async (ctx, next) => {
                   console.log(error);
                 }
               }, msgDeleteTime);
-            } else if (
-              ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID
-            ) {
+            } else {
+              await ctx.reply(
+                `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
+                {
+                  parse_mode: "HTML",
+                  message_thread_id: process.env.VIDEO_THREAD_ID,
+                }
+              );
+            }
+          } else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
+            if (hasFiveParts(ctx.msg.text)) {
               const { message_id } = await ctx.reply(
                 `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
                 {
@@ -483,19 +491,25 @@ userComposer.on(":text", async (ctx, next) => {
                   console.log(error);
                 }
               }, msgDeleteTime);
+            } else {
+              await ctx.reply(
+                `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
+                {
+                  parse_mode: "HTML",
+                  message_thread_id: process.env.AUDIO_THREAD_ID,
+                }
+              );
             }
           }
-          resolve();
-        });
-      // Enqueue tasks
-      taskQueue.enqueue(task1);
-      // Execute tasks in the queue
-      taskQueue.execute().then(() => {
-        console.log("task executed");
+        }
+        resolve();
       });
-    }else{
-      await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {parse_mode:"HTML"})
-    }
+    // Enqueue tasks
+    taskQueue.enqueue(task1);
+    // Execute tasks in the queue
+    taskQueue.execute().then(() => {
+      console.log("task executed");
+    });
   } catch (error: any) {
     console.log(error.message);
   }
