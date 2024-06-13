@@ -390,89 +390,112 @@ class TaskQueue extends Queue<() => Promise<void>> {
   }
 }
 
+function hasFourParts(inputString: string): boolean {
+  // Split the input string by spaces
+  const parts: string[] = inputString.split(" ");
+
+  // Check if the length of the resulting array is 4
+  return parts.length === 5;
+}
+
+// Example usage
+const testString: string = "money heist s04 1080p";
+console.log(hasFourParts(testString)); // Output: true
+
+const anotherTestString: string = "money heist s04";
+console.log(hasFourParts(anotherTestString)); // Output: false
+
 userComposer.on(":text", async (ctx, next) => {
   try {
     // Create a task queue
     const taskQueue = new TaskQueue();
 
-    // Define some tasks
-    const task1 = (): Promise<void> =>
-      new Promise(async (resolve) => {
-        const msgDeleteTime: number = parseInt(
-          process.env.MESSAGE_DELETE_TIME || ""
-        );
-        setTimeout(async () => {
-          try {
-            await ctx.deleteMessage();
-          } catch (error) {
-            console.log(error);
+    if (hasFourParts(ctx.msg.text)) {
+      // Define some tasks
+      const task1 = (): Promise<void> =>
+        new Promise(async (resolve) => {
+          const msgDeleteTime: number = parseInt(
+            process.env.MESSAGE_DELETE_TIME || ""
+          );
+          setTimeout(async () => {
+            try {
+              await ctx.deleteMessage();
+            } catch (error) {
+              console.log(error);
+            }
+          }, msgDeleteTime);
+          const inlineKeyboard = await keyboardlist(
+            ctx,
+            1,
+            ctx.msg.text,
+            ctx.msg.message_thread_id
+          );
+          if (inlineKeyboard) {
+            if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
+              const { message_id } = await ctx.reply(
+                `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
+                {
+                  reply_markup: inlineKeyboard,
+                  parse_mode: "HTML",
+                  message_thread_id: process.env.DOC_THREAD_ID,
+                }
+              );
+              setTimeout(async () => {
+                try {
+                  await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                } catch (error) {
+                  console.log(error);
+                }
+              }, msgDeleteTime);
+            } else if (
+              ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID
+            ) {
+              const { message_id } = await ctx.reply(
+                `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
+                {
+                  reply_markup: inlineKeyboard,
+                  parse_mode: "HTML",
+                  message_thread_id: process.env.VIDEO_THREAD_ID,
+                }
+              );
+              setTimeout(async () => {
+                try {
+                  await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                } catch (error) {
+                  console.log(error);
+                }
+              }, msgDeleteTime);
+            } else if (
+              ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID
+            ) {
+              const { message_id } = await ctx.reply(
+                `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
+                {
+                  reply_markup: inlineKeyboard,
+                  parse_mode: "HTML",
+                  message_thread_id: process.env.AUDIO_THREAD_ID,
+                }
+              );
+              setTimeout(async () => {
+                try {
+                  await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                } catch (error) {
+                  console.log(error);
+                }
+              }, msgDeleteTime);
+            }
           }
-        }, msgDeleteTime);
-        const inlineKeyboard = await keyboardlist(
-          ctx,
-          1,
-          ctx.msg.text,
-          ctx.msg.message_thread_id
-        );
-        if (inlineKeyboard) {
-          if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-            const { message_id } = await ctx.reply(
-              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
-              {
-                reply_markup: inlineKeyboard,
-                parse_mode: "HTML",
-                message_thread_id: process.env.DOC_THREAD_ID,
-              }
-            );
-            setTimeout(async () => {
-              try {
-                await ctx.api.deleteMessage(ctx.chat.id, message_id);
-              } catch (error) {
-                console.log(error);
-              }
-            }, msgDeleteTime);
-          } else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-            const { message_id } = await ctx.reply(
-              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
-              {
-                reply_markup: inlineKeyboard,
-                parse_mode: "HTML",
-                message_thread_id: process.env.VIDEO_THREAD_ID,
-              }
-            );
-            setTimeout(async () => {
-              try {
-                await ctx.api.deleteMessage(ctx.chat.id, message_id);
-              } catch (error) {
-                console.log(error);
-              }
-            }, msgDeleteTime);
-          } else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-            const { message_id } = await ctx.reply(
-              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
-              {
-                reply_markup: inlineKeyboard,
-                parse_mode: "HTML",
-                message_thread_id: process.env.AUDIO_THREAD_ID,
-              }
-            );
-            setTimeout(async () => {
-              try {
-                await ctx.api.deleteMessage(ctx.chat.id, message_id);
-              } catch (error) {
-                console.log(error);
-              }
-            }, msgDeleteTime);
-          }
-        }
-        resolve();
+          resolve();
+        });
+      // Enqueue tasks
+      taskQueue.enqueue(task1);
+      // Execute tasks in the queue
+      taskQueue.execute().then(() => {
+        console.log("task executed");
       });
-    // Enqueue tasks
-    taskQueue.enqueue(task1);
-    // Execute tasks in the queue
-    taskQueue.execute().then(() => {
-      console.log("task executed");
-    });
+    }else{
+      await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {parse_mode:"HTML"})
+    }
   } catch (error: any) {
     console.log(error.message);
   }
