@@ -402,11 +402,7 @@ userComposer.on(":text", async (ctx, next) => {
           process.env.MESSAGE_DELETE_TIME || ""
         );
         setTimeout(async () => {
-          try {
-            await ctx.deleteMessage();
-          } catch (error) {
-            console.log(error);
-          }
+          await ctx.deleteMessage();
         }, msgDeleteTime);
         const inlineKeyboard = await keyboardlist(
           ctx,
