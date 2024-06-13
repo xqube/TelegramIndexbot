@@ -69,56 +69,24 @@ export async function insert_user(data) {
         }
     }
 }
-// export async function search_document(
-//   searchTerms: string,
-//   page: number
-// ): Promise<{ filteredDocs: any[]; totalsize: number }> {
-//   try {
-//     const skip = (page - 1) * 10;
-//     // Split the search terms into individual words
-//     const searchWords = searchTerms.trim().split(/\s+/);
-//     // Construct an array of regex patterns, one for each search word
-//     const regexPatterns = searchWords.map(
-//       (word) => new RegExp(`\\b${word}\\b`, "i")
-//     );
-//     // Combine the regex patterns using the OR operator
-//     const combinedRegex = {
-//       $and: [
-//         { $and: regexPatterns.map((pattern) => ({ file_name: pattern })) },
-//         { is_banned: false },
-//       ],
-//     };
-//     // Count filtered documents
-//     const totalsize = await db.DocumentCollection.countDocuments(combinedRegex);
-//     // Fetch filtered documents for the specified page
-//     const filteredDocs = await db.DocumentCollection.find(combinedRegex)
-//       .skip(skip)
-//       .limit(10)
-//       .toArray();
-//     // Return an object containing both filtered documents and total size
-//     return { filteredDocs, totalsize };
-//   } catch (error: any) {
-//     console.error("Error in search_document at dbFunc.ts", error.message);
-//     throw error;
-//   }
-// }
 export async function search_document(searchTerms, page) {
     try {
         const skip = (page - 1) * 10;
         // Split the search terms into individual words
-        // Join the formatted terms array back into a string with space as separator
-        const term = `${searchTerms
-            .split(" ")
-            .map((term) => `\"${term}\"`)
-            .join(" ")}`;
+        const searchWords = searchTerms.trim().split(/\s+/);
+        // Construct an array of regex patterns, one for each search word
+        const regexPatterns = searchWords.map((word) => new RegExp(`\\b${word}\\b`, "i"));
+        // Combine the regex patterns using the OR operator
+        const combinedRegex = {
+            $and: [
+                { $and: regexPatterns.map((pattern) => ({ file_name: pattern })) },
+                { is_banned: false },
+            ],
+        };
         // Count filtered documents
-        const totalsize = await db.DocumentCollection.countDocuments({
-            $text: { $search: term },
-        });
+        const totalsize = await db.DocumentCollection.countDocuments(combinedRegex);
         // Fetch filtered documents for the specified page
-        const filteredDocs = await db.DocumentCollection.find({
-            $text: { $search: term },
-        })
+        const filteredDocs = await db.DocumentCollection.find(combinedRegex)
             .skip(skip)
             .limit(10)
             .toArray();
@@ -130,6 +98,36 @@ export async function search_document(searchTerms, page) {
         throw error;
     }
 }
+// export async function search_document(
+//   searchTerms: string,
+//   page: number
+// ): Promise<{ filteredDocs: any[]; totalsize: number }> {
+//   try {
+//     const skip = (page - 1) * 10;
+//     // Split the search terms into individual words
+//     // Join the formatted terms array back into a string with space as separator
+//     const term = `${searchTerms
+//       .split(" ")
+//       .map((term) => `\"${term}\"`)
+//       .join(" ")}`;
+//     // Count filtered documents
+//     const totalsize = await db.DocumentCollection.countDocuments({
+//       $text: { $search: term },
+//     });
+//     // Fetch filtered documents for the specified page
+//     const filteredDocs = await db.DocumentCollection.find({
+//       $text: { $search: term },
+//     })
+//       .skip(skip)
+//       .limit(10)
+//       .toArray();
+//     // Return an object containing both filtered documents and total size
+//     return { filteredDocs, totalsize };
+//   } catch (error: any) {
+//     console.error("Error in search_document at dbFunc.ts", error.message);
+//     throw error;
+//   }
+// }
 export async function search_video(searchTerms, page) {
     try {
         const skip = (page - 1) * 10;
