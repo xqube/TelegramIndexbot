@@ -362,18 +362,17 @@ userComposer.on(":text", async (ctx, next) => {
         const task1 = () => new Promise(async (resolve) => {
             var _a, _b, _c, _d, _e, _f;
             const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
-            const searchparam = ctx.msg.text;
-            const inlineKeyboard = await keyboardlist(ctx, 1, searchparam, ctx.msg.message_thread_id);
+            const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text, ctx.msg.message_thread_id);
             if (inlineKeyboard) {
                 if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-                    const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
+                    const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
                         reply_markup: inlineKeyboard,
                         parse_mode: "HTML",
                         message_thread_id: process.env.DOC_THREAD_ID,
                     });
                     setTimeout(async () => {
                         try {
-                            await ctx.deleteMessage();
+                            await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                             await ctx.api.deleteMessage(ctx.chat.id, message_id);
                         }
                         catch (error) {
@@ -382,14 +381,14 @@ userComposer.on(":text", async (ctx, next) => {
                     }, msgDeleteTime);
                 }
                 else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-                    const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id}">${(_d = ctx.from) === null || _d === void 0 ? void 0 : _d.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
+                    const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id}">${(_d = ctx.from) === null || _d === void 0 ? void 0 : _d.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
                         reply_markup: inlineKeyboard,
                         parse_mode: "HTML",
                         message_thread_id: process.env.VIDEO_THREAD_ID,
                     });
                     setTimeout(async () => {
                         try {
-                            await ctx.deleteMessage();
+                            await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                             await ctx.api.deleteMessage(ctx.chat.id, message_id);
                         }
                         catch (error) {
@@ -398,14 +397,14 @@ userComposer.on(":text", async (ctx, next) => {
                     }, msgDeleteTime);
                 }
                 else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-                    const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_e = ctx.from) === null || _e === void 0 ? void 0 : _e.id}">${(_f = ctx.from) === null || _f === void 0 ? void 0 : _f.first_name}</a> , You Searched For: <code>${searchparam}</code>`, {
+                    const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_e = ctx.from) === null || _e === void 0 ? void 0 : _e.id}">${(_f = ctx.from) === null || _f === void 0 ? void 0 : _f.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
                         reply_markup: inlineKeyboard,
                         parse_mode: "HTML",
                         message_thread_id: process.env.AUDIO_THREAD_ID,
                     });
                     setTimeout(async () => {
                         try {
-                            await ctx.deleteMessage();
+                            await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                             await ctx.api.deleteMessage(ctx.chat.id, message_id);
                         }
                         catch (error) {

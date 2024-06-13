@@ -401,17 +401,16 @@ userComposer.on(":text", async (ctx, next) => {
         const msgDeleteTime: number = parseInt(
           process.env.MESSAGE_DELETE_TIME || ""
         );
-        const searchparam = ctx.msg.text;
         const inlineKeyboard = await keyboardlist(
           ctx,
           1,
-          searchparam,
+          ctx.msg.text,
           ctx.msg.message_thread_id
         );
         if (inlineKeyboard) {
           if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
             const { message_id } = await ctx.reply(
-              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`,
+              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
               {
                 reply_markup: inlineKeyboard,
                 parse_mode: "HTML",
@@ -420,7 +419,7 @@ userComposer.on(":text", async (ctx, next) => {
             );
             setTimeout(async () => {
               try {
-                await ctx.deleteMessage();
+                await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                 await ctx.api.deleteMessage(ctx.chat.id, message_id);
               } catch (error) {
                 console.log(error);
@@ -428,7 +427,7 @@ userComposer.on(":text", async (ctx, next) => {
             }, msgDeleteTime);
           } else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
             const { message_id } = await ctx.reply(
-              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`,
+              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
               {
                 reply_markup: inlineKeyboard,
                 parse_mode: "HTML",
@@ -437,7 +436,7 @@ userComposer.on(":text", async (ctx, next) => {
             );
             setTimeout(async () => {
               try {
-                await ctx.deleteMessage();
+                await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                 await ctx.api.deleteMessage(ctx.chat.id, message_id);
               } catch (error) {
                 console.log(error);
@@ -445,7 +444,7 @@ userComposer.on(":text", async (ctx, next) => {
             }, msgDeleteTime);
           } else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
             const { message_id } = await ctx.reply(
-              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${searchparam}</code>`,
+              `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
               {
                 reply_markup: inlineKeyboard,
                 parse_mode: "HTML",
@@ -454,7 +453,7 @@ userComposer.on(":text", async (ctx, next) => {
             );
             setTimeout(async () => {
               try {
-                await ctx.deleteMessage();
+                await ctx.api.deleteMessage(ctx.chat.id, ctx.msg.message_id);
                 await ctx.api.deleteMessage(ctx.chat.id, message_id);
               } catch (error) {
                 console.log(error);
