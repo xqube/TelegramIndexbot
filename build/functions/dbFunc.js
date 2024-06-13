@@ -122,6 +122,7 @@ export async function search_document(searchTerms, page) {
             .project({
             file_name: 1,
             file_unique_id: 1,
+            file_size: 1,
             _id: 0, // Optionally, exclude the default _id field if not needed
         })
             .skip(skip)
