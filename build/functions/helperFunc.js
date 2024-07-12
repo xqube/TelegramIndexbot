@@ -1,9 +1,12 @@
 import { InlineKeyboard } from "grammy";
 import { search_audio, search_document, search_video } from "./dbFunc.js";
+import { hashStringWithKeyToBase64Url } from "../plugins/base64.js";
 export async function keyboardlist(ctx, page, searchTerm, threadid) {
     try {
         const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
         const inlineKeyboard = new InlineKeyboard();
+        const currentHour = new Date().getHours().toString();
+        const encodedString = hashStringWithKeyToBase64Url(currentHour, ctx.msg.from.id.toString()).slice(22);
         if (threadid == process.env.DOC_THREAD_ID) {
             const { filteredDocs, totalsize } = await search_document(searchTerm, page);
             const totalPages = Math.ceil(totalsize / 10);
@@ -27,7 +30,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
                         .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`) //changed it to __ coz fileid can have an underscore
-                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=doc__${doc.file_unique_id}`)
+                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=doc_-_${doc.file_unique_id}_-_${encodedString}`)
                         .row();
                 });
             }
@@ -68,7 +71,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
                         .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`)
-                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=vid__${doc.file_unique_id}`)
+                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=vid_-_${doc.file_unique_id}_-_${encodedString}`)
                         .row();
                 });
             }
@@ -109,7 +112,7 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
                         .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`)
-                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=aud__${doc.file_unique_id}`)
+                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=aud_-_${doc.file_unique_id}_-_${encodedString}`)
                         .row();
                 });
             }

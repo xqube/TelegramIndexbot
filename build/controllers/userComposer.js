@@ -1,6 +1,7 @@
 import { Composer } from "grammy";
 import { insert_audio, insert_document, insert_user, insert_video, search_audio_file_id, search_document_file_id, search_video_file_id, } from "../functions/dbFunc.js";
 import { cleanFileName, extractSearchTerm, keyboardlist, } from "../functions/helperFunc.js";
+import { hashStringWithKeyToBase64Url } from "../plugins/base64.js";
 export const userComposer = new Composer();
 userComposer.on("callback_query:data", async (ctx) => {
     var _a;
@@ -95,53 +96,61 @@ userComposer.on("callback_query:data", async (ctx) => {
 userComposer.chatType("private").command("start", async (ctx) => {
     try {
         if (ctx.match) {
-            const parts = ctx.match.split("__");
+            const parts = ctx.match.split("_-_");
             const file_unique_id = parts[1];
             const type = parts[0];
-            if (type == "doc") {
-                const { filteredDocs } = await search_document_file_id(file_unique_id);
-                if (filteredDocs.file_caption != "") {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_caption,
-                        protect_content: true,
-                    });
+            const code = parts[2];
+            const currentHour = new Date().getHours().toString();
+            const encodedString = hashStringWithKeyToBase64Url(currentHour, ctx.msg.from.id.toString()).slice(22);
+            if (code == encodedString) {
+                if (type == "doc") {
+                    const { filteredDocs } = await search_document_file_id(file_unique_id);
+                    if (filteredDocs.file_caption != "") {
+                        await ctx.replyWithDocument(filteredDocs.file_id, {
+                            caption: filteredDocs.file_caption,
+                            protect_content: true,
+                        });
+                    }
+                    else {
+                        await ctx.replyWithDocument(filteredDocs.file_id, {
+                            caption: filteredDocs.file_name,
+                            protect_content: true,
+                        });
+                    }
                 }
-                else {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_name,
-                        protect_content: true,
-                    });
+                else if (type == "vid") {
+                    const { filteredDocs } = await search_video_file_id(file_unique_id);
+                    if (filteredDocs.file_caption != "") {
+                        await ctx.replyWithDocument(filteredDocs.file_id, {
+                            caption: filteredDocs.file_caption,
+                            protect_content: true,
+                        });
+                    }
+                    else {
+                        await ctx.replyWithDocument(filteredDocs.file_id, {
+                            caption: filteredDocs.file_name,
+                            protect_content: true,
+                        });
+                    }
+                }
+                else if (type == "aud") {
+                    const { filteredDocs } = await search_audio_file_id(file_unique_id);
+                    if (filteredDocs.file_caption != "") {
+                        await ctx.replyWithDocument(filteredDocs.file_id, {
+                            caption: filteredDocs.file_caption,
+                            protect_content: true,
+                        });
+                    }
+                    else {
+                        await ctx.replyWithDocument(filteredDocs.file_id, {
+                            caption: filteredDocs.file_name,
+                            protect_content: true,
+                        });
+                    }
                 }
             }
-            else if (type == "vid") {
-                const { filteredDocs } = await search_video_file_id(file_unique_id);
-                if (filteredDocs.file_caption != "") {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_caption,
-                        protect_content: true,
-                    });
-                }
-                else {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_name,
-                        protect_content: true,
-                    });
-                }
-            }
-            else if (type == "aud") {
-                const { filteredDocs } = await search_audio_file_id(file_unique_id);
-                if (filteredDocs.file_caption != "") {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_caption,
-                        protect_content: true,
-                    });
-                }
-                else {
-                    await ctx.replyWithDocument(filteredDocs.file_id, {
-                        caption: filteredDocs.file_name,
-                        protect_content: true,
-                    });
-                }
+            else {
+                await ctx.reply("Your are not authorized ❌");
             }
         }
         else {
