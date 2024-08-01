@@ -100,7 +100,7 @@ userComposer.chatType("private").command("start", async (ctx) => {
             const type = parts[0];
             const isMember = await ctx.api.getChatMember(Number(process.env.CHECKMEMBER), ctx.from.id);
             console.log(isMember);
-            if (isMember.status == "member") {
+            if (isMember.status == "member" || "administrator" || "creator") {
                 if (type == "doc") {
                     const { filteredDocs } = await search_document_file_id(file_unique_id);
                     if (filteredDocs.file_caption != "") {
