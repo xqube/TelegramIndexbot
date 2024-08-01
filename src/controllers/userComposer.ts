@@ -136,7 +136,7 @@ userComposer.chatType("private").command("start", async (ctx) => {
       );
       console.log(isMember);
       
-      if (isMember.status == "member" || "administrator" || "creator") {
+      if (isMember.status == "member" || "administrator") {
         if (type == "doc") {
           const { filteredDocs } = await search_document_file_id(
             file_unique_id
