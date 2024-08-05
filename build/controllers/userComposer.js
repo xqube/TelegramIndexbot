@@ -1,7 +1,7 @@
 import { Composer } from "grammy";
+import { InlineKeyboard } from "grammy";
 import { insert_audio, insert_document, insert_user, insert_video, search_audio_file_id, search_document_file_id, search_video_file_id, } from "../functions/dbFunc.js";
-import { cleanFileName, extractSearchTerm, keyboardlist, } from "../functions/helperFunc.js";
-import { hashStringWithKeyToBase64Url } from "../plugins/base64.js";
+import { cleanFileName, extractSearchTerm, keyboardlist, userMode, } from "../functions/helperFunc.js";
 export const userComposer = new Composer();
 userComposer.on("callback_query:data", async (ctx) => {
     var _a;
@@ -10,51 +10,58 @@ userComposer.on("callback_query:data", async (ctx) => {
         const calladatanext = calldata.match(/\^next/);
         const calladataprev = calldata.match(/\^prev/);
         const calladatafile = calldata.match(/file/);
+        const searchMode = calldata.match(/\^toggle/);
         const messageText = (_a = ctx.update.callback_query.message) === null || _a === void 0 ? void 0 : _a.text;
         const searchTerm = extractSearchTerm(messageText);
         const data = calldata.split("__");
         ///below code is for nav button click
-        const thread_id_nav = Number(data[2]);
         /////below code is for the file name button click
-        const file_thread_id = Number(data[2]); //checking the the req from if its from a specific thread id
         const file_unique_id = data[1];
         if (calladatafile) {
-            if (file_thread_id.toString() == process.env.DOC_THREAD_ID) {
-                const { filteredDocs } = await search_document_file_id(file_unique_id);
-                await ctx.answerCallbackQuery({
-                    text: `${filteredDocs.file_name}`,
-                    show_alert: true,
-                });
-                // if (filteredDocs.file_caption) {
-                //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
-                // } else {
-                //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_name })
-                // }
+            const { filteredDocs } = await search_document_file_id(file_unique_id);
+            await ctx.answerCallbackQuery({
+                text: `${filteredDocs.file_name}`,
+                show_alert: true,
+            });
+            // if (filteredDocs.file_caption) {
+            //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
+            // } else {
+            //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_name })
+            // }
+        }
+        if (searchMode) {
+            const mode = data[1];
+            if (mode == "doc") {
+                userMode.set(ctx.from.id, "document");
+                await ctx.reply(`Sucessfully Changed mode to: ${userMode.get(ctx.from.id)}`);
+                try {
+                    await ctx.api.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id);
+                }
+                catch (error) {
+                    console.log(error.message);
+                }
             }
-            else if (file_thread_id.toString() == process.env.VIDEO_THREAD_ID) {
-                const { filteredDocs } = await search_video_file_id(file_unique_id);
-                await ctx.answerCallbackQuery({
-                    text: `${filteredDocs.file_name}`,
-                    show_alert: true,
-                });
-                // if (filteredDocs.file_caption) {
-                //     await ctx.replyWithVideo(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
-                // } else {
-                //     await ctx.replyWithVideo(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_name })
-                // }
+            else if (mode == "vid") {
+                userMode.set(ctx.from.id, "video");
+                await ctx.reply(`Sucessfully Changed mode to: ${userMode.get(ctx.from.id)}`);
+                try {
+                    await ctx.api.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id);
+                }
+                catch (error) {
+                    console.log(error.message);
+                }
             }
-            else if (file_thread_id.toString() == process.env.AUDIO_THREAD_ID) {
-                const { filteredDocs } = await search_audio_file_id(file_unique_id);
-                await ctx.answerCallbackQuery({
-                    text: `${filteredDocs.file_name}`,
-                    show_alert: true,
-                });
-                // if (filteredDocs.file_caption) {
-                //     await ctx.replyWithVideo(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
-                // } else {
-                //     await ctx.replyWithVideo(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_name })
-                // }
+            else if (mode == "aud") {
+                userMode.set(ctx.from.id, "audio");
+                await ctx.reply(`Sucessfully Changed mode to: ${userMode.get(ctx.from.id)}`);
+                try {
+                    await ctx.api.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id);
+                }
+                catch (error) {
+                    console.log(error.message);
+                }
             }
+            return;
         }
         if (ctx.update.callback_query.message.entities[0].user.id == ctx.from.id) {
             //checks if the same user is clicking the button
@@ -62,22 +69,20 @@ userComposer.on("callback_query:data", async (ctx) => {
             if (calladatanext) {
                 const page = Number(data[1]);
                 const nextpage = page + 1;
-                const inlineKeyboard = await keyboardlist(ctx, nextpage, searchTerm, thread_id_nav);
+                const inlineKeyboard = await keyboardlist(ctx, nextpage, searchTerm);
                 await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
                     reply_markup: inlineKeyboard,
                     parse_mode: "HTML",
-                    message_thread_id: thread_id_nav,
                 });
             }
             //get prev page ;)
             if (calladataprev) {
                 const page = Number(data[1]);
                 const prevpage = page - 1;
-                const inlineKeyboard = await keyboardlist(ctx, prevpage, searchTerm, thread_id_nav);
+                const inlineKeyboard = await keyboardlist(ctx, prevpage, searchTerm);
                 await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
                     reply_markup: inlineKeyboard,
                     parse_mode: "HTML",
-                    message_thread_id: thread_id_nav,
                 });
             }
         }
@@ -101,57 +106,55 @@ userComposer.chatType("private").command("start", async (ctx) => {
             const type = parts[0];
             const code = parts[2];
             const currentHour = new Date().getHours().toString();
-            const encodedString = hashStringWithKeyToBase64Url(currentHour, ctx.msg.from.id.toString()).slice(22);
-            if (code == encodedString) {
-                if (type == "doc") {
-                    const { filteredDocs } = await search_document_file_id(file_unique_id);
-                    if (filteredDocs.file_caption != "") {
-                        await ctx.replyWithDocument(filteredDocs.file_id, {
-                            caption: filteredDocs.file_caption,
-                            protect_content: true,
-                        });
-                    }
-                    else {
-                        await ctx.replyWithDocument(filteredDocs.file_id, {
-                            caption: filteredDocs.file_name,
-                            protect_content: true,
-                        });
-                    }
+            // if (code == encodedString) {
+            if (type == "doc") {
+                const { filteredDocs } = await search_document_file_id(file_unique_id);
+                if (filteredDocs.file_caption != "") {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_caption,
+                        protect_content: true,
+                    });
                 }
-                else if (type == "vid") {
-                    const { filteredDocs } = await search_video_file_id(file_unique_id);
-                    if (filteredDocs.file_caption != "") {
-                        await ctx.replyWithDocument(filteredDocs.file_id, {
-                            caption: filteredDocs.file_caption,
-                            protect_content: true,
-                        });
-                    }
-                    else {
-                        await ctx.replyWithDocument(filteredDocs.file_id, {
-                            caption: filteredDocs.file_name,
-                            protect_content: true,
-                        });
-                    }
-                }
-                else if (type == "aud") {
-                    const { filteredDocs } = await search_audio_file_id(file_unique_id);
-                    if (filteredDocs.file_caption != "") {
-                        await ctx.replyWithDocument(filteredDocs.file_id, {
-                            caption: filteredDocs.file_caption,
-                            protect_content: true,
-                        });
-                    }
-                    else {
-                        await ctx.replyWithDocument(filteredDocs.file_id, {
-                            caption: filteredDocs.file_name,
-                            protect_content: true,
-                        });
-                    }
+                else {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_name,
+                        protect_content: true,
+                    });
                 }
             }
-            else {
-                await ctx.reply("Your are not authorized ❌");
+            else if (type == "vid") {
+                const { filteredDocs } = await search_video_file_id(file_unique_id);
+                if (filteredDocs.file_caption != "") {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_caption,
+                        protect_content: true,
+                    });
+                }
+                else {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_name,
+                        protect_content: true,
+                    });
+                }
             }
+            else if (type == "aud") {
+                const { filteredDocs } = await search_audio_file_id(file_unique_id);
+                if (filteredDocs.file_caption != "") {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_caption,
+                        protect_content: true,
+                    });
+                }
+                else {
+                    await ctx.replyWithDocument(filteredDocs.file_id, {
+                        caption: filteredDocs.file_name,
+                        protect_content: true,
+                    });
+                }
+            }
+            // } else {
+            //   await ctx.reply("Your are not authorized ❌");
+            // }
         }
         else {
             if (ctx.from) {
@@ -160,13 +163,12 @@ userComposer.chatType("private").command("start", async (ctx) => {
                     first_name: ctx.from.first_name,
                     warn: 0,
                     is_banned: false,
+                    mode: "document",
                 };
                 await insert_user(data);
             }
-            // ctx.reply(
-            //     `👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 Send me your documents, videos, and audios, and I'll store them for public use. You can access them later from our group. <blockquote>Please note that the bot is in the beta phase</blockquote> 🌟 Access our group here: https://t.me/+Q1fGy7GpkJ81NjA1`,
-            //     { parse_mode: "HTML" }
-            // );
+            userMode.set(ctx.from.id, "document");
+            ctx.reply(`👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 I am a movie serving bot`, { parse_mode: "HTML" });
         }
     }
     catch (error) { }
@@ -314,6 +316,26 @@ userComposer.chatType("channel").on(":file", async (ctx, next) => {
     }
     await next();
 });
+userComposer.chatType("private").command("mode", async (ctx, next) => {
+    try {
+        const keyboard = new InlineKeyboard();
+        keyboard
+            .text("Document", `^toggle__doc`)
+            .row()
+            .text("Video", `^toggle__vid`)
+            .row()
+            .text("Audio", `^toggle__aud`)
+            .row();
+        let State = userMode.get(ctx.from.id);
+        await ctx.reply(`Your current mode is: ${State}\n\nPlease select one of the option below\n\nrecommended: Document`, {
+            reply_markup: keyboard,
+        });
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+    await next();
+});
 class Queue {
     constructor() {
         this.items = [];
@@ -369,139 +391,76 @@ function hasFiveParts(inputString) {
     // Check if the length of the resulting array is 4
     return parts.length <= 5;
 }
-userComposer.on(":text", async (ctx, next) => {
+userComposer.chatType("private").on(":text", async (ctx, next) => {
     try {
         const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
-        if (hasFiveParts(ctx.msg.text)) {
-            // Create a task queue
-            const taskQueue = new TaskQueue();
-            // Define some tasks
-            const task1 = () => new Promise(async (resolve) => {
-                var _a, _b, _c, _d, _e, _f;
-                setTimeout(async () => {
-                    try {
-                        await ctx.deleteMessage();
-                    }
-                    catch (error) {
-                        console.log(error);
-                    }
-                }, msgDeleteTime);
-                const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text, ctx.msg.message_thread_id);
-                if (inlineKeyboard) {
-                    if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-                        const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
-                            reply_markup: inlineKeyboard,
-                            parse_mode: "HTML",
-                            message_thread_id: process.env.DOC_THREAD_ID,
-                        });
+        if (!ctx.msg.text.includes("/")) {
+            if (userMode.get(ctx.from.id)) {
+                if (hasFiveParts(ctx.msg.text)) {
+                    // Create a task queue
+                    const taskQueue = new TaskQueue();
+                    // Define some tasks
+                    const task1 = () => new Promise(async (resolve) => {
+                        var _a, _b;
                         setTimeout(async () => {
                             try {
-                                await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                                await ctx.deleteMessage();
                             }
                             catch (error) {
                                 console.log(error);
                             }
                         }, msgDeleteTime);
-                    }
-                    else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-                        const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.id}">${(_d = ctx.from) === null || _d === void 0 ? void 0 : _d.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
-                            reply_markup: inlineKeyboard,
-                            parse_mode: "HTML",
-                            message_thread_id: process.env.VIDEO_THREAD_ID,
-                        });
-                        setTimeout(async () => {
-                            try {
-                                await ctx.api.deleteMessage(ctx.chat.id, message_id);
-                            }
-                            catch (error) {
-                                console.log(error);
-                            }
-                        }, msgDeleteTime);
-                    }
-                    else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-                        const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_e = ctx.from) === null || _e === void 0 ? void 0 : _e.id}">${(_f = ctx.from) === null || _f === void 0 ? void 0 : _f.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
-                            reply_markup: inlineKeyboard,
-                            parse_mode: "HTML",
-                            message_thread_id: process.env.AUDIO_THREAD_ID,
-                        });
-                        setTimeout(async () => {
-                            try {
-                                await ctx.api.deleteMessage(ctx.chat.id, message_id);
-                            }
-                            catch (error) {
-                                console.log(error);
-                            }
-                        }, msgDeleteTime);
-                    }
+                        const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
+                        if (inlineKeyboard) {
+                            const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
+                                reply_markup: inlineKeyboard,
+                                parse_mode: "HTML",
+                            });
+                            setTimeout(async () => {
+                                try {
+                                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                                }
+                                catch (error) {
+                                    console.log(error);
+                                }
+                            }, msgDeleteTime);
+                        }
+                        resolve();
+                    });
+                    // Enqueue tasks
+                    taskQueue.enqueue(task1);
+                    // Execute tasks in the queue
+                    taskQueue.execute().then(() => {
+                        console.log("task executed");
+                    });
                 }
-                resolve();
-            });
-            // Enqueue tasks
-            taskQueue.enqueue(task1);
-            // Execute tasks in the queue
-            taskQueue.execute().then(() => {
-                console.log("task executed");
-            });
-        }
-        else {
-            setTimeout(async () => {
-                try {
-                    await ctx.deleteMessage();
+                else {
+                    setTimeout(async () => {
+                        try {
+                            await ctx.deleteMessage();
+                        }
+                        catch (error) {
+                            console.log(error);
+                        }
+                    }, msgDeleteTime);
+                    const { message_id } = await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {
+                        parse_mode: "HTML",
+                        reply_parameters: {
+                            message_id: ctx.msg.message_id,
+                        },
+                    });
+                    setTimeout(async () => {
+                        try {
+                            await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                        }
+                        catch (error) {
+                            console.log(error);
+                        }
+                    }, msgDeleteTime);
                 }
-                catch (error) {
-                    console.log(error);
-                }
-            }, msgDeleteTime);
-            if (ctx.msg.message_thread_id == process.env.DOC_THREAD_ID) {
-                const { message_id } = await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {
-                    parse_mode: "HTML",
-                    message_thread_id: process.env.DOC_THREAD_ID,
-                    reply_parameters: {
-                        message_id: ctx.msg.message_id,
-                    },
-                });
-                setTimeout(async () => {
-                    try {
-                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
-                    }
-                    catch (error) {
-                        console.log(error);
-                    }
-                }, msgDeleteTime);
             }
-            else if (ctx.msg.message_thread_id == process.env.VIDEO_THREAD_ID) {
-                const { message_id } = await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {
-                    parse_mode: "HTML",
-                    message_thread_id: process.env.VIDEO_THREAD_ID,
-                    reply_parameters: {
-                        message_id: ctx.msg.message_id,
-                    },
-                });
-                setTimeout(async () => {
-                    try {
-                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
-                    }
-                    catch (error) {
-                        console.log(error);
-                    }
-                }, msgDeleteTime);
-            }
-            else if (ctx.msg.message_thread_id == process.env.AUDIO_THREAD_ID) {
-                const { message_id } = await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {
-                    parse_mode: "HTML",
-                    message_thread_id: process.env.AUDIO_THREAD_ID,
-                    reply_parameters: {
-                        message_id: ctx.msg.message_id,
-                    },
-                });
-                setTimeout(async () => {
-                    try {
-                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
-                    }
-                    catch (error) {
-                        console.log(error);
-                    }
-                }, msgDeleteTime);
+            else {
+                await ctx.reply("Please set your search mode using /mode");
             }
         }
     }

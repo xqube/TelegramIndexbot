@@ -1,20 +1,18 @@
 import { InlineKeyboard } from "grammy";
 import { search_audio, search_document, search_video } from "./dbFunc.js";
-import { hashStringWithKeyToBase64Url } from "../plugins/base64.js";
-export async function keyboardlist(ctx, page, searchTerm, threadid) {
+export const userMode = new Map();
+export async function keyboardlist(ctx, page, searchTerm) {
     try {
         const msgDeleteTime = parseInt(process.env.MESSAGE_DELETE_TIME || "");
         const inlineKeyboard = new InlineKeyboard();
         const currentHour = new Date().getHours().toString();
-        const encodedString = hashStringWithKeyToBase64Url(currentHour, ctx.msg.from.id.toString()).slice(22);
-        if (threadid == process.env.DOC_THREAD_ID) {
+        let currentState = userMode.get(ctx.from.id);
+        if (currentState == "document") {
             const { filteredDocs, totalsize } = await search_document(searchTerm, page);
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                const { message_id } = await ctx.reply("No Document found.", {
-                    message_thread_id: threadid,
-                });
+                const { message_id } = await ctx.reply("No Document found.", {});
                 setTimeout(async () => {
                     try {
                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
@@ -29,33 +27,32 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                 filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`) //changed it to __ coz fileid can have an underscore
-                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=doc_-_${doc.file_unique_id}_-_${encodedString}`)
+                        .text(doc.file_name, `file__${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
+                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=doc_-_${doc.file_unique_id}`)
                         .row();
                 });
             }
             if (page == 1 && page < totalPages) {
-                inlineKeyboard.text("Next>>", `^next__${page}__${threadid}`).row();
+                inlineKeyboard.text("Next>>", `^next__${page}`).row();
             }
             else if (page > 1 && page < totalPages) {
                 inlineKeyboard
-                    .text("<<Prev", `^prev__${page}__${threadid}`)
+                    .text("<<Prev", `^prev__${page}`)
                     .text(`${page}/${totalPages}📄`)
-                    .text("Next>>", `^next__${page}__${threadid}`)
+                    .text("Next>>", `^next__${page}`)
                     .row();
             }
             else if (page == totalPages && page != 1) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`).row();
+                inlineKeyboard.text("<<Prev", `^prev__${page}`).row();
             }
+            return inlineKeyboard;
         }
-        else if (threadid == process.env.VIDEO_THREAD_ID) {
+        else if (currentState == "video") {
             const { filteredDocs, totalsize } = await search_video(searchTerm, page);
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                const { message_id } = await ctx.reply("No Video found.", {
-                    message_thread_id: threadid,
-                });
+                const { message_id } = await ctx.reply("No Video found.", {});
                 setTimeout(async () => {
                     try {
                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
@@ -70,33 +67,32 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                 filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`)
-                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=vid_-_${doc.file_unique_id}_-_${encodedString}`)
+                        .text(doc.file_name, `file__${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
+                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=doc_-_${doc.file_unique_id}`)
                         .row();
                 });
             }
             if (page == 1 && page < totalPages) {
-                inlineKeyboard.text("Next>>", `^next__${page}__${threadid}`).row();
+                inlineKeyboard.text("Next>>", `^next__${page}`).row();
             }
             else if (page > 1 && page < totalPages) {
                 inlineKeyboard
-                    .text("<<Prev", `^prev__${page}__${threadid}`)
+                    .text("<<Prev", `^prev__${page}`)
                     .text(`${page}/${totalPages}📄`)
-                    .text("Next>>", `^next__${page}__${threadid}`)
+                    .text("Next>>", `^next__${page}`)
                     .row();
             }
             else if (page == totalPages && page != 1) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`);
+                inlineKeyboard.text("<<Prev", `^prev__${page}`).row();
             }
+            return inlineKeyboard;
         }
-        else if (threadid == process.env.AUDIO_THREAD_ID) {
+        else if (currentState == "audio") {
             const { filteredDocs, totalsize } = await search_audio(searchTerm, page);
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                const { message_id } = await ctx.reply("No Audio found.", {
-                    message_thread_id: threadid,
-                });
+                const { message_id } = await ctx.reply("No Audio found.", {});
                 setTimeout(async () => {
                     try {
                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
@@ -111,26 +107,26 @@ export async function keyboardlist(ctx, page, searchTerm, threadid) {
                 filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text(doc.file_name, `file__${doc.file_unique_id}__${threadid}`)
-                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=aud_-_${doc.file_unique_id}_-_${encodedString}`)
+                        .text(doc.file_name, `file__${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
+                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=doc_-_${doc.file_unique_id}`)
                         .row();
                 });
             }
             if (page == 1 && page < totalPages) {
-                inlineKeyboard.text("Next>>", `^next__${page}__${threadid}`).row();
+                inlineKeyboard.text("Next>>", `^next__${page}`).row();
             }
             else if (page > 1 && page < totalPages) {
                 inlineKeyboard
-                    .text("<<Prev", `^prev__${page}__${threadid}`)
+                    .text("<<Prev", `^prev__${page}`)
                     .text(`${page}/${totalPages}📄`)
-                    .text("Next>>", `^next__${page}__${threadid}`)
+                    .text("Next>>", `^next__${page}`)
                     .row();
             }
             else if (page == totalPages && page != 1) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}__${threadid}`);
+                inlineKeyboard.text("<<Prev", `^prev__${page}`).row();
             }
+            return inlineKeyboard;
         }
-        return inlineKeyboard;
     }
     catch (error) {
         console.log("Error at keyboardlist in helperFunc.ts", error.message);
