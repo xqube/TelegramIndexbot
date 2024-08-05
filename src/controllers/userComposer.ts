@@ -194,7 +194,6 @@ userComposer.chatType("private").command("start", async (ctx) => {
           first_name: ctx.from.first_name,
           warn: 0,
           is_banned: false,
-          mode: "document",
         };
         await insert_user(data);
       }
