@@ -140,7 +140,7 @@ ownerComposer.command("stats", async (ctx, next) => {
           await get_db_data();
         const data = JSON.stringify(dbdata, null, 4);
         await ctx.reply(
-          `<pre language="json">${data}</pre>\n<b>Total Size</b>: ${totalsize}\n<b>Total Docs</b>: ${doc_result}\n<b>Total Videos</b>: ${vid_result}\n<b>Total Audios</b>: ${aud_result}\n<b>Total Users</b>: ${user_data}
+          `<pre language="json">${data}</pre>\n<b>Total Size</b>: ${totalsize[0].totalFileSize}\n<b>Total Docs</b>: ${doc_result}\n<b>Total Videos</b>: ${vid_result}\n<b>Total Audios</b>: ${aud_result}\n<b>Total Users</b>: ${user_data}
                 `,
           { parse_mode: "HTML" }
         );
