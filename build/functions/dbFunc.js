@@ -255,11 +255,12 @@ export async function get_db_data() {
             scale: 1024,
             freeStorage: 1,
         });
+        const totalsize = await db.documents.aggregate([{ $group: { _id: null, totalFileSize: { $sum: "$file_size" } } }]);
         const doc_result = await db.DocumentCollection.countDocuments();
         const vid_result = await db.VideoCollection.countDocuments();
         const aud_result = await db.AudioCollection.countDocuments();
         const user_data = await db.UserCollection.countDocuments();
-        return { dbdata, doc_result, vid_result, aud_result, user_data };
+        return { dbdata, doc_result, vid_result, aud_result, user_data, totalsize };
     }
     catch (error) {
         console.log(error.message);

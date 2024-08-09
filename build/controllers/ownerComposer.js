@@ -104,9 +104,9 @@ ownerComposer.command("stats", async (ctx, next) => {
         const from = ctx.msg.from;
         if (from) {
             if (ctx.msg.chat.type === "private" && admins.includes(from.id)) {
-                const { dbdata, doc_result, vid_result, aud_result, user_data } = await get_db_data();
+                const { dbdata, doc_result, vid_result, aud_result, user_data, totalsize } = await get_db_data();
                 const data = JSON.stringify(dbdata, null, 4);
-                await ctx.reply(`<pre language="json">${data}</pre>\n<b>Total Docs</b>: ${doc_result}\n<b>Total Videos</b>: ${vid_result}\n<b>Total Audios</b>: ${aud_result}\n<b>Total Users</b>: ${user_data}
+                await ctx.reply(`<pre language="json">${data}</pre>\n<b>Total Size</b>: ${totalsize}\n<b>Total Docs</b>: ${doc_result}\n<b>Total Videos</b>: ${vid_result}\n<b>Total Audios</b>: ${aud_result}\n<b>Total Users</b>: ${user_data}
                 `, { parse_mode: "HTML" });
             }
         }
