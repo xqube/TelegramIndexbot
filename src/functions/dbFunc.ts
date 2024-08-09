@@ -292,7 +292,7 @@ export async function get_db_data(): Promise<any | null> {
       scale: 1024,
       freeStorage: 1,
     });
-    const totalsize = await db.documents.aggregate([{ $group: { _id: null, totalFileSize: { $sum: "$file_size" } } }])
+    const totalsize = await db.DocumentCollection.aggregate([{ $group: { _id: null, totalFileSize: { $sum: "$file_size" } } }])
     const doc_result = await db.DocumentCollection.countDocuments();
     const vid_result = await db.VideoCollection.countDocuments();
     const aud_result = await db.AudioCollection.countDocuments();
