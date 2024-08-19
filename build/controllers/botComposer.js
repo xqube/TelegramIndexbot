@@ -1,4 +1,5 @@
 import { Composer } from "grammy";
+import { notAuthorized } from "./userComposer.js";
 export const botComposer = new Composer();
 // botComposer.on("my_chat_member", async (ctx, next) => {
 //     try {
@@ -10,3 +11,13 @@ export const botComposer = new Composer();
 //     }
 //     await next()
 // });
+botComposer.on("chat_member", async (ctx, next) => {
+    try {
+        if (ctx.chat.id == 35445) {
+            if (ctx.chatMember.new_chat_member.status == "member") {
+                notAuthorized.delete(ctx.chatMember.new_chat_member.user.id);
+            }
+        }
+    }
+    catch (error) { }
+});

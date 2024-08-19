@@ -17,6 +17,8 @@ import {
   userMode,
 } from "../functions/helperFunc.js";
 
+export const notAuthorized = new Set();
+
 export const userComposer = new Composer<Context>();
 
 userComposer.on("callback_query:data", async (ctx: any) => {
@@ -136,12 +138,15 @@ userComposer.on("callback_query:data", async (ctx: any) => {
 userComposer.chatType("private").command("start", async (ctx) => {
   try {
     if (ctx.match) {
-      const parts = ctx.match.split("_-_");
-      const file_unique_id = parts[1];
-      const type = parts[0];
-      const code = parts[2];
-      const currentHour = new Date().getHours().toString();
-      // if (code == encodedString) {
+      const isMember = await ctx.api.getChatMember(
+        Number(process.env.CHECKMEMBER),
+        ctx.from.id
+      );
+
+      if (["member"].includes(isMember.status)) {
+        const parts = ctx.match.split("_-_");
+        const file_unique_id = parts[1];
+        const type = parts[0];
         if (type == "doc") {
           const { filteredDocs } = await search_document_file_id(
             file_unique_id
@@ -184,9 +189,14 @@ userComposer.chatType("private").command("start", async (ctx) => {
             });
           }
         }
-      // } else {
-      //   await ctx.reply("Your are not authorized ❌");
-      // }
+      } else {
+        if (!notAuthorized.has(ctx.from.id)) {
+          await ctx.reply(
+            "Looks like you're not authorized ❌. Please visit the channel @dedxec for more information."
+          );
+          notAuthorized.add(ctx.from.id);
+        }
+      }
     } else {
       if (ctx.from) {
         const data = {
@@ -199,7 +209,7 @@ userComposer.chatType("private").command("start", async (ctx) => {
       }
       userMode.set(ctx.from.id, "document");
       ctx.reply(
-        `👋 Hi, I'm ${ctx.me.first_name}! 📄🎥🎵 I am a movie serving bot`,
+        `👋 Hi ${ctx.from.first_name}, I'm ${ctx.me.first_name}! 📄🎥🎵 Feel free to search for any media files through me 😊.`,
         { parse_mode: "HTML" }
       );
     }
@@ -444,73 +454,87 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
     const msgDeleteTime: number = parseInt(
       process.env.MESSAGE_DELETE_TIME || ""
     );
+
     if (!ctx.msg.text.includes("/")) {
-      if (userMode.get(ctx.from.id)) {
-        if (hasFiveParts(ctx.msg.text)) {
-          // Create a task queue
-          const taskQueue = new TaskQueue();
-          // Define some tasks
-          const task1 = (): Promise<void> =>
-            new Promise(async (resolve) => {
-              setTimeout(async () => {
-                try {
-                  await ctx.deleteMessage();
-                } catch (error) {
-                  console.log(error);
-                }
-              }, msgDeleteTime);
-              const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
-              if (inlineKeyboard) {
-                const { message_id } = await ctx.reply(
-                  `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
-                  {
-                    reply_markup: inlineKeyboard,
-                    parse_mode: "HTML",
-                  }
-                );
+      const isMember = await ctx.api.getChatMember(
+        Number(process.env.CHECKMEMBER),
+        ctx.from.id
+      );
+      if (["member"].includes(isMember.status)) {
+        if (userMode.get(ctx.from.id)) {
+          if (hasFiveParts(ctx.msg.text)) {
+            // Create a task queue
+            const taskQueue = new TaskQueue();
+            // Define some tasks
+            const task1 = (): Promise<void> =>
+              new Promise(async (resolve) => {
                 setTimeout(async () => {
                   try {
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    await ctx.deleteMessage();
                   } catch (error) {
                     console.log(error);
                   }
                 }, msgDeleteTime);
-              }
-              resolve();
+                const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
+                if (inlineKeyboard) {
+                  const { message_id } = await ctx.reply(
+                    `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
+                    {
+                      reply_markup: inlineKeyboard,
+                      parse_mode: "HTML",
+                    }
+                  );
+                  setTimeout(async () => {
+                    try {
+                      await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                    } catch (error) {
+                      console.log(error);
+                    }
+                  }, msgDeleteTime);
+                }
+                resolve();
+              });
+            // Enqueue tasks
+            taskQueue.enqueue(task1);
+            // Execute tasks in the queue
+            taskQueue.execute().then(() => {
+              console.log("task executed");
             });
-          // Enqueue tasks
-          taskQueue.enqueue(task1);
-          // Execute tasks in the queue
-          taskQueue.execute().then(() => {
-            console.log("task executed");
-          });
+          } else {
+            setTimeout(async () => {
+              try {
+                await ctx.deleteMessage();
+              } catch (error) {
+                console.log(error);
+              }
+            }, msgDeleteTime);
+            const { message_id } = await ctx.reply(
+              `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
+              {
+                parse_mode: "HTML",
+                reply_parameters: {
+                  message_id: ctx.msg.message_id,
+                },
+              }
+            );
+            setTimeout(async () => {
+              try {
+                await ctx.api.deleteMessage(ctx.chat.id, message_id);
+              } catch (error) {
+                console.log(error);
+              }
+            }, msgDeleteTime);
+          }
         } else {
-          setTimeout(async () => {
-            try {
-              await ctx.deleteMessage();
-            } catch (error) {
-              console.log(error);
-            }
-          }, msgDeleteTime);
-          const { message_id } = await ctx.reply(
-            `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
-            {
-              parse_mode: "HTML",
-              reply_parameters: {
-                message_id: ctx.msg.message_id,
-              },
-            }
-          );
-          setTimeout(async () => {
-            try {
-              await ctx.api.deleteMessage(ctx.chat.id, message_id);
-            } catch (error) {
-              console.log(error);
-            }
-          }, msgDeleteTime);
+          await ctx.reply("Please set your search mode using /mode");
         }
       } else {
-        await ctx.reply("Please set your search mode using /mode");
+        if (!notAuthorized.has(ctx.from.id)) {
+          await ctx.reply(
+            "🤔 Looks like you're not authorized ❌. Please visit the channel @dedxec for more information."
+          );
+          notAuthorized.add(ctx.from.id);
+        }
       }
     }
   } catch (error: any) {
