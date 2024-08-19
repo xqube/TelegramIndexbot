@@ -5,6 +5,7 @@ import { mongoclient, mongoconnect } from "./db/dbConfig.js";
 import { ownerComposer } from "./controllers/ownerComposer.js";
 
 import { autoRetry } from "@grammyjs/auto-retry";
+import { botComposer } from "./controllers/botComposer.js";
 
 
 type MyContext = Context
@@ -19,6 +20,7 @@ if (db) {
 }
 
 bot.api.config.use(autoRetry());
+bot.use(botComposer)
 bot.use(userComposer)
 bot.use(ownerComposer)
 

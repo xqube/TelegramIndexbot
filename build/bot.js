@@ -4,12 +4,14 @@ import 'dotenv/config';
 import { mongoclient, mongoconnect } from "./db/dbConfig.js";
 import { ownerComposer } from "./controllers/ownerComposer.js";
 import { autoRetry } from "@grammyjs/auto-retry";
+import { botComposer } from "./controllers/botComposer.js";
 export const bot = new Bot(process.env.TOKEN);
 const db = await mongoconnect();
 if (db) {
     console.log('Connected successfully to DB server');
 }
 bot.api.config.use(autoRetry());
+bot.use(botComposer);
 bot.use(userComposer);
 bot.use(ownerComposer);
 process.once("SIGINT", () => {
