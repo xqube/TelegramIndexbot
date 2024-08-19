@@ -14,7 +14,6 @@ export const botComposer = new Composer();
 botComposer.on("chat_member", async (ctx, next) => {
     try {
         if (ctx.chat.id == Number(process.env.CHECKMEMBER)) {
-            console.log(ctx.chatMember);
             if (["member", "left"].includes(ctx.chatMember.new_chat_member.status)) {
                 notAuthorized.delete(ctx.chatMember.new_chat_member.user.id);
             }
