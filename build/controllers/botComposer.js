@@ -13,11 +13,13 @@ export const botComposer = new Composer();
 // });
 botComposer.on("chat_member", async (ctx, next) => {
     try {
-        if (ctx.chat.id == 35445) {
-            if (ctx.chatMember.new_chat_member.status == "member") {
+        if (ctx.chat.id == Number(process.env.CHECKMEMBER)) {
+            if (["member", "left"].includes(ctx.chatMember.new_chat_member.status)) {
                 notAuthorized.delete(ctx.chatMember.new_chat_member.user.id);
             }
         }
     }
-    catch (error) { }
+    catch (error) {
+        console.log(error.message);
+    }
 });
