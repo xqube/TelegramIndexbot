@@ -143,7 +143,7 @@ userComposer.chatType("private").command("start", async (ctx) => {
         ctx.from.id
       );
 
-      if (["administrator", "creator"].includes(isMember.status)) {
+      if (["administrator", "creator", "member"].includes(isMember.status)) {
         const parts = ctx.match.split("_-_");
         const file_unique_id = parts[1];
         const type = parts[0];
@@ -460,7 +460,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
         Number(process.env.CHECKMEMBER),
         ctx.from.id
       );
-      if (["administrator", "creator"].includes(isMember.status)) {
+      if (["administrator", "creator", "member"].includes(isMember.status)) {
         if (userMode.get(ctx.from.id)) {
           if (hasFiveParts(ctx.msg.text)) {
             // Create a task queue
