@@ -33,7 +33,7 @@ process.once("SIGTERM", () => {
     mongoclient.close()
 });
 
-bot.start({ drop_pending_updates: true , allowed_updates: ["chat_member"]});
+bot.start({ drop_pending_updates: true , allowed_updates: ["chat_member", "message", "channel_post", "callback_query", "edited_message"]});
 
 
 bot.catch(async (err) => {
