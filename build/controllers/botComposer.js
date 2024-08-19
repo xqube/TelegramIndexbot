@@ -16,10 +16,12 @@ botComposer.on("chat_member", async (ctx, next) => {
         if (ctx.chat.id == Number(process.env.CHECKMEMBER)) {
             if (["member", "left"].includes(ctx.chatMember.new_chat_member.status)) {
                 notAuthorized.delete(ctx.chatMember.new_chat_member.user.id);
+                console.log(ctx.chatMember.new_chat_member.status);
             }
         }
     }
     catch (error) {
         console.log(error.message);
     }
+    next();
 });
