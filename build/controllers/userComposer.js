@@ -406,7 +406,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                         const taskQueue = new TaskQueue();
                         // Define some tasks
                         const task1 = () => new Promise(async (resolve) => {
-                            var _a, _b;
+                            var _a, _b, _c;
                             setTimeout(async () => {
                                 try {
                                     await ctx.deleteMessage();
@@ -418,10 +418,12 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                             const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
                             if (inlineKeyboard) {
                                 const { message_id } = await ctx.reply("⏳");
-                                await ctx.editMessageText(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
-                                    reply_markup: inlineKeyboard,
-                                    parse_mode: "HTML",
-                                });
+                                if (inlineKeyboard) {
+                                    await ctx.api.editMessageText((_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id, message_id, `Hey <a href="tg://user?id=${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id}">${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
+                                        reply_markup: inlineKeyboard,
+                                        parse_mode: "HTML",
+                                    });
+                                }
                                 setTimeout(async () => {
                                     try {
                                         await ctx.api.deleteMessage(ctx.chat.id, message_id);
