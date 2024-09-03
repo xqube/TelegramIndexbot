@@ -60,7 +60,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string) {
             .text(doc.file_name, `file__${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
             .url(
               file_size.toFixed(1) + "MB 📩",
-              `https://t.me/${process.env.BOT_USERNAME}?start=doc_-_${doc.file_unique_id}`
+              `https://t.me/${process.env.BOT_USERNAME}?start=vid_-_${doc.file_unique_id}`
             )
             .row();
         });
@@ -91,7 +91,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string) {
             .text(doc.file_name, `file__${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
             .url(
               file_size.toFixed(1) + "MB 📩",
-              `https://t.me/${process.env.BOT_USERNAME}?start=doc_-_${doc.file_unique_id}`
+              `https://t.me/${process.env.BOT_USERNAME}?start=aud_-_${doc.file_unique_id}`
             )
             .row();
         });
