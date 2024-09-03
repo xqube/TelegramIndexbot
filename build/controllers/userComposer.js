@@ -417,7 +417,8 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                             }, msgDeleteTime);
                             const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
                             if (inlineKeyboard) {
-                                const { message_id } = await ctx.reply(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
+                                const { message_id } = await ctx.reply("⏳");
+                                await ctx.editMessageText(`Hey <a href="tg://user?id=${(_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id}">${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
                                     reply_markup: inlineKeyboard,
                                     parse_mode: "HTML",
                                 });

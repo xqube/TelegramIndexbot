@@ -477,7 +477,8 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                 }, msgDeleteTime);
                 const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
                 if (inlineKeyboard) {
-                  const { message_id } = await ctx.reply(
+                  const { message_id } = await ctx.reply("⏳")
+                  await ctx.editMessageText(
                     `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
                     {
                       reply_markup: inlineKeyboard,
