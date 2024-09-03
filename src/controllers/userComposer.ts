@@ -494,6 +494,12 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                       console.log(error);
                     }
                   }, msgDeleteTime);
+                } else {
+                  await ctx.api.editMessageText(
+                    ctx.from?.id,
+                    message_id,
+                    "No media found"
+                  );
                 }
                 resolve();
               });

@@ -406,7 +406,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                         const taskQueue = new TaskQueue();
                         // Define some tasks
                         const task1 = () => new Promise(async (resolve) => {
-                            var _a, _b, _c;
+                            var _a, _b, _c, _d;
                             setTimeout(async () => {
                                 try {
                                     await ctx.deleteMessage();
@@ -430,6 +430,9 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                                         console.log(error);
                                     }
                                 }, msgDeleteTime);
+                            }
+                            else {
+                                await ctx.api.editMessageText((_d = ctx.from) === null || _d === void 0 ? void 0 : _d.id, message_id, "No media found");
                             }
                             resolve();
                         });

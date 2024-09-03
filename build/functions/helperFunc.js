@@ -12,15 +12,6 @@ export async function keyboardlist(ctx, page, searchTerm) {
             const totalPages = Math.ceil(totalsize / 10);
             // Display paginated data
             if (filteredDocs.length === 0) {
-                const { message_id } = await ctx.reply("No Document found.", {});
-                setTimeout(async () => {
-                    try {
-                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
-                    }
-                    catch (error) {
-                        console.log(error.message);
-                    }
-                }, msgDeleteTime);
                 return;
             }
             else {
