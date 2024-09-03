@@ -21,7 +21,6 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string) {
       const totalPages = Math.ceil(totalsize / 10);
       // Display paginated data
       if (filteredDocs.length === 0) {
-
         return;
       } else {
         filteredDocs.map(async (doc: any) => {
@@ -53,14 +52,6 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string) {
       const totalPages = Math.ceil(totalsize / 10);
       // Display paginated data
       if (filteredDocs.length === 0) {
-        const { message_id } = await ctx.reply("No Video found.", {});
-        setTimeout(async () => {
-          try {
-            await ctx.api.deleteMessage(ctx.chat.id, message_id);
-          } catch (error: any) {
-            console.log(error.message);
-          }
-        }, msgDeleteTime);
         return;
       } else {
         filteredDocs.map(async (doc: any) => {
@@ -92,14 +83,6 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string) {
       const totalPages = Math.ceil(totalsize / 10);
       // Display paginated data
       if (filteredDocs.length === 0) {
-        const { message_id } = await ctx.reply("No Audio found.", {});
-        setTimeout(async () => {
-          try {
-            await ctx.api.deleteMessage(ctx.chat.id, message_id);
-          } catch (error: any) {
-            console.log(error.message);
-          }
-        }, msgDeleteTime);
         return;
       } else {
         filteredDocs.map(async (doc: any) => {

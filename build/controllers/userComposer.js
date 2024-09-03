@@ -4,95 +4,154 @@ import { insert_audio, insert_document, insert_user, insert_video, search_audio_
 import { cleanFileName, extractSearchTerm, keyboardlist, userMode, } from "../functions/helperFunc.js";
 export const notAuthorized = new Set();
 export const userComposer = new Composer();
+class Queue {
+    constructor() {
+        this.items = [];
+    }
+    // Enqueue: Add an element to the end of the queue
+    enqueue(element) {
+        this.items.push(element);
+    }
+    // Dequeue: Remove an element from the front of the queue
+    dequeue() {
+        return this.items.shift();
+    }
+    // Peek: Get the front element of the queue without removing it
+    peek() {
+        return this.items[0];
+    }
+    // Check if the queue is empty
+    isEmpty() {
+        return this.items.length === 0;
+    }
+    // Get the size of the queue
+    size() {
+        return this.items.length;
+    }
+    // Clear the queue
+    clear() {
+        this.items = [];
+    }
+    // Print the queue
+    print() {
+        console.log(this.items.toString());
+    }
+}
+class TaskQueue extends Queue {
+    // Execute all tasks in the queue
+    async execute() {
+        while (!this.isEmpty()) {
+            const task = this.dequeue();
+            if (task) {
+                try {
+                    await task();
+                }
+                catch (error) {
+                    console.error("Error executing task:", error);
+                }
+            }
+        }
+    }
+}
 userComposer.on("callback_query:data", async (ctx) => {
-    var _a;
     try {
-        const calldata = ctx.update.callback_query.data;
-        const calladatanext = calldata.match(/\^next/);
-        const calladataprev = calldata.match(/\^prev/);
-        const calladatafile = calldata.match(/file/);
-        const searchMode = calldata.match(/\^toggle/);
-        const messageText = (_a = ctx.update.callback_query.message) === null || _a === void 0 ? void 0 : _a.text;
-        const searchTerm = extractSearchTerm(messageText);
-        const data = calldata.split("__");
-        ///below code is for nav button click
-        /////below code is for the file name button click
-        const file_unique_id = data[1];
-        if (calladatafile) {
-            const { filteredDocs } = await search_document_file_id(file_unique_id);
-            await ctx.answerCallbackQuery({
-                text: `${filteredDocs.file_name}`,
-                show_alert: true,
-            });
-            // if (filteredDocs.file_caption) {
-            //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
-            // } else {
-            //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_name })
-            // }
-        }
-        if (searchMode) {
-            const mode = data[1];
-            if (mode == "doc") {
-                userMode.set(ctx.from.id, "document");
-                await ctx.reply(`Sucessfully Changed mode to: ${userMode.get(ctx.from.id)}`);
-                try {
-                    await ctx.api.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id);
+        const taskQueue = new TaskQueue();
+        const searchTask = () => new Promise(async (resolve) => {
+            var _a;
+            const calldata = ctx.update.callback_query.data;
+            const calladatanext = calldata.match(/\^next/);
+            const calladataprev = calldata.match(/\^prev/);
+            const calladatafile = calldata.match(/file/);
+            const searchMode = calldata.match(/\^toggle/);
+            const messageText = (_a = ctx.update.callback_query.message) === null || _a === void 0 ? void 0 : _a.text;
+            const searchTerm = extractSearchTerm(messageText);
+            const data = calldata.split("__");
+            ///below code is for nav button click
+            /////below code is for the file name button click
+            const file_unique_id = data[1];
+            if (calladatafile) {
+                const { filteredDocs } = await search_document_file_id(file_unique_id);
+                await ctx.answerCallbackQuery({
+                    text: `${filteredDocs.file_name}`,
+                    show_alert: true,
+                });
+                // if (filteredDocs.file_caption) {
+                //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_caption })
+                // } else {
+                //     await ctx.replyWithDocument(filteredDocs.file_id, { message_thread_id: file_thread_id, caption: filteredDocs.file_name })
+                // }
+            }
+            if (searchMode) {
+                const mode = data[1];
+                if (mode == "doc") {
+                    userMode.set(ctx.from.id, "document");
+                    await ctx.reply(`Sucessfully Changed mode to: ${userMode.get(ctx.from.id)}`);
+                    try {
+                        await ctx.api.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id);
+                    }
+                    catch (error) {
+                        console.log(error.message);
+                    }
                 }
-                catch (error) {
-                    console.log(error.message);
+                else if (mode == "vid") {
+                    userMode.set(ctx.from.id, "video");
+                    await ctx.reply(`Sucessfully Changed mode to: ${userMode.get(ctx.from.id)}`);
+                    try {
+                        await ctx.api.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id);
+                    }
+                    catch (error) {
+                        console.log(error.message);
+                    }
+                }
+                else if (mode == "aud") {
+                    userMode.set(ctx.from.id, "audio");
+                    await ctx.reply(`Sucessfully Changed mode to: ${userMode.get(ctx.from.id)}`);
+                    try {
+                        await ctx.api.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id);
+                    }
+                    catch (error) {
+                        console.log(error.message);
+                    }
+                }
+                return;
+            }
+            if (ctx.update.callback_query.message.entities[0].user.id == ctx.from.id) {
+                //checks if the same user is clicking the button
+                //get next page
+                if (calladatanext) {
+                    const page = Number(data[1]);
+                    const nextpage = page + 1;
+                    const inlineKeyboard = await keyboardlist(ctx, nextpage, searchTerm);
+                    await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
+                        reply_markup: inlineKeyboard,
+                        parse_mode: "HTML",
+                    });
+                }
+                //get prev page ;)
+                if (calladataprev) {
+                    const page = Number(data[1]);
+                    const prevpage = page - 1;
+                    const inlineKeyboard = await keyboardlist(ctx, prevpage, searchTerm);
+                    await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
+                        reply_markup: inlineKeyboard,
+                        parse_mode: "HTML",
+                    });
                 }
             }
-            else if (mode == "vid") {
-                userMode.set(ctx.from.id, "video");
-                await ctx.reply(`Sucessfully Changed mode to: ${userMode.get(ctx.from.id)}`);
-                try {
-                    await ctx.api.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id);
-                }
-                catch (error) {
-                    console.log(error.message);
-                }
-            }
-            else if (mode == "aud") {
-                userMode.set(ctx.from.id, "audio");
-                await ctx.reply(`Sucessfully Changed mode to: ${userMode.get(ctx.from.id)}`);
-                try {
-                    await ctx.api.deleteMessage(ctx.update.callback_query.message.chat.id, ctx.update.callback_query.message.message_id);
-                }
-                catch (error) {
-                    console.log(error.message);
-                }
-            }
-            return;
-        }
-        if (ctx.update.callback_query.message.entities[0].user.id == ctx.from.id) {
-            //checks if the same user is clicking the button
-            //get next page
-            if (calladatanext) {
-                const page = Number(data[1]);
-                const nextpage = page + 1;
-                const inlineKeyboard = await keyboardlist(ctx, nextpage, searchTerm);
-                await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
-                    reply_markup: inlineKeyboard,
-                    parse_mode: "HTML",
+            else {
+                await ctx.answerCallbackQuery({
+                    text: "Request for yourself 😊",
+                    show_alert: true,
                 });
             }
-            //get prev page ;)
-            if (calladataprev) {
-                const page = Number(data[1]);
-                const prevpage = page - 1;
-                const inlineKeyboard = await keyboardlist(ctx, prevpage, searchTerm);
-                await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
-                    reply_markup: inlineKeyboard,
-                    parse_mode: "HTML",
-                });
-            }
-        }
-        else {
-            await ctx.answerCallbackQuery({
-                text: "Request for yourself 😊",
-                show_alert: true,
-            });
-        }
+            resolve();
+        });
+        // Enqueue tasks
+        taskQueue.enqueue(searchTask);
+        // Execute tasks in the queue
+        taskQueue.execute().then(() => {
+            console.log("search call-back task executed");
+        });
     }
     catch (error) {
         console.log("Error in callback_query:data at UserComposer", error.message);
@@ -339,55 +398,6 @@ userComposer.chatType("private").command("mode", async (ctx, next) => {
     }
     await next();
 });
-class Queue {
-    constructor() {
-        this.items = [];
-    }
-    // Enqueue: Add an element to the end of the queue
-    enqueue(element) {
-        this.items.push(element);
-    }
-    // Dequeue: Remove an element from the front of the queue
-    dequeue() {
-        return this.items.shift();
-    }
-    // Peek: Get the front element of the queue without removing it
-    peek() {
-        return this.items[0];
-    }
-    // Check if the queue is empty
-    isEmpty() {
-        return this.items.length === 0;
-    }
-    // Get the size of the queue
-    size() {
-        return this.items.length;
-    }
-    // Clear the queue
-    clear() {
-        this.items = [];
-    }
-    // Print the queue
-    print() {
-        console.log(this.items.toString());
-    }
-}
-class TaskQueue extends Queue {
-    // Execute all tasks in the queue
-    async execute() {
-        while (!this.isEmpty()) {
-            const task = this.dequeue();
-            if (task) {
-                try {
-                    await task();
-                }
-                catch (error) {
-                    console.error("Error executing task:", error);
-                }
-            }
-        }
-    }
-}
 function hasFiveParts(inputString) {
     // Split the input string by spaces
     const parts = inputString.split(" ");
@@ -405,7 +415,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                         // Create a task queue
                         const taskQueue = new TaskQueue();
                         // Define some tasks
-                        const task1 = () => new Promise(async (resolve) => {
+                        const searchTask = () => new Promise(async (resolve) => {
                             var _a, _b, _c, _d;
                             setTimeout(async () => {
                                 try {
@@ -422,22 +432,22 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                                     reply_markup: inlineKeyboard,
                                     parse_mode: "HTML",
                                 });
-                                setTimeout(async () => {
-                                    try {
-                                        await ctx.api.deleteMessage(ctx.chat.id, message_id);
-                                    }
-                                    catch (error) {
-                                        console.log(error);
-                                    }
-                                }, msgDeleteTime);
                             }
                             else {
                                 await ctx.api.editMessageText((_d = ctx.from) === null || _d === void 0 ? void 0 : _d.id, message_id, "No media found");
                             }
+                            setTimeout(async () => {
+                                try {
+                                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                                }
+                                catch (error) {
+                                    console.log(error);
+                                }
+                            }, msgDeleteTime);
                             resolve();
                         });
                         // Enqueue tasks
-                        taskQueue.enqueue(task1);
+                        taskQueue.enqueue(searchTask);
                         // Execute tasks in the queue
                         taskQueue.execute().then(() => {
                             console.log("task executed");
