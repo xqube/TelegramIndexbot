@@ -415,15 +415,13 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                                     console.log(error);
                                 }
                             }, msgDeleteTime);
+                            const { message_id } = await ctx.reply("⏳");
                             const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
                             if (inlineKeyboard) {
-                                const { message_id } = await ctx.reply("⏳");
-                                if (inlineKeyboard) {
-                                    await ctx.api.editMessageText((_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id, message_id, `Hey <a href="tg://user?id=${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id}">${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
-                                        reply_markup: inlineKeyboard,
-                                        parse_mode: "HTML",
-                                    });
-                                }
+                                await ctx.api.editMessageText((_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id, message_id, `Hey <a href="tg://user?id=${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id}">${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
+                                    reply_markup: inlineKeyboard,
+                                    parse_mode: "HTML",
+                                });
                                 setTimeout(async () => {
                                     try {
                                         await ctx.api.deleteMessage(ctx.chat.id, message_id);

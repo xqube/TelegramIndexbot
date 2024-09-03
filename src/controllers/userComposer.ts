@@ -475,20 +475,18 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                     console.log(error);
                   }
                 }, msgDeleteTime);
+                const { message_id } = await ctx.reply("⏳");
                 const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
                 if (inlineKeyboard) {
-                  const { message_id } = await ctx.reply("⏳");
-                  if (inlineKeyboard) {
-                    await ctx.api.editMessageText(
-                      ctx.from?.id,
-                      message_id,
-                      `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
-                      {
-                        reply_markup: inlineKeyboard,
-                        parse_mode: "HTML",
-                      }
-                    );
-                  }
+                  await ctx.api.editMessageText(
+                    ctx.from?.id,
+                    message_id,
+                    `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
+                    {
+                      reply_markup: inlineKeyboard,
+                      parse_mode: "HTML",
+                    }
+                  );
                   setTimeout(async () => {
                     try {
                       await ctx.api.deleteMessage(ctx.chat.id, message_id);
