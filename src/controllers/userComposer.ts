@@ -14,6 +14,7 @@ import {
   cleanFileName,
   extractSearchTerm,
   keyboardlist,
+  removePAfterNumber,
   userMode,
 } from "../functions/helperFunc.js";
 
@@ -486,7 +487,8 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
       );
       if (["administrator", "creator", "member"].includes(isMember.status)) {
         if (userMode.get(ctx.from.id)) {
-          if (hasFiveParts(ctx.msg.text)) {
+          const text = removePAfterNumber(ctx.msg.text)
+          if (hasFiveParts(text)) {
             // Create a task queue
             const taskQueue = new TaskQueue();
             // Define some tasks
@@ -500,7 +502,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                   }
                 }, msgDeleteTime);
                 const { message_id } = await ctx.reply("⏳");
-                const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
+                const inlineKeyboard = await keyboardlist(ctx, 1, text);
                 if (inlineKeyboard) {
                   await ctx.api.editMessageText(
                     ctx.from?.id,
@@ -542,7 +544,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
               }
             }, msgDeleteTime);
             const { message_id } = await ctx.reply(
-              `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`,
+              `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04e01 1080p</code>`,
               {
                 parse_mode: "HTML",
                 reply_parameters: {

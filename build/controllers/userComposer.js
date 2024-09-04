@@ -1,7 +1,7 @@
 import { Composer } from "grammy";
 import { InlineKeyboard } from "grammy";
 import { insert_audio, insert_document, insert_user, insert_video, search_audio_file_id, search_document_file_id, search_video_file_id, } from "../functions/dbFunc.js";
-import { cleanFileName, extractSearchTerm, keyboardlist, userMode, } from "../functions/helperFunc.js";
+import { cleanFileName, extractSearchTerm, keyboardlist, removePAfterNumber, userMode, } from "../functions/helperFunc.js";
 export const notAuthorized = new Set();
 export const userComposer = new Composer();
 class Queue {
@@ -411,7 +411,8 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
             const isMember = await ctx.api.getChatMember(Number(process.env.CHECKMEMBER), ctx.from.id);
             if (["administrator", "creator", "member"].includes(isMember.status)) {
                 if (userMode.get(ctx.from.id)) {
-                    if (hasFiveParts(ctx.msg.text)) {
+                    const text = removePAfterNumber(ctx.msg.text);
+                    if (hasFiveParts(text)) {
                         // Create a task queue
                         const taskQueue = new TaskQueue();
                         // Define some tasks
@@ -426,7 +427,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                                 }
                             }, msgDeleteTime);
                             const { message_id } = await ctx.reply("⏳");
-                            const inlineKeyboard = await keyboardlist(ctx, 1, ctx.msg.text);
+                            const inlineKeyboard = await keyboardlist(ctx, 1, text);
                             if (inlineKeyboard) {
                                 await ctx.api.editMessageText((_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id, message_id, `Hey <a href="tg://user?id=${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id}">${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
                                     reply_markup: inlineKeyboard,
@@ -462,7 +463,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                                 console.log(error);
                             }
                         }, msgDeleteTime);
-                        const { message_id } = await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04 1080p</code>`, {
+                        const { message_id } = await ctx.reply(`Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04e01 1080p</code>`, {
                             parse_mode: "HTML",
                             reply_parameters: {
                                 message_id: ctx.msg.message_id,

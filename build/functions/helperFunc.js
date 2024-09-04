@@ -117,6 +117,9 @@ export function bytesToMegabytes(bytes) {
 //     cleanedFileName = cleanedFileName.replace(/\s{2,}/g, " ");
 //     return cleanedFileName;
 // }
+export function removePAfterNumber(str) {
+    return str.replace(/(\d+)p\b/g, '$1');
+}
 export function cleanFileName(fileName) {
     // Define a regular expression pattern to match characters to be removed
     const pattern = /[_.,\[\]\|\\\/\?\>\<\+\=\-\!\@\#\$\%\^\&\*\(\)\~\`\{\}\s]+/g;
@@ -133,5 +136,5 @@ export function extractSearchTerm(searchString) {
     const match = searchString.match(regexPattern);
     // Extract the term after "Searched For:"
     const termAfterSearchedFor = match ? match[1] : null;
-    return termAfterSearchedFor;
+    return termAfterSearchedFor ? removePAfterNumber(termAfterSearchedFor) : null;
 }
