@@ -134,7 +134,7 @@ export function bytesToMegabytes(bytes: number) {
 export function removeUnwanted(str: string) {
   return str
     .replace(/(\d+)p\b/g, '$1') // Remove 'p' after numbers
-    .replace(/\b(mkv|mp4|mp3|avi)\b/g, '').trim(); // Remove specified file extensions
+    .replace(/\b(mkv|mp4|mp3|avi|x264|x265|10bit)\b/g, '').trim(); // Remove specified file extensions
     // Optionally, you can also trim extra spaces after removal
 }
 
