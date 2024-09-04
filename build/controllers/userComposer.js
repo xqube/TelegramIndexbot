@@ -398,11 +398,11 @@ userComposer.chatType("private").command("mode", async (ctx, next) => {
     }
     await next();
 });
-function hasFiveParts(inputString) {
+function hasSevenParts(inputString) {
     // Split the input string by spaces
     const parts = inputString.split(" ");
     // Check if the length of the resulting array is 4
-    return parts.length <= 5;
+    return parts.length <= 7;
 }
 userComposer.chatType("private").on(":text", async (ctx, next) => {
     try {
@@ -412,12 +412,49 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
             if (["administrator", "creator", "member"].includes(isMember.status)) {
                 if (userMode.get(ctx.from.id)) {
                     const text = removeUnwanted(cleanFileName(ctx.msg.text));
-                    // if (hasFiveParts(text)) {
-                    // Create a task queue
-                    const taskQueue = new TaskQueue();
-                    // Define some tasks
-                    const searchTask = () => new Promise(async (resolve) => {
-                        var _a, _b, _c, _d;
+                    if (hasSevenParts(text)) {
+                        // Create a task queue
+                        const taskQueue = new TaskQueue();
+                        // Define some tasks
+                        const searchTask = () => new Promise(async (resolve) => {
+                            var _a, _b, _c, _d;
+                            setTimeout(async () => {
+                                try {
+                                    await ctx.deleteMessage();
+                                }
+                                catch (error) {
+                                    console.log(error);
+                                }
+                            }, msgDeleteTime);
+                            const { message_id } = await ctx.reply("⏳");
+                            const inlineKeyboard = await keyboardlist(ctx, 1, text);
+                            if (inlineKeyboard) {
+                                await ctx.api.editMessageText((_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id, message_id, `Hey <a href="tg://user?id=${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id}">${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
+                                    reply_markup: inlineKeyboard,
+                                    parse_mode: "HTML",
+                                });
+                            }
+                            else {
+                                await ctx.api.editMessageText((_d = ctx.from) === null || _d === void 0 ? void 0 : _d.id, message_id, "No media found");
+                            }
+                            setTimeout(async () => {
+                                try {
+                                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                                }
+                                catch (error) {
+                                    console.log(error);
+                                }
+                            }, msgDeleteTime);
+                            resolve();
+                        });
+                        // Enqueue tasks
+                        taskQueue.enqueue(searchTask);
+                        // Execute tasks in the queue
+                        taskQueue.execute().then(() => {
+                            console.log("task executed");
+                        });
+                    }
+                    else {
                         setTimeout(async () => {
                             try {
                                 await ctx.deleteMessage();
@@ -426,17 +463,12 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                                 console.log(error);
                             }
                         }, msgDeleteTime);
-                        const { message_id } = await ctx.reply("⏳");
-                        const inlineKeyboard = await keyboardlist(ctx, 1, text);
-                        if (inlineKeyboard) {
-                            await ctx.api.editMessageText((_a = ctx.from) === null || _a === void 0 ? void 0 : _a.id, message_id, `Hey <a href="tg://user?id=${(_b = ctx.from) === null || _b === void 0 ? void 0 : _b.id}">${(_c = ctx.from) === null || _c === void 0 ? void 0 : _c.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`, {
-                                reply_markup: inlineKeyboard,
-                                parse_mode: "HTML",
-                            });
-                        }
-                        else {
-                            await ctx.api.editMessageText((_d = ctx.from) === null || _d === void 0 ? void 0 : _d.id, message_id, "No media found");
-                        }
+                        const { message_id } = await ctx.reply(`Please limit your request to 7 words or less.\n\neg: <code>Money Heist s04e01 1080p</code>`, {
+                            parse_mode: "HTML",
+                            reply_parameters: {
+                                message_id: ctx.msg.message_id,
+                            },
+                        });
                         setTimeout(async () => {
                             try {
                                 await ctx.api.deleteMessage(ctx.chat.id, message_id);
@@ -445,39 +477,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
                                 console.log(error);
                             }
                         }, msgDeleteTime);
-                        resolve();
-                    });
-                    // Enqueue tasks
-                    taskQueue.enqueue(searchTask);
-                    // Execute tasks in the queue
-                    taskQueue.execute().then(() => {
-                        console.log("task executed");
-                    });
-                    // } else {
-                    //   setTimeout(async () => {
-                    //     try {
-                    //       await ctx.deleteMessage();
-                    //     } catch (error) {
-                    //       console.log(error);
-                    //     }
-                    //   }, msgDeleteTime);
-                    //   const { message_id } = await ctx.reply(
-                    //     `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04e01 1080p</code>`,
-                    //     {
-                    //       parse_mode: "HTML",
-                    //       reply_parameters: {
-                    //         message_id: ctx.msg.message_id,
-                    //       },
-                    //     }
-                    //   );
-                    //   setTimeout(async () => {
-                    //     try {
-                    //       await ctx.api.deleteMessage(ctx.chat.id, message_id);
-                    //     } catch (error) {
-                    //       console.log(error);
-                    //     }
-                    //   }, msgDeleteTime);
-                    // }
+                    }
                 }
                 else {
                     await ctx.reply("Please set your search mode using /mode");

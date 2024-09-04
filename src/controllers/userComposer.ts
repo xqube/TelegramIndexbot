@@ -466,12 +466,12 @@ userComposer.chatType("private").command("mode", async (ctx, next) => {
   await next();
 });
 
-function hasFiveParts(inputString: string): boolean {
+function hasSevenParts(inputString: string): boolean {
   // Split the input string by spaces
   const parts: string[] = inputString.split(" ");
 
   // Check if the length of the resulting array is 4
-  return parts.length <= 5;
+  return parts.length <= 7;
 }
 
 userComposer.chatType("private").on(":text", async (ctx, next) => {
@@ -488,7 +488,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
       if (["administrator", "creator", "member"].includes(isMember.status)) {
         if (userMode.get(ctx.from.id)) {
           const text = removeUnwanted(cleanFileName(ctx.msg.text));
-          // if (hasFiveParts(text)) {
+          if (hasSevenParts(text)) {
           // Create a task queue
           const taskQueue = new TaskQueue();
           // Define some tasks
@@ -535,31 +535,31 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
           taskQueue.execute().then(() => {
             console.log("task executed");
           });
-          // } else {
-          //   setTimeout(async () => {
-          //     try {
-          //       await ctx.deleteMessage();
-          //     } catch (error) {
-          //       console.log(error);
-          //     }
-          //   }, msgDeleteTime);
-          //   const { message_id } = await ctx.reply(
-          //     `Please limit your request to 5 words or less.\n\neg: <code>Money Heist s04e01 1080p</code>`,
-          //     {
-          //       parse_mode: "HTML",
-          //       reply_parameters: {
-          //         message_id: ctx.msg.message_id,
-          //       },
-          //     }
-          //   );
-          //   setTimeout(async () => {
-          //     try {
-          //       await ctx.api.deleteMessage(ctx.chat.id, message_id);
-          //     } catch (error) {
-          //       console.log(error);
-          //     }
-          //   }, msgDeleteTime);
-          // }
+          } else {
+            setTimeout(async () => {
+              try {
+                await ctx.deleteMessage();
+              } catch (error) {
+                console.log(error);
+              }
+            }, msgDeleteTime);
+            const { message_id } = await ctx.reply(
+              `Please limit your request to 7 words or less.\n\neg: <code>Money Heist s04e01 1080p</code>`,
+              {
+                parse_mode: "HTML",
+                reply_parameters: {
+                  message_id: ctx.msg.message_id,
+                },
+              }
+            );
+            setTimeout(async () => {
+              try {
+                await ctx.api.deleteMessage(ctx.chat.id, message_id);
+              } catch (error) {
+                console.log(error);
+              }
+            }, msgDeleteTime);
+          }
         } else {
           await ctx.reply("Please set your search mode using /mode");
         }
