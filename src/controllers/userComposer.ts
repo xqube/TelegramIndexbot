@@ -14,7 +14,7 @@ import {
   cleanFileName,
   extractSearchTerm,
   keyboardlist,
-  removePAfterNumber,
+  removeUnwanted,
   userMode,
 } from "../functions/helperFunc.js";
 
@@ -167,7 +167,7 @@ userComposer.on("callback_query:data", async (ctx: any) => {
             const inlineKeyboard = await keyboardlist(
               ctx,
               nextpage,
-              searchTerm
+              removeUnwanted(cleanFileName(searchTerm))
             );
             await ctx.editMessageText(
               `Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`,
@@ -184,7 +184,7 @@ userComposer.on("callback_query:data", async (ctx: any) => {
             const inlineKeyboard = await keyboardlist(
               ctx,
               prevpage,
-              searchTerm
+              removeUnwanted(cleanFileName(searchTerm))
             );
             await ctx.editMessageText(
               `Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`,
@@ -487,54 +487,54 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
       );
       if (["administrator", "creator", "member"].includes(isMember.status)) {
         if (userMode.get(ctx.from.id)) {
-          const text = removePAfterNumber(ctx.msg.text)
+          const text = removeUnwanted(cleanFileName(ctx.msg.text));
           // if (hasFiveParts(text)) {
-            // Create a task queue
-            const taskQueue = new TaskQueue();
-            // Define some tasks
-            const searchTask = (): Promise<void> =>
-              new Promise(async (resolve) => {
-                setTimeout(async () => {
-                  try {
-                    await ctx.deleteMessage();
-                  } catch (error) {
-                    console.log(error);
-                  }
-                }, msgDeleteTime);
-                const { message_id } = await ctx.reply("⏳");
-                const inlineKeyboard = await keyboardlist(ctx, 1, text);
-                if (inlineKeyboard) {
-                  await ctx.api.editMessageText(
-                    ctx.from?.id,
-                    message_id,
-                    `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
-                    {
-                      reply_markup: inlineKeyboard,
-                      parse_mode: "HTML",
-                    }
-                  );
-                } else {
-                  await ctx.api.editMessageText(
-                    ctx.from?.id,
-                    message_id,
-                    "No media found"
-                  );
+          // Create a task queue
+          const taskQueue = new TaskQueue();
+          // Define some tasks
+          const searchTask = (): Promise<void> =>
+            new Promise(async (resolve) => {
+              setTimeout(async () => {
+                try {
+                  await ctx.deleteMessage();
+                } catch (error) {
+                  console.log(error);
                 }
-                setTimeout(async () => {
-                  try {
-                    await ctx.api.deleteMessage(ctx.chat.id, message_id);
-                  } catch (error) {
-                    console.log(error);
+              }, msgDeleteTime);
+              const { message_id } = await ctx.reply("⏳");
+              const inlineKeyboard = await keyboardlist(ctx, 1, text);
+              if (inlineKeyboard) {
+                await ctx.api.editMessageText(
+                  ctx.from?.id,
+                  message_id,
+                  `Hey <a href="tg://user?id=${ctx.from?.id}">${ctx.from?.first_name}</a> , You Searched For: <code>${ctx.msg.text}</code>`,
+                  {
+                    reply_markup: inlineKeyboard,
+                    parse_mode: "HTML",
                   }
-                }, msgDeleteTime);
-                resolve();
-              });
-            // Enqueue tasks
-            taskQueue.enqueue(searchTask);
-            // Execute tasks in the queue
-            taskQueue.execute().then(() => {
-              console.log("task executed");
+                );
+              } else {
+                await ctx.api.editMessageText(
+                  ctx.from?.id,
+                  message_id,
+                  "No media found"
+                );
+              }
+              setTimeout(async () => {
+                try {
+                  await ctx.api.deleteMessage(ctx.chat.id, message_id);
+                } catch (error) {
+                  console.log(error);
+                }
+              }, msgDeleteTime);
+              resolve();
             });
+          // Enqueue tasks
+          taskQueue.enqueue(searchTask);
+          // Execute tasks in the queue
+          taskQueue.execute().then(() => {
+            console.log("task executed");
+          });
           // } else {
           //   setTimeout(async () => {
           //     try {

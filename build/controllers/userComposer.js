@@ -1,7 +1,7 @@
 import { Composer } from "grammy";
 import { InlineKeyboard } from "grammy";
 import { insert_audio, insert_document, insert_user, insert_video, search_audio_file_id, search_document_file_id, search_video_file_id, } from "../functions/dbFunc.js";
-import { cleanFileName, extractSearchTerm, keyboardlist, removePAfterNumber, userMode, } from "../functions/helperFunc.js";
+import { cleanFileName, extractSearchTerm, keyboardlist, removeUnwanted, userMode, } from "../functions/helperFunc.js";
 export const notAuthorized = new Set();
 export const userComposer = new Composer();
 class Queue {
@@ -121,7 +121,7 @@ userComposer.on("callback_query:data", async (ctx) => {
                 if (calladatanext) {
                     const page = Number(data[1]);
                     const nextpage = page + 1;
-                    const inlineKeyboard = await keyboardlist(ctx, nextpage, searchTerm);
+                    const inlineKeyboard = await keyboardlist(ctx, nextpage, removeUnwanted(cleanFileName(searchTerm)));
                     await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
                         reply_markup: inlineKeyboard,
                         parse_mode: "HTML",
@@ -131,7 +131,7 @@ userComposer.on("callback_query:data", async (ctx) => {
                 if (calladataprev) {
                     const page = Number(data[1]);
                     const prevpage = page - 1;
-                    const inlineKeyboard = await keyboardlist(ctx, prevpage, searchTerm);
+                    const inlineKeyboard = await keyboardlist(ctx, prevpage, removeUnwanted(cleanFileName(searchTerm)));
                     await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a> , You Searched For: <code>${searchTerm}</code>`, {
                         reply_markup: inlineKeyboard,
                         parse_mode: "HTML",
@@ -411,7 +411,7 @@ userComposer.chatType("private").on(":text", async (ctx, next) => {
             const isMember = await ctx.api.getChatMember(Number(process.env.CHECKMEMBER), ctx.from.id);
             if (["administrator", "creator", "member"].includes(isMember.status)) {
                 if (userMode.get(ctx.from.id)) {
-                    const text = removePAfterNumber(ctx.msg.text);
+                    const text = removeUnwanted(cleanFileName(ctx.msg.text));
                     // if (hasFiveParts(text)) {
                     // Create a task queue
                     const taskQueue = new TaskQueue();

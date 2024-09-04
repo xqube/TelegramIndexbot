@@ -131,9 +131,13 @@ export function bytesToMegabytes(bytes: number) {
 // }
 
 
-export function removePAfterNumber(str:string) {
-  return str.replace(/(\d+)p\b/g, '$1');
+export function removeUnwanted(str: string) {
+  return str
+    .replace(/(\d+)p\b/g, '$1') // Remove 'p' after numbers
+    .replace(/\b(mkv|mp4|mp3|avi)\b/g, '').trim(); // Remove specified file extensions
+    // Optionally, you can also trim extra spaces after removal
 }
+
 
 export function cleanFileName(fileName: any): string {
   // Define a regular expression pattern to match characters to be removed
@@ -152,5 +156,6 @@ export function extractSearchTerm(searchString: string) {
   const match = searchString.match(regexPattern);
   // Extract the term after "Searched For:"
   const termAfterSearchedFor = match ? match[1] : null;
-  return termAfterSearchedFor ? removePAfterNumber(termAfterSearchedFor) : null;
+  return termAfterSearchedFor;
 }
+
