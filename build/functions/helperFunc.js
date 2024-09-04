@@ -119,9 +119,9 @@ export function bytesToMegabytes(bytes) {
 // }
 export function removeUnwanted(str) {
     return str
-        .replace(/(\d+)p\b/g, '$1') // Remove 'p' after numbers
-        .replace(/\b(mkv|mp4|mp3|avi|x264|x265|10bit)\b/g, '').trim(); // Remove specified file extensions
-    // Optionally, you can also trim extra spaces after removal
+        .replace(/(\d+)p\b/gi, '$1') // Remove 'p' after numbers
+        .replace(/\b(mkv|mp4|mp3|avi|x264|x265|10bit|h\s?265|h\s?264|web\srip|web\sdl)\b/gi, '') // Remove specified file extensions, with optional spaces, case-insensitive
+        .trim(); // Remove extra spaces after removal
 }
 export function cleanFileName(fileName) {
     // Define a regular expression pattern to match characters to be removed
