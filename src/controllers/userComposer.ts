@@ -77,9 +77,9 @@ class TaskQueue extends Queue<() => Promise<void>> {
   }
 }
 
-userComposer.on("callback_query:data", async (ctx:any) => {
+userComposer.on("callback_query:data", async (ctx: any) => {
   try {
-    if (ctx.msg?.date > Date.now() / 1000 - 3600) {
+    if (ctx.msg?.date > Math.floor(Date.now() / 1000) - 3600) {
       const taskQueue = new TaskQueue();
 
       const searchTask = (): Promise<void> =>
@@ -431,11 +431,11 @@ userComposer.chatType("private").command("mode", async (ctx, next) => {
   try {
     const keyboard = new InlineKeyboard();
     keyboard
-      .text("Document", `^toggle__doc`)
+      .text("Document", `^toggle::doc`)
       .row()
-      .text("Video", `^toggle__vid`)
+      .text("Video", `^toggle::vid`)
       .row()
-      .text("Audio", `^toggle__aud`)
+      .text("Audio", `^toggle::aud`)
       .row();
     let State = userMode.get(ctx.from.id);
     await ctx.reply(
