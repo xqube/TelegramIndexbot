@@ -74,17 +74,17 @@ userComposer.on("callback_query:data", async (ctx) => {
                     const file_unique_id = data[1];
                     if (filetype == "doc") {
                         await ctx.answerCallbackQuery({
-                            url: `https://t.me/${process.env.BOT_USERNAME}?start=doc::${file_unique_id}`,
+                            url: `t.me/${process.env.BOT_USERNAME}?start=doc-_-${file_unique_id}`,
                         });
                     }
                     else if (filetype == "vid") {
                         await ctx.answerCallbackQuery({
-                            url: `https://t.me/${process.env.BOT_USERNAME}?start=vid::${file_unique_id}`,
+                            url: `t.me/${process.env.BOT_USERNAME}?start=vid-_-${file_unique_id}`,
                         });
                     }
                     else if (filetype == "aud") {
                         await ctx.answerCallbackQuery({
-                            url: `https://t.me/${process.env.BOT_USERNAME}?start=aud::${file_unique_id}`,
+                            url: `t.me/${process.env.BOT_USERNAME}?start=aud-_-${file_unique_id}`,
                         });
                     }
                     if (calladatafile) {
@@ -151,7 +151,7 @@ userComposer.chatType("private").command("start", async (ctx) => {
         if (ctx.match) {
             const isMember = await ctx.api.getChatMember(Number(process.env.CHECKMEMBER), ctx.from.id);
             if (["administrator", "creator", "member"].includes(isMember.status)) {
-                const parts = ctx.match.split("::");
+                const parts = ctx.match.split("-_-");
                 const file_unique_id = parts[1];
                 const type = parts[0];
                 if (type == "doc") {
