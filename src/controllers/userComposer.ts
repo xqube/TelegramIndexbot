@@ -148,7 +148,7 @@ userComposer.on("callback_query:data", async (ctx: any) => {
                 { reply_markup: inlineKeyboard, parse_mode: "HTML" }
               );
             } else if (nulldata) {
-              return;
+              return null;
             }
           } else {
             await ctx.answerCallbackQuery({
