@@ -96,6 +96,7 @@ userComposer.on("callback_query:data", async (ctx) => {
                     }
                     else if (nulldata) {
                         resolve();
+                        console.log("got here");
                     }
                 }
                 else {

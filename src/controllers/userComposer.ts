@@ -149,6 +149,8 @@ userComposer.on("callback_query:data", async (ctx: any) => {
               );
             } else if (nulldata) {
               resolve();
+              console.log("got here");
+              
             }
           } else {
             await ctx.answerCallbackQuery({
