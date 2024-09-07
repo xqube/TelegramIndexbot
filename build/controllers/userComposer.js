@@ -95,8 +95,9 @@ userComposer.on("callback_query:data", async (ctx) => {
                         await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a>, You Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML" });
                     }
                     else if (nulldata) {
-                        resolve();
-                        console.log("got here");
+                        await ctx.answerCallbackQuery({
+                            text: "Don't touch on everything you see.👻",
+                        });
                     }
                 }
                 else {
