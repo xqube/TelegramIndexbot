@@ -54,9 +54,9 @@ class TaskQueue extends Queue {
     }
 }
 userComposer.on("callback_query:data", async (ctx) => {
-    var _a, _b;
+    var _a;
     try {
-        if (((_a = ctx.msg) === null || _a === void 0 ? void 0 : _a.date) > ((_b = ctx.msg) === null || _b === void 0 ? void 0 : _b.date) - 3600) {
+        if (((_a = ctx.msg) === null || _a === void 0 ? void 0 : _a.date) > (Date.now() / 1000) - 3600) {
             const taskQueue = new TaskQueue();
             const searchTask = () => new Promise(async (resolve, reject) => {
                 var _a;

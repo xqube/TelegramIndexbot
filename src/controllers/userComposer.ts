@@ -77,9 +77,9 @@ class TaskQueue extends Queue<() => Promise<void>> {
   }
 }
 
-userComposer.on("callback_query:data", async (ctx:any) => {
+userComposer.on("callback_query:data", async (ctx: any) => {
   try {
-    if (ctx.msg?.date > ctx.msg?.date - 3600) {
+    if (ctx.msg?.date > (Date.now()/1000)-3600) {
       const taskQueue = new TaskQueue();
 
       const searchTask = (): Promise<void> =>
