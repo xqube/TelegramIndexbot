@@ -63,6 +63,7 @@ userComposer.on("callback_query:data", async (ctx) => {
                 const calladatanext = calldata.match(/\^next/);
                 const calladataprev = calldata.match(/\^prev/);
                 const calladatafile = calldata.match(/file/);
+                const nulldata = calldata.match(/null/);
                 const searchMode = calldata.match(/\^toggle/);
                 const messageText = (_a = ctx.update.callback_query.message) === null || _a === void 0 ? void 0 : _a.text;
                 const searchTerm = extractSearchTerm(messageText);
@@ -92,6 +93,9 @@ userComposer.on("callback_query:data", async (ctx) => {
                         const page = Number(data[1]) - 1;
                         const inlineKeyboard = await keyboardlist(ctx, page, removeUnwanted(cleanFileName(searchTerm)));
                         await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a>, You Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML" });
+                    }
+                    else if (nulldata) {
+                        return;
                     }
                 }
                 else {

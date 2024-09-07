@@ -88,6 +88,7 @@ userComposer.on("callback_query:data", async (ctx: any) => {
           const calladatanext = calldata.match(/\^next/);
           const calladataprev = calldata.match(/\^prev/);
           const calladatafile = calldata.match(/file/);
+          const nulldata = calldata.match(/null/);
           const searchMode = calldata.match(/\^toggle/);
           const messageText = ctx.update.callback_query.message?.text;
           const searchTerm: any = extractSearchTerm(messageText!);
@@ -146,6 +147,8 @@ userComposer.on("callback_query:data", async (ctx: any) => {
                 `Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a>, You Searched For: <code>${searchTerm}</code>`,
                 { reply_markup: inlineKeyboard, parse_mode: "HTML" }
               );
+            } else if (nulldata) {
+              return;
             }
           } else {
             await ctx.answerCallbackQuery({

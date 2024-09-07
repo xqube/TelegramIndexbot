@@ -40,7 +40,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string) {
       } else if (page > 1 && page < totalPages) {
         inlineKeyboard
           .text("<<Prev", `^prev__${page}`)
-          .text(`${page}/${totalPages}📄`)
+          .text(`${page}/${totalPages}📄`, "null")
           .text("Next>>", `^next__${page}`)
           .row();
       } else if (page == totalPages && page != 1) {
@@ -71,7 +71,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string) {
       } else if (page > 1 && page < totalPages) {
         inlineKeyboard
           .text("<<Prev", `^prev__${page}`)
-          .text(`${page}/${totalPages}📄`)
+          .text(`${page}/${totalPages}📄`,"null")
           .text("Next>>", `^next__${page}`)
           .row();
       } else if (page == totalPages && page != 1) {
@@ -102,7 +102,7 @@ export async function keyboardlist(ctx: any, page: number, searchTerm: string) {
       } else if (page > 1 && page < totalPages) {
         inlineKeyboard
           .text("<<Prev", `^prev__${page}`)
-          .text(`${page}/${totalPages}📄`)
+          .text(`${page}/${totalPages}📄`, "null")
           .text("Next>>", `^next__${page}`)
           .row();
       } else if (page == totalPages && page != 1) {
