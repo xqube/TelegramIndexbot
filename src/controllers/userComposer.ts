@@ -77,9 +77,9 @@ class TaskQueue extends Queue<() => Promise<void>> {
   }
 }
 
-userComposer.on("callback_query:data", async (ctx: any) => {
+userComposer.on("callback_query:data", async (ctx:any) => {
   try {
-    if (ctx.msg?.date > (Date.now()/1000)-3600) {
+    if (ctx.msg?.date > Date.now() / 1000 - 3600) {
       const taskQueue = new TaskQueue();
 
       const searchTask = (): Promise<void> =>
@@ -93,9 +93,24 @@ userComposer.on("callback_query:data", async (ctx: any) => {
             const searchMode = calldata.match(/\^toggle/);
             const messageText = ctx.update.callback_query.message?.text;
             const searchTerm: any = extractSearchTerm(messageText!);
-            const data = calldata.split("__");
+            const data = calldata.split("::");
 
+            const filetype = data[0];
             const file_unique_id = data[1];
+
+            if (filetype == "doc") {
+              await ctx.answerCallbackQuery({
+                url: `https://t.me/${process.env.BOT_USERNAME}?start=doc::${file_unique_id}`,
+              });
+            } else if (filetype == "vid") {
+              await ctx.answerCallbackQuery({
+                url: `https://t.me/${process.env.BOT_USERNAME}?start=vid::${file_unique_id}`,
+              });
+            } else if (filetype == "aud") {
+              await ctx.answerCallbackQuery({
+                url: `https://t.me/${process.env.BOT_USERNAME}?start=aud::${file_unique_id}`,
+              });
+            }
 
             if (calladatafile) {
               const { filteredDocs } = await search_document_file_id(
@@ -149,9 +164,7 @@ userComposer.on("callback_query:data", async (ctx: any) => {
                   { reply_markup: inlineKeyboard, parse_mode: "HTML" }
                 );
               } else if (nulldata) {
-                await ctx.answerCallbackQuery({
-                  text: "Don't touch on everything you see.👻",
-                });
+                await ctx.answerCallbackQuery();
               }
             } else {
               await ctx.answerCallbackQuery({
@@ -195,7 +208,7 @@ userComposer.chatType("private").command("start", async (ctx) => {
       );
 
       if (["administrator", "creator", "member"].includes(isMember.status)) {
-        const parts = ctx.match.split("_-_");
+        const parts = ctx.match.split("::");
         const file_unique_id = parts[1];
         const type = parts[0];
         if (type == "doc") {

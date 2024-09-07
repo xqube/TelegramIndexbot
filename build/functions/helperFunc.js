@@ -18,23 +18,23 @@ export async function keyboardlist(ctx, page, searchTerm) {
                 filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text(doc.file_name, `file__${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
-                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=doc_-_${doc.file_unique_id}`)
+                        .text(doc.file_name, `file::${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
+                        .text(file_size.toFixed(1) + "MB 📩", `doc::${doc.file_unique_id}`)
                         .row();
                 });
             }
             if (page == 1 && page < totalPages) {
-                inlineKeyboard.text("Next>>", `^next__${page}`).row();
+                inlineKeyboard.text("Next>>", `^next::${page}`).row();
             }
             else if (page > 1 && page < totalPages) {
                 inlineKeyboard
-                    .text("<<Prev", `^prev__${page}`)
+                    .text("<<Prev", `^prev::${page}`)
                     .text(`${page}/${totalPages}📄`, "null")
-                    .text("Next>>", `^next__${page}`)
+                    .text("Next>>", `^next::${page}`)
                     .row();
             }
             else if (page == totalPages && page != 1) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}`).row();
+                inlineKeyboard.text("<<Prev", `^prev::${page}`).row();
             }
             return inlineKeyboard;
         }
@@ -49,23 +49,23 @@ export async function keyboardlist(ctx, page, searchTerm) {
                 filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text(doc.file_name, `file__${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
-                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=vid_-_${doc.file_unique_id}`)
+                        .text(doc.file_name, `file::${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
+                        .text(file_size.toFixed(1) + "MB 📩", `vid::${doc.file_unique_id}`)
                         .row();
                 });
             }
             if (page == 1 && page < totalPages) {
-                inlineKeyboard.text("Next>>", `^next__${page}`).row();
+                inlineKeyboard.text("Next>>", `^next::${page}`).row();
             }
             else if (page > 1 && page < totalPages) {
                 inlineKeyboard
-                    .text("<<Prev", `^prev__${page}`)
+                    .text("<<Prev", `^prev::${page}`)
                     .text(`${page}/${totalPages}📄`, "null")
-                    .text("Next>>", `^next__${page}`)
+                    .text("Next>>", `^next::${page}`)
                     .row();
             }
             else if (page == totalPages && page != 1) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}`).row();
+                inlineKeyboard.text("<<Prev", `^prev::${page}`).row();
             }
             return inlineKeyboard;
         }
@@ -80,23 +80,23 @@ export async function keyboardlist(ctx, page, searchTerm) {
                 filteredDocs.map(async (doc) => {
                     const file_size = bytesToMegabytes(doc.file_size);
                     inlineKeyboard
-                        .text(doc.file_name, `file__${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
-                        .url(file_size.toFixed(1) + "MB 📩", `https://t.me/${process.env.BOT_USERNAME}?start=aud_-_${doc.file_unique_id}`)
+                        .text(doc.file_name, `file::${doc.file_unique_id}`) //changed it to __ coz fileid can have an underscore
+                        .text(file_size.toFixed(1) + "MB 📩", `aud::${doc.file_unique_id}`)
                         .row();
                 });
             }
             if (page == 1 && page < totalPages) {
-                inlineKeyboard.text("Next>>", `^next__${page}`).row();
+                inlineKeyboard.text("Next>>", `^next::${page}`).row();
             }
             else if (page > 1 && page < totalPages) {
                 inlineKeyboard
-                    .text("<<Prev", `^prev__${page}`)
+                    .text("<<Prev", `^prev::${page}`)
                     .text(`${page}/${totalPages}📄`, "null")
-                    .text("Next>>", `^next__${page}`)
+                    .text("Next>>", `^next::${page}`)
                     .row();
             }
             else if (page == totalPages && page != 1) {
-                inlineKeyboard.text("<<Prev", `^prev__${page}`).row();
+                inlineKeyboard.text("<<Prev", `^prev::${page}`).row();
             }
             return inlineKeyboard;
         }

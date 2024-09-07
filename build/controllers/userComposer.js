@@ -56,7 +56,7 @@ class TaskQueue extends Queue {
 userComposer.on("callback_query:data", async (ctx) => {
     var _a;
     try {
-        if (((_a = ctx.msg) === null || _a === void 0 ? void 0 : _a.date) > (Date.now() / 1000) - 3600) {
+        if (((_a = ctx.msg) === null || _a === void 0 ? void 0 : _a.date) > Date.now() / 1000 - 3600) {
             const taskQueue = new TaskQueue();
             const searchTask = () => new Promise(async (resolve, reject) => {
                 var _a;
@@ -69,8 +69,24 @@ userComposer.on("callback_query:data", async (ctx) => {
                     const searchMode = calldata.match(/\^toggle/);
                     const messageText = (_a = ctx.update.callback_query.message) === null || _a === void 0 ? void 0 : _a.text;
                     const searchTerm = extractSearchTerm(messageText);
-                    const data = calldata.split("__");
+                    const data = calldata.split("::");
+                    const filetype = data[0];
                     const file_unique_id = data[1];
+                    if (filetype == "doc") {
+                        await ctx.answerCallbackQuery({
+                            url: `https://t.me/${process.env.BOT_USERNAME}?start=doc::${file_unique_id}`,
+                        });
+                    }
+                    else if (filetype == "vid") {
+                        await ctx.answerCallbackQuery({
+                            url: `https://t.me/${process.env.BOT_USERNAME}?start=vid::${file_unique_id}`,
+                        });
+                    }
+                    else if (filetype == "aud") {
+                        await ctx.answerCallbackQuery({
+                            url: `https://t.me/${process.env.BOT_USERNAME}?start=aud::${file_unique_id}`,
+                        });
+                    }
                     if (calladatafile) {
                         const { filteredDocs } = await search_document_file_id(file_unique_id);
                         await ctx.answerCallbackQuery({
@@ -97,9 +113,7 @@ userComposer.on("callback_query:data", async (ctx) => {
                             await ctx.editMessageText(`Hey <a href="tg://user?id=${ctx.update.callback_query.message.entities[0].user.id}">${ctx.update.callback_query.message.entities[0].user.first_name}</a>, You Searched For: <code>${searchTerm}</code>`, { reply_markup: inlineKeyboard, parse_mode: "HTML" });
                         }
                         else if (nulldata) {
-                            await ctx.answerCallbackQuery({
-                                text: "Don't touch on everything you see.👻",
-                            });
+                            await ctx.answerCallbackQuery();
                         }
                     }
                     else {
@@ -137,7 +151,7 @@ userComposer.chatType("private").command("start", async (ctx) => {
         if (ctx.match) {
             const isMember = await ctx.api.getChatMember(Number(process.env.CHECKMEMBER), ctx.from.id);
             if (["administrator", "creator", "member"].includes(isMember.status)) {
-                const parts = ctx.match.split("_-_");
+                const parts = ctx.match.split("::");
                 const file_unique_id = parts[1];
                 const type = parts[0];
                 if (type == "doc") {
