@@ -112,8 +112,24 @@ userComposer.on("callback_query:data", async (ctx: any) => {
               });
             }
 
-            if (calladatafile) {
+            if (calladatafile && searchMode === "document") {
               const { filteredDocs } = await search_document_file_id(
+                file_unique_id
+              );
+              await ctx.answerCallbackQuery({
+                text: `${filteredDocs.file_name}`,
+                show_alert: true,
+              });
+            }else if (calladatafile && searchMode === "video") {
+              const { filteredDocs } = await search_video_file_id(
+                file_unique_id
+              );
+              await ctx.answerCallbackQuery({
+                text: `${filteredDocs.file_name}`,
+                show_alert: true,
+              });
+            }else if (calladatafile && searchMode === "audio") {
+              const { filteredDocs } = await search_audio_file_id(
                 file_unique_id
               );
               await ctx.answerCallbackQuery({
