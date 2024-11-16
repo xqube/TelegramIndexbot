@@ -31,7 +31,7 @@ process.once("SIGTERM", () => {
     mongoclient.close()
 });
 
-bot.start({ drop_pending_updates: true });
+bot.start();
 
 
 bot.catch(async (err) => {

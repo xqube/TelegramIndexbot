@@ -20,7 +20,7 @@ process.once("SIGTERM", () => {
     bot.stop();
     mongoclient.close();
 });
-bot.start({ drop_pending_updates: true });
+bot.start();
 bot.catch(async (err) => {
     const ctx = err.ctx;
     console.error(`Error while handling update ${ctx.update.update_id}:`);
